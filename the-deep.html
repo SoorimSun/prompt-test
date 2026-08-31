@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>심연 — 지구에서 가장 깊은 곳까지, 10,935 미터</title>
+<meta name="description" content="스크롤이 곧 잠수. 밝은 수면에서 챌린저 해연 10,935미터까지 내려가는 세로 여행. 하나의 HTML 파일로 만든 인터랙티브 심해 체험.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23041a24'/><circle cx='32' cy='34' r='7' fill='%237FF7E3'/><circle cx='32' cy='34' r='14' fill='none' stroke='%237FF7E3' stroke-opacity='.35'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#04222c;          /* 밝은 물 위의 잉크 */
+  --ink-soft:#0a4a55;
+  --lite:#d5e9ea;         /* 어두운 물 위의 글자 */
+  --lite-dim:#9cc6cc;
+  --lite-faint:#79b8be;
+  --accent:#7ff7e3;       /* 생물 발광 */
+  --mono:'IBM Plex Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
+  --disp:'Noto Serif KR',serif;
+  --body:'Gowun Batang','Noto Serif KR','Batang',serif;
+  --ease:cubic-bezier(.22,.9,.28,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:var(--body);
+  color:var(--lite);
+  /* JS가 꺼져 있을 때의 정적 폴백 배경 */
+  background:linear-gradient(180deg,#7cd0c9 0,#35959a 6%,#125264 14%,#06263f 30%,#000204 62%);
+  overflow-x:hidden;
+}
+::selection{background:#7ff7e3;color:#04222c}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:#010509}
+::-webkit-scrollbar-thumb{background:rgba(127,200,200,.28);border-radius:6px}
+@supports (scrollbar-color: red blue){ html{scrollbar-color:rgba(127,200,200,.35) #010509} }
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+/* ── 바다 캔버스 ─────────────────────────── */
+#sea{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.vignette{
+  position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(120% 92% at 50% 44%, transparent 56%, rgba(0,4,10,.38) 100%);
+}
+main,footer{position:relative;z-index:1}
+
+/* ── 잠수 계기 (데스크톱) ─────────────────── */
+.gauge{
+  position:fixed;right:22px;top:50%;transform:translateY(-50%);
+  z-index:10;width:138px;padding:16px 16px 14px;
+  background:rgba(2,18,26,.34);
+  -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);
+  border:1px solid rgba(159,242,224,.16);border-radius:12px;
+  font-family:var(--mono);color:#d8eef0;
+  box-shadow:0 8px 30px rgba(0,6,12,.25);
+}
+.g-label{font-size:9px;letter-spacing:.22em;color:#7fb9bf;text-transform:uppercase}
+.g-depth{font-size:21px;font-weight:500;font-variant-numeric:tabular-nums;margin-top:4px;line-height:1.1}
+.g-depth .g-unit{font-size:10px;color:#9cc6cc;margin-left:4px;font-weight:400}
+.g-rail{position:relative;height:132px;margin:14px 2px 10px;border-left:1px solid rgba(159,242,224,.28)}
+.g-rail i{position:absolute;left:0;width:7px;height:1px;background:rgba(159,242,224,.4)}
+.g-rail b{position:absolute;left:10px;font-weight:400;font-size:8.5px;color:#6fa8af;white-space:nowrap;transform:translateY(-50%)}
+.g-mark{
+  position:absolute;left:-3.5px;width:8px;height:8px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 10px rgba(127,247,227,.9);
+  transform:translateY(-50%);top:0;
+}
+.g-rows{display:grid;gap:7px;border-top:1px solid rgba(159,242,224,.14);padding-top:10px}
+.g-rows>div{display:flex;justify-content:space-between;align-items:baseline}
+.g-rows dt{font-size:9px;letter-spacing:.14em;color:#7fb9bf}
+.g-rows dd{margin:0;font-size:11.5px;font-variant-numeric:tabular-nums}
+
+/* ── 모바일 HUD ─────────────────────────── */
+.hud{
+  display:none;position:fixed;top:14px;right:14px;z-index:10;
+  font-family:var(--mono);font-size:12px;color:#d8eef0;
+  background:rgba(2,18,26,.4);-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);
+  border:1px solid rgba(159,242,224,.18);border-radius:99px;
+  padding:7px 13px;font-variant-numeric:tabular-nums;
+  opacity:0;transition:opacity .5s var(--ease);
+}
+.hud.show{opacity:1}
+.hud .h-zone{color:#9cc6cc;margin-left:8px;font-size:11px}
+@media (max-width:899px){ .hud{display:block} .gauge{display:none} }
+
+/* ── 히어로 : 수면 ─────────────────────────── */
+.hero{
+  min-height:100vh;min-height:100svh;
+  display:grid;place-content:center;justify-items:center;text-align:center;
+  padding:6rem 1.5rem 4rem;color:var(--ink);
+}
+.h-eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.3em;
+  color:var(--ink-soft);text-transform:uppercase;margin:0 0 2.4rem;
+}
+.hero h1{
+  margin:0;font-family:var(--disp);font-weight:900;
+  font-size:clamp(5rem,19vw,12.5rem);line-height:1.02;letter-spacing:.06em;
+  background:linear-gradient(180deg,#032b34 20%,#0a5560 90%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:#04303a;
+}
+.h-en{
+  font-family:var(--mono);font-size:clamp(9px,1.4vw,12px);letter-spacing:.46em;
+  color:#0e5560;margin:1.6rem 0 0;text-transform:uppercase;
+}
+.h-sub{
+  max-width:30.5rem;font-size:1.06rem;line-height:2.05;color:#093e49;
+  margin:2.6rem 0 3rem;
+}
+.h-go{
+  font-family:var(--mono);font-size:12px;letter-spacing:.28em;text-transform:uppercase;
+  color:#063842;background:transparent;border:1px solid rgba(6,56,66,.5);
+  padding:.95em 1.9em .95em 2.2em;border-radius:99px;cursor:pointer;
+  transition:background .35s var(--ease),transform .35s var(--ease);
+}
+.h-go:hover{background:rgba(255,255,255,.3);transform:translateY(1px)}
+.h-go span{display:inline-block;margin-left:.6em;animation:bob 2.4s var(--ease) infinite}
+@keyframes bob{0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}
+
+/* 히어로 등장 */
+.js .hero>*{opacity:0;animation:rise 1.1s var(--ease) forwards}
+.js .h-eyebrow{animation-delay:.15s}
+.js .hero h1{animation-delay:.3s}
+.js .h-en{animation-delay:.55s}
+.js .h-sub{animation-delay:.75s}
+.js .h-go{animation-delay:.95s}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+/* ── 해구(존) 섹션 ─────────────────────────── */
+.zone{padding:26vh 0}
+.copy{
+  position:relative;max-width:34rem;
+  margin-left:clamp(1.5rem,9vw,10rem);
+  margin-right:clamp(1.5rem,6vw,7rem);
+}
+.alt{margin-left:auto}
+.marker{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--lite-faint);
+  display:flex;align-items:center;gap:1em;flex-wrap:wrap;margin:0 0 1.1rem;
+}
+.marker::before{content:"";width:2.6rem;height:1px;background:rgba(159,242,224,.5)}
+.zone h2{
+  margin:0 0 1.7rem;font-family:var(--disp);font-weight:900;
+  font-size:clamp(2.3rem,5.6vw,4rem);line-height:1.18;color:#eef8f8;
+  text-shadow:0 2px 30px rgba(0,10,16,.5);
+}
+.body{margin:0;font-size:1.07rem;line-height:2.08;color:var(--lite)}
+.obs{
+  margin:2.4rem 0 0;font-family:var(--mono);font-size:12.5px;line-height:1.8;
+  color:#a9d6d4;border-left:1px solid rgba(127,247,227,.45);
+  padding-left:1.05rem;display:flex;gap:.8em;align-items:baseline;
+}
+.obs .tag{color:#6fa8af;letter-spacing:.18em;font-size:10px;white-space:nowrap;text-transform:uppercase}
+.obs i{
+  width:5px;height:5px;border-radius:50%;background:var(--accent);flex:none;
+  align-self:center;animation:obsPulse 2.8s ease-in-out infinite;
+}
+@keyframes obsPulse{0%,100%{opacity:.35}50%{opacity:1}}
+
+/* 표층대의 빛 속 텍스트 보호용 베일 */
+.veil::before{
+  content:"";position:absolute;z-index:-1;inset:-16% -34%;
+  background:radial-gradient(58% 55% at 50% 50%, rgba(2,16,26,.6), rgba(2,16,26,.32) 52%, transparent 76%);
+}
+
+/* ── 챌린저 해연 ─────────────────────────── */
+.final{
+  min-height:100vh;min-height:100svh;
+  display:grid;place-content:center;text-align:center;padding:14vh 1.5rem;
+}
+.final .copy{margin-inline:auto;max-width:38rem}
+.final .marker{justify-content:center}
+.final .marker::after{content:"";width:2.6rem;height:1px;background:rgba(159,242,224,.5)}
+.f-num{
+  margin:0 0 1.4rem;font-family:var(--disp);font-weight:900;
+  font-size:clamp(3.4rem,11vw,8rem);line-height:1;color:#f2fcfa;
+  font-variant-numeric:tabular-nums;letter-spacing:.02em;
+  text-shadow:0 0 52px rgba(127,247,227,.32);
+  animation:breathe 6s ease-in-out infinite;
+}
+@keyframes breathe{
+  0%,100%{text-shadow:0 0 40px rgba(127,247,227,.22)}
+  50%{text-shadow:0 0 66px rgba(127,247,227,.44)}
+}
+.f-cap{font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:#8fd0cc;text-transform:uppercase;margin:0 0 2.6rem}
+.final .body{text-align:center;max-width:30rem;margin-inline:auto}
+
+/* ── 푸터 ─────────────────────────── */
+footer{
+  padding:4.5rem 1.5rem 6rem;text-align:center;
+  font-family:var(--mono);font-size:11px;line-height:2.1;color:#5e8a93;
+}
+.btn-top{
+  margin-top:1.8rem;display:inline-block;
+  font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+  color:#bfe6e4;background:transparent;border:1px solid rgba(159,242,224,.4);
+  padding:.9em 1.9em .9em 2.2em;border-radius:99px;cursor:pointer;
+  transition:background .35s var(--ease);
+}
+.btn-top:hover{background:rgba(127,247,227,.1)}
+.btn-top span{display:inline-block;margin-left:.6em}
+
+/* ── 스크롤 등장 ─────────────────────────── */
+.js .copy{opacity:0;transform:translateY(26px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.js .copy.in{opacity:1;transform:none}
+
+/* ── 반응형 ─────────────────────────── */
+@media (max-width:899px){
+  .copy{margin-left:clamp(1.4rem,7vw,4rem);margin-right:clamp(1.4rem,7vw,4rem)}
+  .zone{padding:20vh 0}
+}
+
+/* ── 모션 최소화 ─────────────────────────── */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .js .hero>*{animation:none;opacity:1;transform:none}
+  .js .copy{transition:none;opacity:1;transform:none}
+  .h-go span,.obs i,.f-num{animation:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="sea" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+
+<aside class="gauge" aria-hidden="true">
+  <div class="g-label">Depth · 수심</div>
+  <div class="g-depth"><span id="gDepth">0</span><span class="g-unit">m</span></div>
+  <div class="g-rail" id="gRail"><i class="g-mark" id="gMark"></i></div>
+  <dl class="g-rows">
+    <div><dt>수압</dt><dd id="gPress">1 기압</dd></div>
+    <div><dt>수온</dt><dd id="gTemp">24.0 °C</dd></div>
+    <div><dt>층</dt><dd id="gZone">표층대</dd></div>
+  </dl>
+</aside>
+
+<div class="hud" aria-hidden="true"><span id="hDepth">0 m</span><span class="h-zone" id="hZone">표층대</span></div>
+
+<main>
+  <header class="hero" id="top" data-depth="0">
+    <p class="h-eyebrow">11°22′ N · 142°35′ E — 태평양, 마리아나 해구</p>
+    <h1>심연</h1>
+    <p class="h-en">A Vertical Journey · 10,935 Meters Down</p>
+    <p class="h-sub">스크롤은 잠수입니다. 이 페이지는 지금부터 10,935미터, 지구에서 가장 깊은 곳까지 내려갑니다. 위에서 올 수 있는 빛은 점점 사라지고, 대신 어둠 속에서 스스로 빛내는 것들이 나타날 것입니다.</p>
+    <button class="h-go" id="dive" type="button">잠수 시작<span aria-hidden="true">↓</span></button>
+  </header>
+
+  <section class="zone" id="zone-sunlight" data-depth="150" aria-labelledby="z1t">
+    <div class="copy veil">
+      <p class="marker"><span>0 – 200 m</span><span>Epipelagic</span><span>표층대</span></p>
+      <h2 id="z1t">빛이 사는 곳</h2>
+      <p class="body">바닷물은 색을 골라 삼킨다. 10미터만 내려가도 붉은빛이 사라지고, 100미터에서는 초록이 사라진다. 빛이 닿는 마지막 200미터에는 파란빛만 남는다. 이 얕은 층의 식물성 플랑크톤은 바다 전체의 먹이 사슬을 여는 존재이면서, 지구 산소의 절반 가까이를 만들어 낸다.</p>
+      <p class="obs"><i aria-hidden="true"></i><span class="tag">관측 기록</span>해양 플랑크톤은 지구 산소의 약 절반을 생산한다</p>
+    </div>
+  </section>
+
+  <section class="zone" id="zone-twilight" data-depth="420" aria-labelledby="z2t">
+    <div class="copy alt">
+      <p class="marker"><span>200 – 1,000 m</span><span>Mesopelagic</span><span>미광대</span></p>
+      <h2 id="z2t">영원한 황혼</h2>
+      <p class="body">여기는 낮도 밤도 아닌, 영원한 황혼의 층이다. 눈은 커지고 몸은 투명해진다. 해가 지면 이 층의 생물 수십억 마리가 먹이를 좓아 수백 미터를 올라갔다가, 새벽이 되어 다시 내려앉는다. 지구에서 가장 규모가 큰 동물의 이동이 매일 밤, 아무도 보지 못하는 사이에 일어난다.</p>
+      <p class="obs"><i aria-hidden="true"></i><span class="tag">관측 기록</span>매일 밤의 수직 이동은 지구에서 가장 큰 동물의 이동이다</p>
+    </div>
+  </section>
+
+  <section class="zone" id="zone-midnight" data-depth="1500" aria-labelledby="z3t">
+    <div class="copy">
+      <p class="marker"><span>1,000 – 4,000 m</span><span>Bathypelagic</span><span>무광대</span></p>
+      <h2 id="z3t">빛이 끝나는 지점</h2>
+      <p class="body">수심 1,000미터. 태양은 여기서 끝난다. 그러나 바다는 검게 칠해지지 않는다 — 심해 생물의 4분의 3이 스스로 빛을 낸다. 먹이를 부르는 빛, 짝을 부르는 빛, 몸의 윤곽을 지우는 빛. 여기에서 빛은 장식이 아니라 언어다.</p>
+      <p class="obs"><i aria-hidden="true"></i><span class="tag">관측 기록</span>심해 생물의 약 4분의 3이 생물 발광을 한다</p>
+    </div>
+  </section>
+
+  <section class="zone" id="zone-abyss" data-depth="4200" aria-labelledby="z4t">
+    <div class="copy alt">
+      <p class="marker"><span>4,000 – 6,000 m</span><span>Abyssopelagic</span><span>심원대</span></p>
+      <h2 id="z4t">눈이 내리는 바다</h2>
+      <p class="body">해수면의 먼지와 생물의 잔해가 해상 눈이 되어 아주 천천히 가라앉는다. 하루에 겨우 몇 미터씩, 해저에 닿기까지 몇 주가 걸린다. 큰 고래가 이 눈 위에 닿아 쓰러지면, 그 몸은 수십 년 동안 깊은 바다의 식당이 된다.</p>
+      <p class="obs"><i aria-hidden="true"></i><span class="tag">관측 기록</span>고래 하나의 사체는 수십 년짜리 심해 생태계가 된다</p>
+    </div>
+  </section>
+
+  <section class="zone" id="zone-hadal" data-depth="6150" aria-labelledby="z5t">
+    <div class="copy">
+      <p class="marker"><span>6,000 – 11,000 m</span><span>Hadalpelagic</span><span>초심해</span></p>
+      <h2 id="z5t">지구의 마지막 균열</h2>
+      <p class="body">6,000미터 아래를 초심해라고 부른다. 이 깊이를 품을 수 있는 곳은 대륙이 서로 밀어 만든 좁고 긴 균열, 해구뿐이다. 챌린저 해연에 에베레스트를 통째로 내려놓아도, 봉우리가 약 2킬로미터나 물속에 남는다.</p>
+      <p class="obs"><i aria-hidden="true"></i><span class="tag">관측 기록</span>챌린저 해연(10,935 m)은 에베레스트(8,849 m)보다 2,086 m 더 깊다</p>
+    </div>
+  </section>
+
+  <section class="zone final" id="challenger" data-depth="10880" aria-labelledby="z6t">
+    <div class="copy">
+      <p class="marker"><span>10,935 m</span><span>Challenger Deep</span><span>챌린저 해연</span></p>
+      <h2 class="f-num" id="z6t">10,935<span style="font-size:.32em;letter-spacing:.1em"> m</span></h2>
+      <p class="f-cap">지구에서 가장 깊은 곳</p>
+      <p class="body">수압은 약 1,100기압. 손톱만 한 면적에 1톤이 얹히는 깊이다. 그리고 1960년, 인류는 달에 가기 아홉 해 전에 이미 이곳을 먼저 다녀왔다. 지금 당신이 있는 곳은 지구에서 가장 조용한 자리다. 손끝을 움직여 보라 — 어둠 속의 플랑크톤이 빛으로 답할 것이다.</p>
+    </div>
+  </section>
+</main>
+
+<footer data-depth="10935">
+  <p style="margin:0">하나의 HTML 파일 · 이미지 없이 CSS와 Canvas, JavaScript로 만들었습니다<br>
+  깊이와 수치는 대중적으로 인용되는 값(챌린저 해연 약 10,935 m)을 따랐습니다</p>
+  <button class="btn-top" id="resurface" type="button">수면으로 돌아가기<span aria-hidden="true">↑</span></button>
+</footer>
+
+<noscript><style>.gauge,.hud{display:none}</style></noscript>
+
+<script>
+(function(){
+'use strict';
+document.documentElement.classList.add('js');
+
+var clamp=function(v,a,b){return Math.max(a,Math.min(b,v));};
+var lerp=function(a,b,t){return a+(b-a)*t;};
+var hx=function(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];};
+var fmt=function(n){return Math.round(n).toLocaleString('ko-KR');};
+
+/* ── 깊이 → 색/수치 램프 (실제 해양 데이터에 근거) ── */
+var RAMP=[
+  [0,    hx('#7cd0c9')],[150,  hx('#47a3a6')],[260,  hx('#35929a')],
+  [380,  hx('#125264')],[480,  hx('#0b3a50')],[1000, hx('#06263f')],
+  [1500, hx('#041a2e')],[2500, hx('#03121f')],[4200, hx('#020b16')],
+  [6150, hx('#01050d')],[8000, hx('#000307')],[10935,hx('#000204')]
+];
+var TEMP=[[0,24],[100,20],[200,14],[500,8],[1000,4.4],[2000,2.8],[4000,1.9],[6000,1.6],[10935,1.1]];
+var MAXD=10935;
+
+function rampAt(d,arr){
+  if(d<=arr[0][0])return arr[0][1];
+  for(var i=1;i<arr.length;i++){
+    if(d<=arr[i][0]){
+      var a=arr[i-1],b=arr[i],t=(d-a[0])/(b[0]-a[0]);
+      if(arr===RAMP){return [lerp(a[1][0],b[1][0],t),lerp(a[1][1],b[1][1],t),lerp(a[1][2],b[1][2],t)];}
+      return lerp(a[1],b[1],t);
+    }
+  }
+  return arr===RAMP?arr[arr.length-1][1].slice():arr[arr.length-1][1];
+}
+
+/* ── 스크롤 위치 ↔ 수심 (섹션 앵커 기반) ── */
+var anchors=[];
+function measure(){
+  var els=document.querySelectorAll('[data-depth]');
+  var list=[];
+  for(var i=0;i<els.length;i++){
+    var el=els[i];
+    var y=el.getBoundingClientRect().top+window.scrollY;
+    list.push({y:y,d:parseFloat(el.getAttribute('data-depth'))});
+  }
+  list.sort(function(a,b){return a.y-b.y;});
+  if(list.length&&list[0].y>2)list.unshift({y:0,d:0});
+  anchors=list;
+}
+function depthAt(sy){
+  var A=anchors;if(!A.length)return 0;
+  if(sy<=A[0].y)return A[0].d;
+  for(var i=1;i<A.length;i++){
+    if(sy<=A[i].y){
+      var a=A[i-1],b=A[i];
+      return lerp(a.d,b.d,(sy-a.y)/Math.max(1,b.y-a.y));
+    }
+  }
+  return A[A.length-1].d;
+}
+function scrollAt(d){
+  var A=anchors;if(!A.length)return 0;
+  if(d<=A[0].d)return A[0].y;
+  for(var i=1;i<A.length;i++){
+    if(d<=A[i].d){
+      var a=A[i-1],b=A[i];
+      return lerp(a.y,b.y,(d-a.d)/Math.max(0.001,b.d-a.d));
+    }
+  }
+  return A[A.length-1].y;
+}
+function zoneAt(d){
+  if(d>=10850)return '챌린저 해연';
+  if(d>=6000)return '초심해';
+  if(d>=4000)return '심원대';
+  if(d>=1000)return '무광대';
+  if(d>=200)return '미광대';
+  return '표층대';
+}
+
+/* ── 캔버스 준비 ── */
+var canvas=document.getElementById('sea');
+var ctx=canvas.getContext('2d');
+var W=0,H=0,dpr=1;
+
+function glowSprite(rgb){
+  var s=128,c=document.createElement('canvas');c.width=c.height=s;
+  var g=c.getContext('2d');
+  var rg=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+  rg.addColorStop(0,'rgba('+rgb+',1)');
+  rg.addColorStop(.25,'rgba('+rgb+',.55)');
+  rg.addColorStop(1,'rgba('+rgb+',0)');
+  g.fillStyle=rg;g.fillRect(0,0,s,s);
+  return c;
+}
+var gCyan=glowSprite('127,247,227');
+var gWhite=glowSprite('235,250,250');
+var gGold=glowSprite('255,227,166');
+
+/* ── 개체들 ── */
+var snow=[],blinks=[],sparks=[],jellies,angler,lastLight;
+var MAXDEPTH_ENT=MAXD;
+
+function seed(){
+  var n=clamp(Math.round(W*H/9000),80,190);
+  snow=[];
+  for(var i=0;i<n;i++)snow.push({
+    x:Math.random()*W,y:Math.random()*H,
+    r:.6+Math.random()*1.5,a:.14+Math.random()*.3,
+    vy:.05+Math.random()*.16,sw:.2+Math.random()*.5,ph:Math.random()*6.28
+  });
+  blinks=[];
+  for(i=0;i<26;i++)blinks.push({
+    d:300+Math.random()*(10500-300),xf:.06+Math.random()*.88,
+    ph:Math.random()*6.28,sp:.4+Math.random()*.9,
+    sw:.1+Math.random()*.25,sz:2.2+Math.random()*3.4
+  });
+  jellies=[
+    {d:620, x0:.24,r:34,ph:1.2,pw:1.7},
+    {d:790, x0:.68,r:25,ph:3.9,pw:2.1},
+    {d:2450,x0:.78,r:30,ph:5.1,pw:1.6}
+  ];
+  angler={d:2600};
+  lastLight={d:10920};
+}
+
+function sizeCanvas(){
+  W=window.innerWidth;H=window.innerHeight;
+  dpr=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+/* ── 포인터 : 어둠 속의 빛 ── */
+var px=-9999,py=-9999,lx=0,ly=0;
+function spawnSpark(x,y,burst){
+  if(sparks.length>240)sparks.splice(0,sparks.length-240);
+  var a=Math.random()*6.28,sp=burst?40+Math.random()*110:4+Math.random()*14;
+  sparks.push({
+    x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-(burst?20:8),
+    life:0,span:.9+Math.random()*1.1,r:2.2+Math.random()*3.6,
+    sprite:Math.random()<.75?gCyan:gWhite
+  });
+}
+function onMove(e){
+  px=e.clientX;py=e.clientY;
+  var d=depthAt(window.scrollY),dark=clamp((d-260)/520,0,1);
+  var dx=px-lx,dy=py-ly;
+  if(dark>.25&&dx*dx+dy*dy>26*26){lx=px;ly=py;spawnSpark(px,py,false);}
+}
+function onDown(e){spawnSpark(e.clientX,e.clientY,true);}
+window.addEventListener('pointermove',onMove,{passive:true});
+window.addEventListener('pointerdown',onDown,{passive:true});
+
+/* ── 그리기 함수들 ── */
+function drawRays(t,rayA){
+  if(rayA<=.01)return;
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  for(var i=0;i<5;i++){
+    var bx=W*(.12+.19*i)+Math.sin(t*.08+i*1.7)*46;
+    var bw=70+((i*37)%60);
+    ctx.save();ctx.translate(bx,-40);ctx.rotate((.16+Math.sin(t*.05+i)*.1)*(i%2?1:-1));
+    var rg=ctx.createLinearGradient(0,0,0,H*.95);
+    rg.addColorStop(0,'rgba(255,255,244,'+(0.13*rayA)+')');
+    rg.addColorStop(1,'rgba(255,255,244,0)');
+    ctx.fillStyle=rg;ctx.fillRect(-bw/2,0,bw,H);
+    ctx.restore();
+  }
+  ctx.restore();
+}
+function drawSnow(t,dt,dark,velS){
+  for(var i=0;i<snow.length;i++){
+    var p=snow[i];
+    p.y+=(p.vy-velS*.5)*dt*60;
+    p.x+=Math.sin(t*p.sw+p.ph)*.06*dt*60;
+    if(p.y<-12){p.y=H+12;p.x=Math.random()*W;}
+    if(p.y>H+12){p.y=-12;p.x=Math.random()*W;}
+    if(p.x<-12)p.x=W+12;if(p.x>W+12)p.x=-12;
+    ctx.globalAlpha=p.a*(.3+.7*dark);
+    ctx.drawImage(gWhite,p.x-p.r,p.y-p.r,p.r*2,p.r*2);
+  }
+  ctx.globalAlpha=1;
+}
+function drawBlinks(t,dark,sy){
+  if(dark<=.02)return;
+  for(var i=0;i<blinks.length;i++){
+    var b=blinks[i];
+    var y=scrollAt(b.d)-sy;
+    if(y<-40||y>H+40)continue;
+    var ph=Math.sin(t*b.sp+b.ph);
+    var a=(0.2+0.8*Math.pow(Math.max(0,ph),3))*dark;
+    if(a<.03)continue;
+    var x=b.xf*W+Math.sin(t*b.sw+b.ph)*22;
+    var s=b.sz*(0.85+0.35*ph);
+    ctx.globalAlpha=a;
+    ctx.drawImage(gCyan,x-s,y-s,s*2,s*2);
+  }
+  ctx.globalAlpha=1;
+}
+function drawJelly(j,t,sy){
+  var y=scrollAt(j.d)-sy+Math.sin(t*.5+j.ph)*14;
+  if(y<-160||y>H+160)return;
+  var x=j.x0*W+Math.sin(t*.13+j.ph)*30;
+  var edge=clamp((y+160)/160,0,1)*clamp((H+160-y)/160,0,1);
+  var pulse=1+.1*Math.sin(t*j.pw+j.ph);
+  var r=j.r*pulse,a=edge;
+  ctx.save();ctx.translate(x,y);
+  ctx.globalCompositeOperation='lighter';
+  var g=ctx.createRadialGradient(0,-r*.15,r*.1,0,0,r*1.6);
+  g.addColorStop(0,'rgba(159,242,224,'+(0.26*a)+')');
+  g.addColorStop(.55,'rgba(120,214,205,'+(0.09*a)+')');
+  g.addColorStop(1,'rgba(120,214,205,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*1.6,0,6.2832);ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(-r,0);
+  ctx.bezierCurveTo(-r,-r*1.35,r,-r*1.35,r,0);
+  ctx.quadraticCurveTo(r*.66,r*.22,r*.33,r*.02);
+  ctx.quadraticCurveTo(0,r*.24,-r*.33,r*.02);
+  ctx.quadraticCurveTo(-r*.66,r*.22,-r,0);
+  ctx.fillStyle='rgba(159,242,224,'+(0.07*a)+')';ctx.fill();
+  ctx.strokeStyle='rgba(214,255,246,'+(0.5*a)+')';ctx.lineWidth=1.2;ctx.stroke();
+  for(var k=0;k<5;k++){
+    var bx=(k/4*2-1)*r*.7;
+    var sway=Math.sin(t*1.3+j.ph+k)*r*.35;
+    ctx.beginPath();ctx.moveTo(bx,r*.05);
+    ctx.bezierCurveTo(bx+sway*.3,r*.9,bx+sway,r*1.6,bx+sway*1.4,r*2.3);
+    ctx.strokeStyle='rgba(190,246,235,'+(0.2*a)+')';ctx.lineWidth=1;ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawAngler(f,t,sy,dt){
+  var y=scrollAt(f.d)-sy+Math.sin(t*.7)*10;
+  if(y<-140||y>H+140)return;
+  var ph=t*.05+2;
+  var x=W*(.5+.34*Math.sin(ph));
+  var dir=Math.cos(ph)>=0?1:-1;
+  var edge=clamp((y+140)/140,0,1)*clamp((H+140-y)/140,0,1);
+  var L=96;
+  ctx.save();ctx.translate(x,y);ctx.scale(dir,1);
+  ctx.fillStyle='rgba(4,14,24,'+(0.9*edge)+')';
+  ctx.strokeStyle='rgba(140,190,205,'+(0.14*edge)+')';
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(L*.5,0);
+  ctx.bezierCurveTo(L*.42,-L*.34,L*.05,-L*.36,-L*.18,-L*.22);
+  ctx.bezierCurveTo(-L*.5,-L*.1,-L*.62,-L*.05,-L*.78,-L*.28);
+  ctx.lineTo(-L*.66,0);
+  ctx.lineTo(-L*.8,L*.24);
+  ctx.bezierCurveTo(-L*.5,L*.16,-L*.2,L*.3,L*.05,L*.3);
+  ctx.bezierCurveTo(L*.3,L*.28,L*.46,L*.14,L*.5,0);
+  ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(-L*.05,L*.05);
+  ctx.quadraticCurveTo(-L*.18,L*.34,-L*.3,L*.3);
+  ctx.quadraticCurveTo(-L*.2,L*.1,-L*.05,L*.05);
+  ctx.fillStyle='rgba(5,18,30,'+(0.7*edge)+')';ctx.fill();
+  ctx.beginPath();ctx.moveTo(L*.28,-L*.3);
+  ctx.quadraticCurveTo(L*.6,-L*.55,L*.68,-L*.14);
+  ctx.strokeStyle='rgba(200,230,225,'+(0.4*edge)+')';ctx.lineWidth=1.1;ctx.stroke();
+  ctx.globalCompositeOperation='lighter';
+  var pulse=.8+.3*Math.sin(t*2.4);
+  var gs=44*pulse;
+  ctx.globalAlpha=.85*edge;
+  ctx.drawImage(gGold,L*.68-gs,-L*.14-gs,gs*2,gs*2);
+  ctx.globalAlpha=.95*edge;
+  ctx.drawImage(gWhite,L*.68-2.4,-L*.14-2.4,4.8,4.8);
+  ctx.globalAlpha=.5*edge;
+  ctx.drawImage(gGold,L*.32-2,-L*.14-2,4,4);
+  ctx.restore();ctx.globalAlpha=1;
+}
+function drawLastLight(l,t,sy,dark,now){
+  var y=scrollAt(l.d)-sy;
+  if(y<-80||y>H+80)return;
+  var edge=clamp((y+80)/80,0,1)*clamp((H+80-y)/80,0,1);
+  var pulse=.8+.25*Math.sin(t*1.8);
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  ctx.globalAlpha=.8*edge;
+  var s=46*pulse;
+  ctx.drawImage(gCyan,W*.5-s,y-s,s*2,s*2);
+  ctx.globalAlpha=.95*edge;
+  ctx.drawImage(gWhite,W*.5-2.2,y-2.2,4.4,4.4);
+  ctx.restore();ctx.globalAlpha=1;
+  if(!l.next)l.next=now+1200;
+  if(now>l.next){
+    l.next=now+2200+Math.random()*1400;
+    spawnSpark(W*.5,y,false);spawnSpark(W*.5,y,false);
+  }
+}
+function drawSparks(dt){
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  for(var i=sparks.length-1;i>=0;i--){
+    var s=sparks[i];
+    s.life+=dt/s.span;
+    if(s.life>=1){sparks.splice(i,1);continue;}
+    s.x+=s.vx*dt;s.y+=s.vy*dt-12*dt;
+    s.vx*=.985;s.vy*=.985;
+    var a=Math.sin(Math.PI*Math.min(1,s.life));
+    var r=s.r*(1+s.life*.7);
+    ctx.globalAlpha=a*.9;
+    ctx.drawImage(s.sprite,s.x-r,s.y-r,r*2,r*2);
+  }
+  ctx.restore();ctx.globalAlpha=1;
+}
+function drawCursorLight(dark){
+  if(dark<=.02||px<-9000)return;
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  ctx.globalAlpha=.15*dark;ctx.drawImage(gCyan,px-170,py-170,340,340);
+  ctx.globalAlpha=.1*dark;ctx.drawImage(gWhite,px-64,py-64,128,128);
+  ctx.restore();ctx.globalAlpha=1;
+}
+
+/* ── 계기판 갱신 ── */
+var gDepth=document.getElementById('gDepth'),gPress=document.getElementById('gPress'),
+    gTemp=document.getElementById('gTemp'),gZone=document.getElementById('gZone'),
+    gMark=document.getElementById('gMark'),
+    hDepth=document.getElementById('hDepth'),hZone=document.getElementById('hZone'),
+    hud=document.querySelector('.hud');
+var lastTxt={};
+function put(el,key,txt){if(lastTxt[key]!==txt){lastTxt[key]=txt;el.textContent=txt;}}
+function updateGauge(d){
+  put(gDepth,'d',fmt(d));
+  put(gPress,'p',fmt(1+d/10)+' 기압');
+  put(gTemp,'t',rampAt(d,TEMP).toFixed(1)+' °C');
+  put(gZone,'z',zoneAt(d));
+  gMark.style.top=(clamp(d/MAXD,0,1)*100)+'%';
+  put(hDepth,'hd',fmt(d)+' m');
+  put(hZone,'hz',zoneAt(d));
+  hud.classList.toggle('show',window.scrollY>60);
+}
+
+/* ── 등장 애니메이션 ── */
+var io=null;
+if('IntersectionObserver' in window){
+  io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}
+    });
+  },{threshold:.18,rootMargin:'0px 0px -6% 0px'});
+  document.querySelectorAll('.copy').forEach(function(el){io.observe(el);});
+}else{
+  document.querySelectorAll('.copy').forEach(function(el){el.classList.add('in');});
+}
+
+/* ── 버튼 ── */
+document.getElementById('dive').addEventListener('click',function(){
+  document.getElementById('zone-sunlight').scrollIntoView();
+});
+document.getElementById('resurface').addEventListener('click',function(){
+  window.scrollTo({top:0});
+});
+
+/* ── 메인 루프 ── */
+var reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+var rafId=null,prevSy=window.scrollY,velS=0,lastT=0,autoNext=0;
+
+function frame(now){
+  rafId=requestAnimationFrame(frame);
+  var t=now/1000;
+  var dt=Math.min(.05,(now-lastT)/1000)||.016;
+  lastT=now;
+  var sy=window.scrollY;
+  var d=depthAt(sy);
+  var dark=clamp((d-260)/520,0,1);
+  var c=rampAt(d,RAMP);
+
+  var grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'rgb('+Math.min(255,c[0]*1.22+14|0)+','+Math.min(255,c[1]*1.2+12|0)+','+Math.min(255,c[2]*1.18+10|0)+')');
+  grad.addColorStop(1,'rgb('+(c[0]*.7|0)+','+(c[1]*.76|0)+','+(c[2]*.8|0)+')');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+
+  drawRays(t,1-clamp(d/260,0,1));
+  velS+=((sy-prevSy)-velS)*.1;prevSy=sy;
+  drawSnow(t,dt,dark,velS);
+  drawBlinks(t,dark,sy);
+  for(var i=0;i<jellies.length;i++)drawJelly(jellies[i],t,sy);
+  drawAngler(angler,t,sy,dt);
+  drawLastLight(lastLight,t,sy,dark,now);
+  drawCursorLight(dark);
+  drawSparks(dt);
+  updateGauge(d);
+}
+
+function drawStatic(){
+  var d=depthAt(window.scrollY);
+  var dark=clamp((d-260)/520,0,1);
+  var c=rampAt(d,RAMP);
+  var grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'rgb('+Math.min(255,c[0]*1.22+14|0)+','+Math.min(255,c[1]*1.2+12|0)+','+Math.min(255,c[2]*1.18+10|0)+')');
+  grad.addColorStop(1,'rgb('+(c[0]*.7|0)+','+(c[1]*.76|0)+','+(c[2]*.8|0)+')');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+  drawRays(0,1-clamp(d/260,0,1));
+  for(var i=0;i<snow.length;i++){
+    var p=snow[i];
+    ctx.globalAlpha=p.a*(.3+.7*dark);
+    ctx.drawImage(gWhite,p.x-p.r,p.y-p.r,p.r*2,p.r*2);
+  }
+  ctx.globalAlpha=1;
+  updateGauge(d);
+}
+
+function start(){
+  if(reduced.matches){
+    if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+    drawStatic();
+  }else if(!rafId){
+    lastT=performance.now();
+    rafId=requestAnimationFrame(frame);
+  }
+}
+
+/* ── 초기화 ── */
+function init(){
+  measure();sizeCanvas();seed();start();
+}
+var measureQueued=false;
+function queueMeasure(){
+  if(measureQueued)return;measureQueued=true;
+  requestAnimationFrame(function(){
+    measureQueued=false;
+    var oldW=W,oldH=H;
+    measure();sizeCanvas();
+    if(oldW!==W||oldH!==H)seed();
+    if(reduced.matches)drawStatic();
+  });
+}
+if('ResizeObserver' in window){
+  new ResizeObserver(queueMeasure).observe(document.documentElement);
+}
+window.addEventListener('resize',queueMeasure);
+window.addEventListener('load',queueMeasure);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(queueMeasure);
+reduced.addEventListener?reduced.addEventListener('change',start):reduced.addListener(start);
+
+init();
+})();
+</script>
+</body>
+</html>
