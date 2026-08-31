@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>거울 나라의 앨리스 — 붉은 실을 따라, 여덟 칸</title>
+<meta name="description" content="스크롤은 체스의 한 수. 살아 있는 꽃들의 정원에서 여덟째 칸의 대관식까지, 거울 속 세계를 걷는 한 편의 인터랙티브 그림책.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%23f1e8d7'/><circle cx='32' cy='22' r='9' fill='%23a51f2b'/><path d='M22 34h20l-3 8H25zM18 44h28l4 10H14z' fill='%23a51f2b'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Nanum+Myeongjo:wght@400;700;800&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f1e8d7;
+  --paper-dim:#e6d9be;
+  --paper-deep:#d9c9a8;
+  --ink:#26201a;
+  --ink-soft:#4d4234;
+  --ink-faint:#7a6c56;
+  --red:#a51f2b;
+  --red-bright:#c82833;
+  --night:#171310;
+  --night-2:#221a14;
+  --fell:'IM Fell English',serif;
+  --fellsc:'IM Fell English SC',serif;
+  --disp:'Nanum Myeongjo','Noto Serif KR',serif;
+  --mono:'Courier Prime',ui-monospace,Consolas,monospace;
+  --ease:cubic-bezier(.22,.9,.28,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--paper)}
+body{
+  margin:0;font-family:var(--disp);color:var(--ink);
+  background:var(--paper);overflow-x:hidden;
+}
+::selection{background:var(--red);color:var(--paper)}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:var(--paper-deep)}
+::-webkit-scrollbar-thumb{background:#a5906c;border-radius:6px}
+@supports (scrollbar-color: red blue){html{scrollbar-color:#a5906c var(--paper-deep)}}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:2px}
+
+/* 종이 결 */
+.grain{
+  position:fixed;inset:0;z-index:50;pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.13 0 0 0 0 0.09 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.vignette{
+  position:fixed;inset:0;z-index:51;pointer-events:none;
+  background:radial-gradient(130% 100% at 50% 42%, transparent 62%, rgba(38,32,26,.14) 100%);
+}
+
+/* ── 왼쪽 붉은 실 (진행선) ─────────────── */
+.thread{
+  position:fixed;left:0;top:0;bottom:0;width:74px;z-index:40;pointer-events:none;
+}
+.thread .t-label{
+  position:absolute;left:14px;top:50%;
+  transform:translateY(-50%) rotate(180deg);writing-mode:vertical-rl;
+  font-family:var(--mono);font-size:10px;letter-spacing:.42em;color:var(--ink-faint);
+  text-transform:uppercase;
+}
+.thread svg{position:absolute;right:16px;top:0;height:100%;width:36px;overflow:visible}
+.thread .t-base{fill:none;stroke:var(--ink-faint);stroke-width:1.6;stroke-dasharray:2 7;opacity:.5}
+.thread .t-red{fill:none;stroke:var(--red);stroke-width:2.2}
+.thread .t-dot{fill:var(--red-bright);stroke:var(--paper);stroke-width:2}
+@media (max-width:1099px){.thread{display:none}}
+
+/* ── HUD : 병졸의 위치 ─────────────── */
+.hud{
+  position:fixed;top:16px;right:16px;z-index:52;display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:12px;color:var(--ink);
+  background:rgba(241,232,215,.82);border:1.5px solid var(--ink);
+  box-shadow:3px 3px 0 rgba(38,32,26,.85);
+  padding:7px 13px;border-radius:2px;max-width:78vw;
+}
+.hud svg{display:block;flex:none}
+.hud .h-rank{font-weight:700;font-variant-numeric:tabular-nums}
+.hud .h-ch{color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52vw}
+@media (max-width:640px){.hud .h-ch{display:none}}
+
+main,footer{position:relative;z-index:1}
+.wrap{max-width:38rem;margin-inline:auto;padding-inline:1.5rem}
+
+/* ── 히어로 : 거울 ─────────────── */
+.hero{
+  min-height:100vh;min-height:100svh;
+  display:grid;place-content:center;justify-items:center;text-align:center;
+  padding:5rem 1.5rem 4rem;
+}
+.h-eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:var(--ink-soft);
+  margin:0 0 1.6rem;text-transform:uppercase;
+}
+.hero h1{
+  margin:0;font-weight:800;font-size:clamp(2.5rem,7vw,4.6rem);line-height:1.22;letter-spacing:.02em;
+}
+.h-en{
+  font-family:var(--fellsc);font-size:clamp(.95rem,2vw,1.2rem);letter-spacing:.22em;
+  color:var(--ink-soft);margin:1rem 0 0;
+}
+.mirror{
+  position:relative;width:min(430px,84vw);aspect-ratio:460/620;
+  margin:3rem 0 0;
+}
+.mirror>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.mirror .glass{
+  position:absolute;left:8.2%;right:8.2%;top:6.2%;bottom:6.4%;overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 22% 8%, rgba(250,250,248,.5), transparent 46%),
+    linear-gradient(168deg,#c9ced2 0%,#aeb6bc 34%,#98a2aa 62%,#b8bfc4 100%);
+  box-shadow:inset 0 0 30px rgba(38,32,26,.4), inset 0 0 4px rgba(38,32,26,.5);
+}
+.mirror .glass::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(105deg,
+    transparent calc(var(--mx,50%) - 16%),
+    rgba(255,255,255,.22) var(--mx,50%),
+    transparent calc(var(--mx,50%) + 16%));
+  transition:background .18s linear;
+}
+.mirror .glass::after{ /* 유리가 안개처럼 녹는다 */
+  content:"";position:absolute;left:0;right:0;bottom:0;height:34%;
+  background:linear-gradient(180deg,transparent, rgba(233,236,238,.55));
+  animation:melt 9s var(--ease) infinite alternate;
+}
+@keyframes melt{from{height:26%;opacity:.75}to{height:42%;opacity:1}}
+.mirror .ghost{
+  position:absolute;top:13%;left:0;right:0;text-align:center;
+  font-family:var(--fellsc);font-size:clamp(.72rem,2.6vw,1.02rem);letter-spacing:.3em;
+  color:rgba(58,66,72,.62);transform:scaleX(-1);
+}
+.mirror .ghost small{
+  display:block;margin-top:1.4em;font-family:var(--fell);font-style:italic;
+  letter-spacing:.12em;font-size:.92em;color:rgba(58,66,72,.5);
+}
+.kitten{position:absolute;bottom:-26px;right:-30px;width:158px;max-width:34vw;z-index:2}
+.kitten svg{width:100%;height:auto;display:block;overflow:visible}
+.h-sub{max-width:29rem;font-size:1.04rem;line-height:2.05;color:var(--ink-soft);margin:3rem 0 0}
+.h-hint{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--ink-faint);margin:1.2rem 0 0}
+.h-go{
+  margin-top:2.4rem;font-family:var(--mono);font-size:11.5px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--paper);background:var(--ink);border:1.5px solid var(--ink);
+  box-shadow:3px 3px 0 rgba(165,31,43,.9);
+  padding:.95em 1.9em .95em 2.2em;cursor:pointer;border-radius:2px;
+  transition:transform .2s var(--ease),box-shadow .2s var(--ease);
+}
+.h-go:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 rgba(165,31,43,.9)}
+.h-go span{display:inline-block;margin-left:.6em;animation:bob 2.6s var(--ease) infinite}
+@keyframes bob{0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}
+
+.js .hero>*{opacity:0;animation:rise 1.1s var(--ease) forwards}
+.js .h-eyebrow{animation-delay:.1s}
+.js .hero h1{animation-delay:.22s}
+.js .h-en{animation-delay:.4s}
+.js .mirror{animation-delay:.55s}
+.js .h-sub{animation-delay:.8s}
+.js .h-hint{animation-delay:.95s}
+.js .h-go{animation-delay:1.05s}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+/* ── 장(章) 섹션 공통 ─────────────── */
+.ch{position:relative;padding:18vh 0 16vh}
+.eyebrow{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.3em;color:var(--ink-faint);
+  text-transform:uppercase;display:flex;align-items:center;gap:1em;margin:0 0 1.4rem;
+}
+.eyebrow::before{content:"";width:2.4rem;height:1.5px;background:var(--red)}
+.ch h2{
+  margin:0 0 1.7rem;font-weight:800;font-size:clamp(2rem,5.4vw,3.3rem);line-height:1.28;letter-spacing:.01em;
+}
+.latin{font-family:var(--fellsc);font-weight:400;letter-spacing:.14em}
+.body{margin:0;font-size:1.05rem;line-height:2.08;color:var(--ink-soft)}
+.body b{color:var(--ink);font-weight:700}
+.quote{
+  margin:2.5rem 0 0;padding:1.4rem 1.6rem;position:relative;
+  border-left:3px solid var(--red);background:rgba(165,31,43,.05);
+  font-size:1.06rem;line-height:1.95;color:var(--ink);
+}
+.quote i{display:block;margin-top:.7em;font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--ink-faint)}
+.obs{
+  margin:2.3rem 0 0;font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--ink-faint);
+  display:flex;gap:.8em;align-items:baseline;
+}
+.obs .tag{letter-spacing:.2em;font-size:9.5px;white-space:nowrap;text-transform:uppercase;color:var(--red)}
+.obs i{width:6px;height:6px;background:var(--red);flex:none;align-self:center;transform:rotate(45deg)}
+
+/* ── 정원 ─────────────── */
+#garden .garden-scene{position:relative;margin:3.4rem -1.5rem 0;padding:0 1.5rem}
+.flower-row{display:flex;justify-content:center;align-items:flex-end;gap:clamp(1rem,6vw,4rem);flex-wrap:wrap}
+.flower{
+  position:relative;background:transparent;border:none;padding:0;cursor:pointer;
+  transition:transform .5s var(--ease);
+}
+.flower:hover,.flower:focus-visible{transform:translateY(-7px) rotate(-1.5deg)}
+.flower svg{width:clamp(84px,15vw,132px);height:auto;display:block;overflow:visible}
+.flower .say{
+  position:absolute;bottom:106%;left:50%;transform:translate(-50%,8px);
+  background:var(--paper);border:1.5px solid var(--ink);box-shadow:3px 3px 0 rgba(38,32,26,.85);
+  padding:.55em .85em;font-size:.86rem;line-height:1.5;color:var(--ink);white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .3s var(--ease),transform .3s var(--ease);
+}
+.flower .say::after{
+  content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:7px solid transparent;border-top-color:var(--ink);
+}
+.flower:hover .say,.flower:focus-visible .say{opacity:1;transform:translate(-50%,0)}
+@media (hover:none){.flower .say{opacity:1;transform:translate(-50%,0);font-size:.78rem;white-space:normal;width:max-content;max-width:60vw}}
+.sway{animation:sway 5.5s ease-in-out infinite alternate;transform-origin:50% 100%}
+.sway.s2{animation-duration:6.6s;animation-delay:-2s}
+.sway.s3{animation-duration:7.4s;animation-delay:-4s}
+@keyframes sway{from{transform:rotate(-2.4deg)}to{transform:rotate(2.4deg)}}
+.lawn{
+  margin-top:-4px;height:52px;
+  background:
+    conic-gradient(var(--paper-deep) 25%, transparent 0 50%, var(--paper-deep) 0 75%, transparent 0) 0 0/52px 52px,
+    linear-gradient(180deg,#cbbc99,#b7a67f);
+  border-top:2px solid var(--ink);
+}
+
+/* ── 이름 없는 숲 ─────────────── */
+.wood{
+  position:relative;background:linear-gradient(180deg,var(--paper) 0,var(--night) 12%,var(--night) 88%,var(--paper-dim) 100%);
+  padding:26vh 0 24vh;color:var(--paper);overflow:hidden;
+}
+.wood .trees{position:absolute;left:0;right:0;pointer-events:none}
+.wood .trees.t-top{top:6%}.wood .trees.t-btm{bottom:4%;opacity:.7}
+.wood .trees svg{width:100%;height:auto;display:block}
+.wood .wrap{position:relative;z-index:1;text-align:center}
+.wood .eyebrow{justify-content:center}
+.wood .eyebrow::before{display:none}
+.wood .eyebrow::after{content:"";width:2.4rem;height:1.5px;background:var(--red)}
+.wood h2{color:var(--paper)}
+.wood .body{color:#cbbfa8;max-width:27rem;margin-inline:auto}
+.fade-word{
+  margin:4.2rem 0 0;font-weight:800;font-size:clamp(3.4rem,13vw,7.5rem);line-height:1.1;
+  letter-spacing:.08em;color:var(--paper);user-select:none;
+}
+.fade-word .ltr{display:inline-block;transition:opacity .5s ease,filter .5s ease,transform .5s ease;will-change:transform,opacity}
+.fawn{
+  margin:3rem auto 0;width:min(200px,44vw);opacity:0;transition:opacity 1.6s var(--ease);
+}
+.fawn.on{opacity:.5}
+.fawn svg{width:100%;height:auto;display:block}
+.wood .w-note{font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;color:#8d7f68;margin:3.4rem 0 0}
+
+/* ── 곤충 표본 ─────────────── */
+#insects{background:var(--paper-dim)}
+#insects::before,#insects::after{
+  content:"";position:absolute;left:0;right:0;height:2px;background:var(--ink);opacity:.85;
+}
+#insects::before{top:0}#insects::after{bottom:0}
+.bugs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.6rem;margin:3.2rem 0 0}
+.bug{
+  border:1.5px solid var(--ink);background:var(--paper);border-radius:2px;
+  padding:1.1rem 1.2rem 1.2rem;box-shadow:4px 4px 0 rgba(38,32,26,.8);
+}
+.bug .bug-num{font-family:var(--mono);font-size:9.5px;letter-spacing:.26em;color:var(--red);margin:0 0 .2rem}
+.bug h3{margin:0 0 1rem;font-size:1.05rem;font-weight:800}
+.bug h3 .latin{display:block;font-size:.8rem;color:var(--ink-faint);letter-spacing:.1em;margin-top:.15rem}
+.bug svg{width:100%;height:auto;display:block;overflow:visible}
+.bug p{margin:.9rem 0 0;font-size:.92rem;line-height:1.85;color:var(--ink-soft)}
+.buggy{animation:buggy 6s ease-in-out infinite alternate}
+.buggy.b2{animation-duration:7.2s;animation-delay:-3s}
+.buggy.b3{animation-duration:8s;animation-delay:-5s}
+@keyframes buggy{
+  from{transform:translate(0,0) rotate(-2deg)}
+  30%{transform:translate(6px,-9px) rotate(2deg)}
+  60%{transform:translate(-7px,-4px) rotate(-3deg)}
+  to{transform:translate(3px,-11px) rotate(1deg)}
+}
+
+/* ── 험프티 덤프티 ─────────────── */
+.humpty-scene{position:relative;margin:3.2rem -1.5rem 0;padding:0 1.5rem}
+.humpty-scene svg{width:100%;height:auto;display:block;overflow:visible}
+.port{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin:3rem 0 0}
+.blend{
+  position:relative;background:var(--paper);border:1.5px solid var(--ink);border-radius:2px;
+  box-shadow:3px 3px 0 rgba(38,32,26,.85);padding:1.1rem 1.4rem 1rem;cursor:pointer;
+  transition:transform .25s var(--ease);
+}
+.blend:hover,.blend:focus-visible{transform:translateY(-4px)}
+.blend .word{display:block;font-weight:800;font-size:1.5rem;letter-spacing:.04em}
+.blend .word .latin{font-size:.85rem;color:var(--ink-faint);letter-spacing:.1em;margin-left:.3em}
+.blend .src{
+  position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,6px);
+  white-space:nowrap;background:var(--ink);color:var(--paper);
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:.5em .9em;
+  opacity:0;pointer-events:none;transition:opacity .3s var(--ease),transform .3s var(--ease);
+}
+.blend .src i{font-style:normal;color:var(--red-bright);margin:0 .5em}
+.blend:hover .src,.blend:focus-visible .src{opacity:1;transform:translate(-50%,0)}
+.blend .src::after{
+  content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-top-color:var(--ink);
+}
+.verse{
+  margin:3.2rem 0 0;padding:1.6rem 1.4rem;border:1.5px dashed var(--ink-faint);border-radius:2px;
+}
+.verse p{margin:0;font-family:var(--fell);font-style:italic;font-size:1.12rem;line-height:1.9;color:var(--ink)}
+.verse .kr{font-family:var(--disp);font-style:normal;font-size:.95rem;line-height:1.95;color:var(--ink-soft);margin-top:1.1rem !important}
+.verse i.v-cap{display:block;margin-top:1.2em;font-family:var(--mono);font-style:normal;font-size:10px;letter-spacing:.22em;color:var(--ink-faint);text-transform:uppercase}
+
+/* ── 흰 기사 ─────────────── */
+#knight{background:var(--paper-dim)}
+.ride{margin:3rem -1.5rem 0;padding:0 1.5rem}
+.ride svg{width:100%;height:auto;display:block;overflow:visible}
+#rider{transform-origin:178px 150px;animation:rideoff 9s var(--ease) infinite}
+@keyframes rideoff{
+  0%,50%{transform:rotate(0) translate(0,0)}
+  55%{transform:rotate(3deg) translate(2px,2px)}
+  64%{transform:rotate(-38deg) translate(-30px,88px)}
+  72%{transform:rotate(-86deg) translate(-44px,106px)}
+  86%{transform:rotate(-86deg) translate(-44px,108px)}
+  94%,100%{transform:rotate(0) translate(0,0)}
+}
+.dust{opacity:0;animation:dust 9s var(--ease) infinite}
+@keyframes dust{
+  0%,64%{opacity:0}
+  70%,82%{opacity:1}
+  90%,100%{opacity:0}
+}
+.horse-idle{animation:horseidle 4.5s ease-in-out infinite alternate}
+@keyframes horseidle{from{transform:translateY(0)}to{transform:translateY(3px)}}
+.k-caption{
+  text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.28em;
+  color:var(--ink-faint);margin:1.6rem 0 0;text-transform:uppercase;
+}
+
+/* ── 여덟째 칸 ─────────────── */
+#queens{
+  background:
+    conic-gradient(rgba(165,31,43,.05) 25%, transparent 0 50%, rgba(165,31,43,.05) 0 75%, transparent 0) 0 0/72px 72px,
+    linear-gradient(180deg,#241014,#2b0f13 40%,#1d0b0e);
+  color:var(--paper);padding:20vh 0;
+}
+#queens .eyebrow{color:#b39a86}
+#queens .eyebrow::before{background:var(--red-bright)}
+#queens h2{color:#f4ecdd}
+#queens .body{color:#c8b8a4}
+#queens .quote{border-left-color:var(--red-bright);background:rgba(200,40,51,.07);color:#f0e6d3}
+#queens .quote i{color:#a98f7c}
+.crown{margin:3rem auto 0;width:min(340px,72vw)}
+.crown svg{width:100%;height:auto;display:block;overflow:visible}
+.crown .c-path{fill:none;stroke:#e9ddc5;stroke-width:5;stroke-linejoin:round;stroke-linecap:round}
+.crown .c-band{fill:none;stroke:#e9ddc5;stroke-width:3.4}
+.crown .jewel{fill:#f1e8d7;stroke:#e9ddc5;stroke-width:3}
+.crown .jewel.j-red{fill:var(--red-bright)}
+.q-big{
+  margin:2.6rem 0 0;text-align:center;font-weight:800;
+  font-size:clamp(2.4rem,8vw,5.2rem);line-height:1.15;color:#f6efe0;letter-spacing:.06em;
+}
+.q-sub{
+  margin:.6rem 0 0;text-align:center;font-family:var(--fellsc);font-size:1rem;
+  letter-spacing:.34em;color:#b39a86;
+}
+.collapse{position:relative;margin:3.6rem auto 0;width:min(430px,80vw);aspect-ratio:430/240}
+.collapse svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#rqp{transform-origin:120px 220px;transition:none}
+#wball{transform-origin:300px 170px;opacity:0}
+.spin{animation:spin 34s linear infinite;transform-origin:300px 170px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.c-cap{
+  text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:#8d7260;
+  margin:1.4rem 0 0;text-transform:uppercase;
+}
+
+/* ── 깨어남 ─────────────── */
+#dawn{
+  background:linear-gradient(180deg,#1d0b0e 0,var(--paper-dim) 26%,var(--paper) 60%);
+  padding:24vh 0 20vh;text-align:center;
+}
+#dawn .eyebrow{justify-content:center}
+#dawn .eyebrow::before{display:none}
+#dawn .eyebrow::after{content:"";width:2.4rem;height:1.5px;background:var(--red)}
+#dawn h2{color:var(--ink)}
+.dawn-mirror{
+  position:relative;width:min(230px,56vw);aspect-ratio:230/300;margin:3rem auto 0;
+}
+.dawn-mirror svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.dawn-mirror .dglass{
+  position:absolute;left:11%;right:11%;top:9%;bottom:10%;overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 24% 10%, rgba(250,250,248,.55), transparent 48%),
+    linear-gradient(170deg,#c9ced2,#a6aeb5 58%,#b9c0c5);
+  box-shadow:inset 0 0 18px rgba(38,32,26,.4);
+  display:grid;place-content:center;text-align:center;
+  padding:1rem;
+}
+.dawn-mirror .dglass p{
+  margin:0;font-family:var(--disp);font-size:.82rem;line-height:1.9;color:#3f474d;
+  transform:scaleX(-1);
+}
+.sleep{width:min(210px,52vw);margin:2.6rem auto 0}
+.sleep svg{width:100%;height:auto;display:block;overflow:visible}
+.q-es{
+  font-family:var(--fell);font-style:italic;font-size:clamp(1.15rem,3vw,1.7rem);
+  letter-spacing:.04em;color:var(--red);margin:3.4rem 0 0;
+}
+.q-kr{margin:1rem 0 0;font-weight:800;font-size:clamp(1.4rem,4vw,2.3rem);line-height:1.6}
+
+/* ── 푸터 ─────────────── */
+footer{background:var(--paper);padding:3.5rem 1.5rem 6rem;text-align:center}
+footer p{margin:0;font-family:var(--mono);font-size:11px;line-height:2.15;color:var(--ink-faint)}
+.btn-top{
+  margin-top:1.9rem;display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--paper);background:var(--ink);border:1.5px solid var(--ink);
+  box-shadow:3px 3px 0 rgba(165,31,43,.9);padding:.9em 1.9em .9em 2.2em;cursor:pointer;border-radius:2px;
+  transition:transform .2s var(--ease),box-shadow .2s var(--ease);
+}
+.btn-top:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 rgba(165,31,43,.9)}
+.btn-top span{display:inline-block;margin-left:.6em}
+
+/* ── 등장 ─────────────── */
+.js .reveal{opacity:0;transform:translateY(26px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.js .reveal.in{opacity:1;transform:none}
+.js .in-locked{transition:none !important}
+.js.heroDone .hero>*{opacity:1 !important;transform:none !important;animation:none !important}
+
+@media (max-width:640px){
+  .ch{padding:14vh 0 12vh}
+  .kitten{right:-6px;bottom:-18px}
+}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .js .hero>*{animation:none;opacity:1;transform:none}
+  .js .reveal{transition:none;opacity:1;transform:none}
+  .sway,.buggy,#rider,.dust,.horse-idle,.spin,.mirror .glass::after,.h-go span{animation:none !important}
+  .thread .t-red{transition:none}
+}
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<aside class="thread" aria-hidden="true">
+  <span class="t-label">붉은 실을 따라서</span>
+  <svg id="threadSvg" preserveAspectRatio="none">
+    <path class="t-base" id="tBase" d=""/>
+    <path class="t-red" id="tRed" d=""/>
+    <circle class="t-dot" id="tDot" r="5.5" cx="-20" cy="-20"/>
+  </svg>
+</aside>
+
+<div class="hud" aria-hidden="true">
+  <svg width="18" height="24" viewBox="0 0 24 30" aria-hidden="true">
+    <circle cx="12" cy="7" r="5.5" fill="#a51f2b"/>
+    <path d="M7 14h10l-1.6 5H8.6z" fill="#a51f2b"/>
+    <path d="M5 21h14l2.4 7H2.6z" fill="#a51f2b"/>
+  </svg>
+  <span class="h-rank" id="hudRank">칸 1 / 8</span>
+  <span class="h-ch" id="hudCh">거울 앞</span>
+</div>
+
+<main>
+  <!-- ═══ 거울 앞 ═══ -->
+  <header class="hero" id="top">
+    <p class="h-eyebrow">Lewis Carroll · 1871 · Through the Looking-Glass</p>
+    <h1>거울 나라의 앨리스</h1>
+    <p class="h-en">AND WHAT ALICE FOUND THERE</p>
+
+    <div class="mirror" id="mirror">
+      <svg viewBox="0 -40 460 620" aria-hidden="true">
+        <g fill="none" stroke="#26201a">
+          <rect x="10" y="10" width="440" height="560" rx="6" stroke-width="4"/>
+          <rect x="30" y="30" width="400" height="520" rx="3" stroke-width="2"/>
+          <path d="M186 30 C158 30 146 12 166 6 C180 2 190 12 183 22" stroke-width="3"/>
+          <path d="M274 30 C302 30 314 12 294 6 C280 2 270 12 277 22" stroke-width="3"/>
+          <path d="M182 30 A48 48 0 0 1 278 30" stroke-width="3"/>
+          <path d="M196 30 A34 34 0 0 1 264 30" stroke-width="2.4"/>
+          <circle cx="230" cy="-16" r="8" fill="#26201a"/>
+          <path d="M20 288 C8 284 6 272 18 268 M20 302 C8 306 6 318 18 322" stroke-width="2.4"/>
+          <path d="M440 288 C452 284 454 272 442 268 M440 302 C452 306 454 318 442 322" stroke-width="2.4"/>
+          <circle cx="30" cy="30" r="9" stroke-width="2.4"/><path d="M24 24 L36 36 M36 24 L24 36" stroke-width="1.6"/>
+          <circle cx="430" cy="30" r="9" stroke-width="2.4"/><path d="M424 24 L436 36 M436 24 L424 36" stroke-width="1.6"/>
+          <circle cx="30" cy="550" r="9" stroke-width="2.4"/><path d="M24 544 L36 556 M36 544 L24 556" stroke-width="1.6"/>
+          <circle cx="430" cy="550" r="9" stroke-width="2.4"/><path d="M424 544 L436 556 M436 544 L424 556" stroke-width="1.6"/>
+        </g>
+      </svg>
+      <div class="glass" aria-hidden="true">
+        <div class="ghost">THROUGH THE LOOKING GLASS<small>— everything backwards —</small></div>
+      </div>
+      <div class="kitten" aria-hidden="true">
+        <svg viewBox="0 0 150 120">
+          <path d="M20 108 Q16 66 48 54 Q66 47 80 62 Q92 74 90 108 Z" fill="#1c1712"/>
+          <circle cx="76" cy="46" r="17" fill="#1c1712"/>
+          <path d="M62 34 L57 16 L71 27 Z" fill="#1c1712"/>
+          <path d="M84 30 L94 15 L93 32 Z" fill="#1c1712"/>
+          <circle cx="70" cy="44" r="2" fill="#f1e8d7"/><circle cx="83" cy="44" r="2" fill="#f1e8d7"/>
+          <path d="M76 51 q3 3 6 0" stroke="#f1e8d7" stroke-width="1.4" fill="none"/>
+          <ellipse cx="97" cy="80" rx="8" ry="6" fill="#1c1712" transform="rotate(-28 97 80)"/>
+          <path d="M22 106 Q4 100 8 84 Q10 76 4 72" stroke="#1c1712" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <path d="M100 78 C118 70 112 92 98 88 C110 96 126 88 120 76 C132 80 128 96 112 96"
+                fill="none" stroke="#a51f2b" stroke-width="2.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <p class="h-sub">겨울 저녁, 벽난로 앞. 검은 고양이가 붉은 실뭉치를 가지고 놀고 있다. 거울 속 방은 이쪽과 똑같아 보이지만 — 조금씩, 다르다. 어느 순간, 유리가 은빛 안개처럼 녹기 시작했다.</p>
+    <p class="h-hint">마우스를 움직이면 유리가 반응한다 · 붉은 실이 진행을 표시한다</p>
+    <button class="h-go" id="enter" type="button">거울을 통과하다<span aria-hidden="true">↓</span></button>
+  </header>
+
+  <!-- ═══ 정원 ═══ -->
+  <section class="ch" id="garden">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">Chapter II · 살아 있는 꽃들의 정원</p>
+        <h2>말을 하는 꽃들</h2>
+        <p class="body">세계의 바닥은 체스판이었다. 꽃들은 앨리스를 흥미롭게 쳐다보았다 — 꽃이 말을 하는 나라에서는, <b>사람이 이상한 것</b>이니까. 나리가 말했다. "우리는 얘기할 수 있어요. 입 달린 것들은 누구나 할 수 있죠. 대부분 너무 시끄러울 뿐이에요."</p>
+      </div>
+      <div class="garden-scene reveal">
+        <div class="flower-row">
+          <button class="flower" type="button">
+            <span class="say">"쉿 — 붉은 여왕이 오신다!"</span>
+            <svg viewBox="0 0 120 200" class="sway" aria-hidden="true">
+              <path d="M60 190 L60 112" stroke="#4d4234" stroke-width="4" fill="none"/>
+              <path d="M60 150 Q30 144 26 122 Q52 122 60 146Z" fill="#5a7a4a" opacity=".85"/>
+              <path d="M60 164 Q88 158 92 138 Q66 138 60 160Z" fill="#5a7a4a" opacity=".7"/>
+              <g fill="none" stroke="#a51f2b" stroke-width="3">
+                <circle cx="60" cy="84" r="26"/>
+                <path d="M60 84 m-18 0 a18 18 0 0 1 26 -14" stroke-width="2.4"/>
+                <path d="M60 84 m-10 -6 a12 12 0 0 1 18 2" stroke-width="2.4"/>
+                <path d="M60 84 m-3 -8 a6 6 0 0 1 9 4" stroke-width="2.4"/>
+              </g>
+              <path d="M42 66 q-8 -12 2 -20 M78 66 q8 -12 -2 -20" stroke="#4d4234" stroke-width="2" fill="none"/>
+            </svg>
+          </button>
+          <button class="flower" type="button">
+            <span class="say">"우리는 얘기할 수 있어요 — 입 달린 건 다 하죠."</span>
+            <svg viewBox="0 0 140 200" class="sway s2" aria-hidden="true">
+              <path d="M74 190 Q64 142 70 104" stroke="#4d4234" stroke-width="4.4" fill="none"/>
+              <path d="M72 150 Q100 148 106 128 Q82 126 72 146Z" fill="#5a7a4a" opacity=".8"/>
+              <path d="M70 104 Q44 80 30 88 Q40 102 66 98" fill="#d97b2c" stroke="#26201a" stroke-width="2.4"/>
+              <path d="M70 104 Q66 76 84 70 Q94 82 78 98" fill="#d97b2c" stroke="#26201a" stroke-width="2.4"/>
+              <path d="M70 104 Q92 96 104 104 Q94 116 74 110" fill="#d97b2c" stroke="#26201a" stroke-width="2.4"/>
+              <path d="M70 104 Q52 100 44 112 Q58 120 70 110" fill="#d97b2c" stroke="#26201a" stroke-width="2.4"/>
+              <path d="M66 100 L52 84 M60 104 L50 96" stroke="#26201a" stroke-width="2"/>
+              <path d="M70 104 L74 78" stroke="#26201a" stroke-width="2.4"/>
+              <circle cx="74" cy="76" r="3" fill="#26201a"/>
+            </svg>
+          </button>
+          <button class="flower" type="button">
+            <span class="say">"우리도, 다 같이, 속삭이자 — 쉿쉿쉿."</span>
+            <svg viewBox="0 0 120 200" class="sway s3" aria-hidden="true">
+              <path d="M60 190 L60 118" stroke="#4d4234" stroke-width="4" fill="none"/>
+              <path d="M60 156 Q34 152 30 132 Q54 130 60 152Z" fill="#5a7a4a" opacity=".75"/>
+              <g fill="#f4ecdc" stroke="#26201a" stroke-width="2">
+                <ellipse cx="60" cy="76" rx="8" ry="17"/>
+                <ellipse cx="60" cy="76" rx="8" ry="17" transform="rotate(45 60 96)"/>
+                <ellipse cx="60" cy="76" rx="8" ry="17" transform="rotate(90 60 96)"/>
+                <ellipse cx="60" cy="76" rx="8" ry="17" transform="rotate(135 60 96)"/>
+                <ellipse cx="60" cy="76" rx="8" ry="17" transform="rotate(180 60 96)"/>
+                <ellipse cx="60" cy="76" rx="8" ry="17" transform="rotate(225 60 96)"/>
+                <ellipse cx="60" cy="76" rx="8" ry="17" transform="rotate(270 60 96)"/>
+                <ellipse cx="60" cy="76" rx="8" ry="17" transform="rotate(315 60 96)"/>
+              </g>
+              <circle cx="60" cy="96" r="11" fill="#e2c66a" stroke="#26201a" stroke-width="2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="lawn" aria-hidden="true"></div>
+  </section>
+
+  <!-- ═══ 이름 없는 숲 ═══ -->
+  <section class="wood" id="wood">
+    <div class="trees t-top" aria-hidden="true">
+      <svg viewBox="0 0 1200 160" preserveAspectRatio="none">
+        <g stroke="#2c241c" stroke-width="5" fill="none" opacity=".8">
+          <path d="M60 160 L60 20 M60 40 L28 8 M60 56 L96 22 M60 74 L34 56"/>
+          <path d="M300 160 L300 46 M300 60 L266 30 M300 72 L336 44"/>
+          <path d="M560 160 L560 12 M560 34 L528 6 M560 52 L596 20 M560 70 L532 52"/>
+          <path d="M840 160 L840 56 M840 70 L806 40 M840 82 L874 54"/>
+          <path d="M1100 160 L1100 24 M1100 44 L1068 14 M1100 60 L1136 28 M1100 78 L1072 60"/>
+        </g>
+        <g stroke="#3a2f24" stroke-width="3.4" fill="none" opacity=".55">
+          <path d="M180 160 L180 76 M180 90 L152 62 M180 100 L208 74"/>
+          <path d="M440 160 L440 60 M440 74 L412 48 M440 86 L470 58"/>
+          <path d="M700 160 L700 70 M700 84 L672 56 M700 94 L730 66"/>
+          <path d="M960 160 L960 52 M960 68 L932 42 M960 80 L992 52"/>
+        </g>
+      </svg>
+    </div>
+    <div class="trees t-btm" aria-hidden="true">
+      <svg viewBox="0 0 1200 140" preserveAspectRatio="none">
+        <g stroke="#2c241c" stroke-width="5" fill="none" opacity=".8">
+          <path d="M140 0 L140 130 M140 24 L108 -2 M140 40 L176 8"/>
+          <path d="M480 0 L480 118 M480 20 L448 -6 M480 34 L514 4"/>
+          <path d="M780 0 L780 128 M780 22 L748 -4 M780 38 L816 6"/>
+          <path d="M1060 0 L1060 110 M1060 18 L1030 -8 M1060 30 L1094 2"/>
+        </g>
+      </svg>
+    </div>
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">Chapter III 로 가는 길 · The Wood</p>
+        <h2>이름이 사라지는 숲</h2>
+        <p class="body">나무들이 너무 빽빽해서, 이름들이 다 어디론가 가 버렸다. 사슴이 곁에 다가와도, 앨리스는 사슴의 이름을 불러 줄 수 없었다. 사슴도 앨리스를 알아보지 못했다.</p>
+      </div>
+      <p class="fade-word" id="fadeWord" aria-label="앨리스" aria-hidden="true"><span class="ltr">앨</span><span class="ltr">리</span><span class="ltr">스</span></p>
+      <div class="fawn" id="fawn" aria-hidden="true">
+        <svg viewBox="0 0 220 180">
+          <path d="M40 168 L44 120 Q30 112 34 96 Q38 80 56 76 L64 44 Q70 30 84 32 L86 18 L94 32 L106 30 L104 44 Q120 50 122 68 L118 76 Q140 88 142 112 L150 118 L158 112 L162 120 L152 128 L140 124 Q136 140 120 146 L124 168 L112 168 L108 150 L84 152 L80 168 Z"
+                fill="#e8dcc0"/>
+          <path d="M86 18 L80 6 M94 32 L98 12" stroke="#e8dcc0" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <path d="M64 44 Q76 36 84 44" stroke="#171310" stroke-width="2" fill="none"/>
+        </svg>
+      </div>
+      <p class="w-note">스크롤하는 동안, 이름도 흩어진다</p>
+    </div>
+  </section>
+
+  <!-- ═══ 곤충들 ═══ -->
+  <section class="ch" id="insects">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">Chapter III · Looking-Glass Insects</p>
+        <h2>거울 곤충들</h2>
+        <p class="body">기차는 앨리스를 세 번째 칸까지 실어 날랐다. "티켓 주세요!" 차장이 외쳤지만, 티켓은 벌집 모양이었다. 창밖의 풀빛 깊은 곳에서는, <b>이쪽 세계에 없는 곤충들</b>이 그럴듯하게 날고 있었다.</p>
+      </div>
+      <div class="bugs reveal">
+        <div class="bug">
+          <p class="bug-num">표본 Ⅰ</p>
+          <h3>빵버터파리<span class="latin">Bread-and-butter-fly</span></h3>
+          <div class="buggy" aria-hidden="true">
+            <svg viewBox="0 0 220 140">
+              <g stroke="#26201a" fill="#f4ecdc">
+                <path d="M96 70 C60 30 14 44 22 74 C10 100 56 116 96 82 Z" stroke-width="3"/>
+                <path d="M124 70 C160 30 206 44 198 74 C210 100 164 116 124 82 Z" stroke-width="3"/>
+              </g>
+              <g fill="none" stroke="#c9b992" stroke-width="2">
+                <path d="M70 62 Q50 66 42 76 M76 52 Q60 50 52 56"/>
+                <path d="M150 62 Q170 66 178 76 M144 52 Q160 50 168 56"/>
+              </g>
+              <rect x="99" y="58" width="22" height="24" rx="4" fill="#e2c66a" stroke="#26201a" stroke-width="3"/>
+              <path d="M110 52 L110 44 M110 82 L110 90" stroke="#26201a" stroke-width="3"/>
+              <circle cx="104" cy="44" r="2.6" fill="#26201a"/><circle cx="116" cy="44" r="2.6" fill="#26201a"/>
+            </svg>
+          </div>
+          <p>날개는 두 쪽의 식빵, 몸통은 버터 한 조각, 머리는 설탕 덩어리. 먹이를 구할 수 없어서, 늘 절망 속에 산다.</p>
+        </div>
+        <div class="bug">
+          <p class="bug-num">표본 Ⅱ</p>
+          <h3>그네말파리<span class="latin">Rocking-horse-fly</span></h3>
+          <div class="buggy b2" aria-hidden="true">
+            <svg viewBox="0 0 220 140">
+              <path d="M86 46 C82 28 96 16 112 18 C128 20 136 32 134 46 L128 60 L92 60 Z" fill="#a9825a" stroke="#26201a" stroke-width="3"/>
+              <path d="M134 30 C150 26 158 34 154 44 L136 48 Z" fill="#a9825a" stroke="#26201a" stroke-width="3"/>
+              <path d="M96 24 L90 10 L104 18 Z" fill="#26201a"/>
+              <circle cx="104" cy="32" r="2.6" fill="#26201a"/>
+              <path d="M92 60 L94 86 M128 60 L126 86" stroke="#26201a" stroke-width="4"/>
+              <path d="M60 96 Q110 122 160 96" fill="none" stroke="#26201a" stroke-width="5" stroke-linecap="round"/>
+              <path d="M64 96 Q56 88 48 92 M156 96 Q164 88 172 92" stroke="#26201a" stroke-width="3" fill="none"/>
+              <g fill="#f4ecdc" stroke="#26201a" stroke-width="2">
+                <ellipse cx="76" cy="52" rx="16" ry="8" transform="rotate(-24 76 52)"/>
+                <ellipse cx="76" cy="52" rx="16" ry="8" transform="rotate(-56 76 52)"/>
+              </g>
+            </svg>
+          </div>
+          <p>통나무로 온통 만들어져 있고, 날지 않는다 — 그네처럼 흔들리며 움직인다.</p>
+        </div>
+        <div class="bug">
+          <p class="bug-num">표본 Ⅲ</p>
+          <h3>플럼푸딩용파리<span class="latin">Snap-dragon-fly</span></h3>
+          <div class="buggy b3" aria-hidden="true">
+            <svg viewBox="0 0 220 140">
+              <ellipse cx="110" cy="80" rx="42" ry="30" fill="#8a5a34" stroke="#26201a" stroke-width="3"/>
+              <path d="M84 70 Q110 58 136 70 M80 84 Q110 96 140 84" fill="none" stroke="#5f3a20" stroke-width="2.4"/>
+              <g fill="#3f6b3a" stroke="#26201a" stroke-width="2">
+                <path d="M96 54 L92 34 L104 48 L106 28 L112 50 L124 36 L118 56 Z"/>
+              </g>
+              <g fill="#3f6b3a" stroke="#26201a" stroke-width="2">
+                <path d="M72 62 C52 46 30 52 34 66 C22 76 44 90 70 74 Z"/>
+                <path d="M148 62 C168 46 190 52 186 66 C198 76 176 90 150 74 Z"/>
+              </g>
+              <path d="M110 44 C100 26 118 14 112 2 C130 12 128 32 116 44 Z" fill="#c82833" stroke="#7c1420" stroke-width="2"/>
+              <circle cx="110" cy="26" r="3" fill="#f6d67a"/>
+            </svg>
+          </div>
+          <p>몸통은 자두 푸딩, 날개는 호랑가시나뭇잎, 머리는 브랜디에 타오르는 건포도.</p>
+        </div>
+      </div>
+      <div class="reveal">
+        <p class="obs"><i aria-hidden="true"></i><span class="tag">앨리스의 메모</span><span>"저건 정말 불쌍해요. 먹이를 구할 수가 없으니, 오래 살지 못할 거예요." — 앨리스</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 험프티 덤프티 ═══ -->
+  <section class="ch" id="humpty">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">Chapter VI · Humpty Dumpty</p>
+        <h2>험프티 덤프티</h2>
+        <p class="body">달걀이 담장 위에 앉아 있었다. 그는 앨리스에게 자기 이름의 뜻을 설명해 주었고, 이어서 — 자기가 쓰는 <b>단어들의 뜻까지</b> 설명해 주었다.</p>
+        <p class="quote">"내가 단어를 쓸 때, 그 단어는 내가 뜻하기로 한 것을 뜻해요. 더도 아니고, 덜도 아니고."<i>— 험프티 덤프티</i></p>
+      </div>
+      <div class="humpty-scene reveal" aria-hidden="true">
+        <svg viewBox="0 0 640 330">
+          <g stroke="#26201a" stroke-width="2.4" fill="#e6d9be">
+            <rect x="0" y="238" width="640" height="30" fill="#d9c9a8"/>
+            <path d="M0 268 h640" stroke-width="3"/>
+            <g fill="#d9c9a8" stroke-width="2">
+              <rect x="14" y="240" width="72" height="26"/><rect x="100" y="240" width="72" height="26"/>
+              <rect x="186" y="240" width="72" height="26"/><rect x="272" y="240" width="72" height="26"/>
+              <rect x="358" y="240" width="72" height="26"/><rect x="444" y="240" width="72" height="26"/>
+              <rect x="530" y="240" width="72" height="26"/><rect x="616" y="240" width="24" height="26"/>
+              <rect x="42" y="268" width="72" height="26"/><rect x="128" y="268" width="72" height="26"/>
+              <rect x="214" y="268" width="72" height="26"/><rect x="300" y="268" width="72" height="26"/>
+              <rect x="386" y="268" width="72" height="26"/><rect x="472" y="268" width="72" height="26"/>
+              <rect x="558" y="268" width="72" height="26"/>
+            </g>
+          </g>
+          <ellipse cx="320" cy="132" rx="86" ry="106" fill="#f4ecdc" stroke="#26201a" stroke-width="3.4"/>
+          <path d="M262 120 Q268 96 286 88" fill="none" stroke="#cbbfa4" stroke-width="2.4"/>
+          <g stroke="#26201a" stroke-width="3" fill="none" stroke-linecap="round">
+            <path d="M300 104 q6 7 12 0 M332 104 q6 7 12 0"/>
+            <path d="M296 138 Q320 168 346 136"/>
+          </g>
+          <path d="M304 122 q16 10 32 0" stroke="#7a6c56" stroke-width="2" fill="none"/>
+          <path d="M292 226 L320 208 L348 226 L320 238 Z" fill="#a51f2b" stroke="#26201a" stroke-width="2.6"/>
+          <path d="M320 238 L320 208 M306 226 L300 240 M334 226 L340 240" stroke="#26201a" stroke-width="2.2"/>
+          <path d="M398 160 C428 158 436 174 424 186 C442 188 444 206 428 210" fill="none" stroke="#a51f2b" stroke-width="2.4" stroke-linecap="round" opacity=".8"/>
+        </svg>
+      </div>
+      <div class="port reveal">
+        <button class="blend" type="button">
+          <span class="src">민첩한 lithe<i>+</i>미끌한 slimy</span>
+          <span class="word">슬리디<span class="latin">slithy</span></span>
+        </button>
+        <button class="blend" type="button">
+          <span class="src">야윈 flimsy<i>+</i>시무룩한 miserable</span>
+          <span class="word">밈시<span class="latin">mimsy</span></span>
+        </button>
+        <button class="blend" type="button">
+          <span class="src">부글부글 fuming<i>+</i>몹시 성난 furious</span>
+          <span class="word">프루미어스<span class="latin">frumious</span></span>
+        </button>
+      </div>
+      <div class="verse reveal">
+        <p>’Twas brillig, and the slithy toves<br>
+        Did gyre and gimble in the wabe;</p>
+        <p class="kr">부릴리그한 오후, 슬리디한 토브들은<br>
+        기임과 미어 사이를 자이럴리게 굴러 다녔다.</p>
+        <i class="v-cap">재버워크 1연 · 험프티가 풀어 준 대로</i>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 흰 기사 ═══ -->
+  <section class="ch" id="knight">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">Chapter VIII · 'It's my own Invention'</p>
+        <h2>흰 기사</h2>
+        <p class="body">여덟 번째 칸을 앞두고, 흰 기사가 나타났다. 그는 상자를 뒤집어 놓아 비를 막는 법을 발명했고, 말의 발목에 쥐덫을 달아 <b>상어의 이빨</b>을 걱정했다. 그리고 자꾸 말에서 떨어졌다. 앨리스는 이 어수선한 기사를, 이야기 전체에서 가장 좋아하게 되었다.</p>
+        <p class="quote">"떨어지는 건 아무것도 아니에요. 진짜 기술은 — 다시 올라타는 거죠."<i>— 흰 기사</i></p>
+      </div>
+      <div class="ride reveal" aria-hidden="true">
+        <svg viewBox="0 0 540 320">
+          <path d="M40 300 h470" stroke="#7a6c56" stroke-width="3" stroke-linecap="round"/>
+          <g class="horse-idle">
+            <g fill="#26201a">
+              <path d="M64 208 Q58 156 128 146 Q196 136 256 158 Q306 174 316 208 Q310 226 252 234 Q150 244 92 238 Q66 234 64 208 Z"/>
+              <path d="M252 158 Q268 122 292 112 Q318 104 332 118 Q340 130 328 140 Q312 152 296 158 Q272 166 252 162 Z"/>
+              <ellipse cx="336" cy="124" rx="14" ry="10"/>
+              <path d="M300 108 L294 92 L306 102 Z"/>
+              <path d="M96 236 L92 296 M120 238 L118 296 M236 234 L240 296 M262 230 L268 296" stroke="#26201a" stroke-width="11" stroke-linecap="round"/>
+            </g>
+            <path d="M262 150 Q272 128 286 116" stroke="#7a6c56" stroke-width="3" fill="none"/>
+            <path d="M66 210 Q40 200 46 178 Q52 162 38 154" stroke="#26201a" stroke-width="7" stroke-linecap="round" fill="none"/>
+          </g>
+          <g id="rider">
+            <path d="M152 152 L162 112 L188 108 L198 124 L188 152 Z" fill="#f4ecdc" stroke="#26201a" stroke-width="3"/>
+            <circle cx="176" cy="98" r="14" fill="#f4ecdc" stroke="#26201a" stroke-width="3"/>
+            <path d="M162 96 h-8" stroke="#26201a" stroke-width="2.4"/>
+            <path d="M176 86 Q160 62 146 68 Q142 84 158 90" fill="none" stroke="#7a6c56" stroke-width="4" stroke-linecap="round"/>
+            <line x1="196" y1="120" x2="330" y2="58" stroke="#26201a" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="216" cy="112" r="6" fill="#a51f2b" stroke="#26201a" stroke-width="2.4"/>
+            <path d="M186 152 L200 176 L192 178" fill="none" stroke="#26201a" stroke-width="9" stroke-linecap="round"/>
+          </g>
+          <g class="dust" stroke="#7a6c56" stroke-width="3" fill="none" stroke-linecap="round">
+            <path d="M96 288 q6 -10 2 -18 M112 290 q8 -8 6 -20 M128 288 q4 -12 0 -18"/>
+          </g>
+        </svg>
+      </div>
+      <p class="k-caption reveal">…and off he went, again · 9초에 한 번</p>
+      <div class="reveal">
+        <p class="obs"><i aria-hidden="true"></i><span class="tag">앨리스의 메모</span><span>그의 노래 제목은 '문가에 앉아서'. 노래의 이름과 노래가 무엇에 관한 것인지는 — 그에겐 전혀 다른 문제였다.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 여덟째 칸 ═══ -->
+  <section class="ch" id="queens">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">Chapter IX · Queen Alice</p>
+        <h2>여덟째 칸</h2>
+        <p class="body">병졸이 마지막 칸에 닿는 순간, 왕관이 내려앉는다. 잔치가 시작되었지만 — 소개받은 푸딩은 분노했고, 자리는 뒤숭순해졌다. 앨리스는 붉은 여왕의 어깨를 잡고 흔들었다. 흔들수록 여왕은 <b>작아지고, 작아지고, 둥글어져서</b> — 검은 고양이가 되어 있었다.</p>
+      </div>
+      <div class="crown reveal" aria-hidden="true">
+        <svg viewBox="0 0 300 210">
+          <path class="c-path" id="crownPath" d="M42 158 L74 64 L112 134 L150 44 L188 134 L226 64 L258 158"/>
+          <path class="c-band" id="crownBand" d="M42 158 h216 M48 176 h204"/>
+          <circle class="jewel" id="j1" cx="74" cy="64" r="9"/>
+          <circle class="jewel j-red" id="j2" cx="150" cy="44" r="10"/>
+          <circle class="jewel" id="j3" cx="226" cy="64" r="9"/>
+        </svg>
+      </div>
+      <p class="q-big reveal">여왕 앨리스</p>
+      <p class="q-sub reveal">QUEEN ALICE · THE EIGHTH SQUARE</p>
+      <div class="collapse reveal" aria-hidden="true">
+        <svg viewBox="0 0 430 240">
+          <g id="rqp">
+            <path d="M92 40 L104 74 L120 34 L136 74 L148 40 L146 90 Q166 130 148 158 L158 190 Q162 210 150 222 L96 222 Q84 210 88 190 L98 158 Q80 130 100 90 Z"
+                  fill="#c82833" stroke="#f1e8d7" stroke-width="3"/>
+            <circle cx="120" cy="118" r="4" fill="#f1e8d7"/>
+          </g>
+          <g id="wball">
+            <circle cx="300" cy="170" r="52" fill="#a51f2b" stroke="#7c1420" stroke-width="3"/>
+            <g class="spin" fill="none" stroke="#7c1420" stroke-width="2.6" stroke-linecap="round">
+              <path d="M252 158 Q300 128 348 158"/>
+              <path d="M256 190 Q300 214 344 186"/>
+              <path d="M268 136 Q296 170 334 200"/>
+              <path d="M274 200 Q310 152 330 136"/>
+            </g>
+            <path d="M300 118 C316 96 342 100 350 84" fill="none" stroke="#c82833" stroke-width="3" stroke-linecap="round"/>
+          </g>
+          <path d="M170 210 C220 226 258 226 292 214" fill="none" stroke="#c82833" stroke-width="2.4" opacity=".6"/>
+        </svg>
+      </div>
+      <p class="c-cap reveal">붉은 여왕 → 흔들기 → 검은 고양이의 실뭉치</p>
+    </div>
+  </section>
+
+  <!-- ═══ 깨어남 ═══ -->
+  <section class="ch" id="dawn">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">Chapter XI–XII · Waking · Which dreamed it?</p>
+        <h2>누가 꿈를 꾼 걸까</h2>
+        <p class="body" style="margin-inline:auto;max-width:27rem">다시 겨울 저녁의 응접실. 붉은 실뭉치는 풀려 있었고, 검은 고양이는 그 위에서 잠들어 있었다. 앨리스는 물었다 — 붉은 왕이 나를 꿈꾼 걸까, 내가 왕을 꿈꾼 걸까.</p>
+      </div>
+      <div class="dawn-mirror reveal" aria-hidden="true">
+        <svg viewBox="0 0 230 300">
+          <g fill="none" stroke="#26201a">
+            <rect x="6" y="6" width="218" height="288" rx="4" stroke-width="3"/>
+            <rect x="20" y="20" width="190" height="260" rx="2" stroke-width="1.6"/>
+            <path d="M92 20 A24 24 0 0 1 138 20" stroke-width="2"/>
+            <circle cx="115" cy="-4" r="5" fill="#26201a"/>
+          </g>
+        </svg>
+        <div class="dglass"><p>지금 막, 누군가가<br>유리를 지나갔다</p></div>
+      </div>
+      <div class="sleep reveal" aria-hidden="true">
+        <svg viewBox="0 0 240 170">
+          <circle cx="150" cy="110" r="62" fill="#a51f2b" stroke="#7c1420" stroke-width="3"/>
+          <g fill="none" stroke="#7c1420" stroke-width="2.4" stroke-linecap="round">
+            <path d="M96 92 Q150 62 204 92"/>
+            <path d="M100 128 Q150 152 200 126"/>
+            <path d="M112 76 Q140 112 188 142"/>
+          </g>
+          <path d="M150 48 C162 30 184 34 190 20" fill="none" stroke="#a51f2b" stroke-width="3" stroke-linecap="round"/>
+          <path d="M62 138 Q58 106 88 100 Q120 95 138 112 Q154 126 150 142 Q120 152 84 150 Q64 148 62 138 Z" fill="#1c1712"/>
+          <circle cx="92" cy="116" r="14" fill="#1c1712"/>
+          <path d="M82 106 L78 94 L88 102 Z" fill="#1c1712"/>
+          <path d="M98 104 L106 94 L104 106 Z" fill="#1c1712"/>
+          <path d="M86 118 q5 4 10 0" stroke="#f1e8d7" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          <path d="M40 142 Q22 138 26 124 Q30 112 18 106" stroke="#1c1712" stroke-width="6" stroke-linecap="round" fill="none"/>
+          <path d="M20 118 q4 -3 8 0 M28 110 q4 -3 8 0" stroke="#7a6c56" stroke-width="1.6" fill="none"/>
+        </svg>
+      </div>
+      <div class="reveal">
+        <p class="q-es">« Life, what is it but a dream? »</p>
+        <p class="q-kr">인생이란 무엇인가 —<br>꿈이 아니고서야.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>루이스 캐럴 『거울 나라의 앨리스』(1871) 오마주 · 존 테니얼 판화의 정신을 본뜬 인라인 SVG<br>
+  하나의 HTML 파일 · 이미지 없이 CSS와 SVG, JavaScript로만 그렸습니다 · 인용문은 각색을 포함합니다</p>
+  <button class="btn-top" id="back" type="button">거울 앞으로 돌아가기<span aria-hidden="true">↑</span></button>
+</footer>
+
+<noscript><style>.hud,.thread{display:none}</style></noscript>
+
+<script>
+(function(){
+'use strict';
+document.documentElement.classList.add('js');
+var clamp=function(v,a,b){return Math.max(a,Math.min(b,v));};
+var ease=function(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;};
+
+/* ── 붉은 실 (왼쪽 진행선) ── */
+var tSvg=document.getElementById('threadSvg'),
+    tBase=document.getElementById('tBase'),
+    tRed=document.getElementById('tRed'),
+    tDot=document.getElementById('tDot'),
+    tLen=0;
+function buildThread(){
+  var h=window.innerHeight,w=36;
+  tSvg.setAttribute('width',w);tSvg.setAttribute('height',h);
+  tSvg.setAttribute('viewBox','0 0 '+w+' '+h);
+  var d='M18 0';
+  var y=0,dir=1;
+  while(y<h-40){
+    var seg=52+Math.random()*26;
+    var ny=Math.min(h-8,y+seg);
+    d+=' Q'+(18+dir*11)+' '+(y+(ny-y)/2)+' 18 '+ny;
+    y=ny;dir*=-1;
+  }
+  if(h-8-y>0)d+=' L18 '+(h-8);
+  tBase.setAttribute('d',d);tRed.setAttribute('d',d);
+  try{tLen=tRed.getTotalLength();}catch(e){tLen=h;}
+  tRed.style.strokeDasharray=tLen;
+  tRed.style.strokeDashoffset=tLen;
+}
+
+/* ── HUD ── */
+var hudRank=document.getElementById('hudRank'),hudCh=document.getElementById('hudCh');
+var chapters=[
+  {id:'top',label:'거울 앞'},
+  {id:'garden',label:'제2장 · 살아 있는 꽃들의 정원'},
+  {id:'wood',label:'이름 없는 숲'},
+  {id:'insects',label:'제3장 · 거울 곤충들'},
+  {id:'humpty',label:'제6장 · 험프티 덤프티'},
+  {id:'knight',label:'제8장 · 흰 기사'},
+  {id:'queens',label:'제9장 · 여왕 앨리스'},
+  {id:'dawn',label:'누가 꿈을 꾼 걸까'}
+];
+var anchors=[];
+function measure(){
+  var list=[];
+  for(var i=0;i<chapters.length;i++){
+    var el=document.getElementById(chapters[i].id);
+    if(!el)continue;
+    list.push({y:el.getBoundingClientRect().top+window.scrollY+Math.min(el.offsetHeight*.3,300),label:chapters[i].label});
+  }
+  list.sort(function(a,b){return a.y-b.y;});
+  anchors=list;
+}
+
+/* ── 거울 반사광 ── */
+var mirror=document.getElementById('mirror'),heroVisible=true;
+if('IntersectionObserver' in window){
+  new IntersectionObserver(function(es){es.forEach(function(e){heroVisible=e.isIntersecting;});},{threshold:0}).observe(mirror);
+}
+var mirRaf=false;
+mirror.addEventListener('pointermove',function(e){
+  if(mirRaf||!heroVisible)return;
+  mirRaf=true;
+  requestAnimationFrame(function(){
+    mirRaf=false;
+    var r=mirror.getBoundingClientRect();
+    var mx=clamp((e.clientX-r.left)/r.width*100,6,94);
+    mirror.querySelector('.glass').style.setProperty('--mx',mx+'%');
+  });
+},{passive:true});
+
+/* ── 등장 애니메이션 (안전 잠금 포함) ── */
+function lockLater(el){setTimeout(function(){el.classList.add('in-locked');},2400);}
+if('IntersectionObserver' in window){
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('in');lockLater(e.target);io.unobserve(e.target);}
+    });
+  },{threshold:.14,rootMargin:'0px 0px -6% 0px'});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+}else{
+  document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('in','in-locked');});
+}
+setTimeout(function(){document.documentElement.classList.add('heroDone');},3000);
+
+/* ── 버튼 ── */
+document.getElementById('enter').addEventListener('click',function(){
+  document.getElementById('garden').scrollIntoView();
+});
+document.getElementById('back').addEventListener('click',function(){
+  window.scrollTo({top:0});
+});
+
+/* ── 스크롤 구동 요소들 ── */
+var letters=document.querySelectorAll('#fadeWord .ltr'),
+    fawn=document.getElementById('fawn'),
+    woodSec=document.getElementById('wood'),
+    crownPath=document.getElementById('crownPath'),
+    crownBand=document.getElementById('crownBand'),
+    jewels=[document.getElementById('j1'),document.getElementById('j2'),document.getElementById('j3')],
+    rqp=document.getElementById('rqp'),wball=document.getElementById('wball'),
+    queensSec=document.getElementById('queens');
+var crownL=0,crownBL=0;
+try{crownL=crownPath.getTotalLength();}catch(e){crownL=420;}
+try{crownBL=crownBand.getTotalLength();}catch(e){crownBL=440;}
+crownPath.style.strokeDasharray=crownL;crownPath.style.strokeDashoffset=crownL;
+crownBand.style.strokeDasharray=crownBL;crownBand.style.strokeDashoffset=crownBL;
+for(var ji=0;ji<jewels.length;ji++){jewels[ji].style.opacity=0;}
+wball.style.opacity=0;
+
+var ticking=false;
+function onScroll(){
+  if(ticking)return;ticking=true;
+  requestAnimationFrame(update);
+}
+function update(){
+  ticking=false;
+  var vh=window.innerHeight,sy=window.scrollY;
+  var docH=Math.max(1,document.documentElement.scrollHeight-vh);
+  var p=clamp(sy/docH,0,1);
+
+  /* 붉은 실 */
+  if(tLen>0){
+    tRed.style.strokeDashoffset=tLen*(1-p);
+    var pt=tRed.getPointAtLength(tLen*p);
+    if(pt){tDot.setAttribute('cx',pt.x);tDot.setAttribute('cy',pt.y);}
+  }
+
+  /* HUD */
+  var rank=clamp(Math.floor(p*8)+1,1,8);
+  hudRank.textContent='칸 '+rank+' / 8';
+  var label=anchors.length?anchors[0].label:'';
+  for(var i=0;i<anchors.length;i++){if(sy+vh*.45>=anchors[i].y)label=anchors[i].label;}
+  if(hudCh.textContent!==label)hudCh.textContent=label;
+
+  /* 이름이 사라지는 숲 */
+  var wr=woodSec.getBoundingClientRect();
+  var wp=clamp((vh*.72-wr.top)/(wr.height*.9),0,1);
+  for(var li=0;li<letters.length;li++){
+    var start=.1+li*.17;
+    var k=clamp((wp-start)/.13,0,1);
+    var st=letters[li].style;
+    st.opacity=String(1-k);
+    st.filter='blur('+(k*7)+'px)';
+    st.transform='translateY('+(-k*30)+'px) rotate('+(-k*14)+'deg)';
+  }
+  if(fawn)fawn.classList.toggle('on',wp>.45&&wp<.85);
+
+  /* 대관식 */
+  var qr=queensSec.getBoundingClientRect();
+  var cp=clamp((vh*.85-qr.top)/(qr.height*.85),0,1);
+  crownPath.style.strokeDashoffset=crownL*(1-ease(cp));
+  crownBand.style.strokeDashoffset=crownBL*(1-ease(clamp(cp*1.3-.2,0,1)));
+  for(var j=0;j<jewels.length;j++){jewels[j].style.opacity=String(clamp(cp*1.7-.75,0,1));}
+
+  /* 붉은 여왕 → 실뭉치 */
+  var q=clamp((cp-.52)/.4,0,1);
+  rqp.style.opacity=String(1-q);
+  rqp.style.transform='scale('+(1-q*.8)+') rotate('+(q*38)+'deg)';
+  wball.style.opacity=String(q);
+}
+
+window.addEventListener('scroll',onScroll,{passive:true});
+
+/* ── 초기화 ── */
+function init(){
+  buildThread();measure();update();
+}
+var qd=false;
+function queue(){
+  if(qd)return;qd=true;
+  requestAnimationFrame(function(){
+    qd=false;buildThread();measure();update();
+  });
+}
+window.addEventListener('resize',queue);
+window.addEventListener('load',queue);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(queue);
+setTimeout(queue,1200);
+
+init();
+window.__lg_ok=true;
+})();
+</script>
+</body>
+</html>
