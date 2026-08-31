@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시간이 녹는 밤 — 달리의 꿈을 걷는 한 밤</title>
+<meta name="description" content="스크롤은 한 밤의 수면. 살바도르 달리의 꿈을 걷는 인터랙티브 페이지. 녹는 시계, 떠다니는 서랍, 다리 긴 코끼리, 구체의 갈라테아.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23241b3a'/><path d='M14 24 C22 16 40 16 46 22 C52 28 50 40 44 46 C38 52 30 50 26 46 C20 40 16 34 16 28 Z' fill='%23d8b06b'/><circle cx='34' cy='50' r='2.4' fill='%23d8b06b'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,700;0,800;1,600;1,800;1,900&family=Hahmlet:wght@400;700;900&family=Song+Myung&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ivory:#f3e9d2;
+  --ivory-dim:#cbb99a;
+  --ivory-faint:#9d8b6f;
+  --gold:#d9a441;
+  --gold-soft:#e8b060;
+  --espresso:#2e1f14;
+  --night:#0d0a1a;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --disp:'Hahmlet','Nanum Myeongjo','Noto Serif KR',serif;
+  --body:'Song Myung','Nanum Myeongjo','Batang',serif;
+  --latin:'Bodoni Moda',serif;
+  --ease:cubic-bezier(.22,.9,.28,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--night)}
+body{
+  margin:0;font-family:var(--body);color:var(--ivory);
+  /* JS 꺼짐 폴백: 한 밤의 하늘 */
+  background:linear-gradient(180deg,#241b3a 0,#7c4438 8%,#d9914a 16%,#1d1633 30%,#120e24 46%,#0a0818 78%,#38223e 96%);
+  overflow-x:hidden;
+}
+::selection{background:var(--gold);color:var(--espresso)}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:#0a0714}
+::-webkit-scrollbar-thumb{background:rgba(217,164,65,.3);border-radius:6px}
+@supports (scrollbar-color: red blue){ html{scrollbar-color:rgba(217,164,65,.35) #0a0714} }
+:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px;border-radius:2px}
+
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.vignette{
+  position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(125% 95% at 46% 42%, transparent 58%, rgba(8,4,14,.4) 100%);
+}
+main,footer{position:relative;z-index:1}
+
+/* ── HUD : 꿈의 시각 ─────────────────────── */
+.hud{
+  position:fixed;top:18px;right:18px;z-index:20;display:flex;align-items:center;gap:9px;
+  font-family:var(--mono);font-size:12px;color:var(--ivory);
+  background:rgba(14,8,24,.4);-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);
+  border:1px solid rgba(232,176,96,.22);border-radius:99px;padding:7px 14px 7px 9px;
+}
+.hud svg{display:block}
+.hud .h-rot{transform-origin:12px 11px;animation:hudSpin 4.2s linear infinite}
+@keyframes hudSpin{to{transform:rotate(360deg)}}
+.hud .y-label{color:var(--ivory-faint);font-size:9px;letter-spacing:.18em;margin-right:2px}
+#nowYear{color:var(--gold-soft);font-variant-numeric:tabular-nums;transition:opacity .4s var(--ease)}
+#nowYear.fade{opacity:0}
+
+/* ── 히어로 : 석양 ─────────────────────── */
+.hero{
+  min-height:100vh;min-height:100svh;display:grid;place-content:center;justify-items:center;
+  text-align:center;padding:6rem 1.5rem 26vh;
+}
+.h-eyebrow{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--ivory-dim);margin:0 0 2.6rem;
+}
+.hero h1{
+  margin:0;font-family:var(--disp);font-weight:900;line-height:1.08;letter-spacing:.04em;
+  font-size:clamp(3.2rem,10vw,7.4rem);
+  text-shadow:0 4px 44px rgba(10,4,16,.6);
+}
+.h-en{
+  font-family:var(--latin);font-style:italic;font-weight:600;
+  font-size:clamp(.85rem,1.8vw,1.15rem);letter-spacing:.14em;color:var(--gold-soft);
+  margin:1.4rem 0 0;
+}
+.clock-wrap{margin-top:-6px;position:relative;z-index:1}
+.clock-wrap svg{width:min(31rem,88vw);height:auto;display:block;overflow:visible}
+.sag{animation:sag 7s var(--ease) infinite alternate;transform-origin:252px 96px}
+@keyframes sag{from{transform:rotate(.5deg) scaleY(1)}to{transform:rotate(-.7deg) scaleY(1.035)}}
+.droplet{animation:dropFall 4.4s ease-in infinite}
+.droplet.d2{animation-delay:2.1s}
+@keyframes dropFall{
+  0%{transform:translateY(0);opacity:0}
+  8%{opacity:1}
+  72%{transform:translateY(46px);opacity:1}
+  82%{transform:translateY(54px) scaleY(1.6);opacity:0}
+  100%{transform:translateY(54px);opacity:0}
+}
+.h-sub{
+  max-width:29.5rem;font-size:1.05rem;line-height:2.05;color:var(--ivory-dim);
+  margin:2.6rem 0 2.9rem;text-shadow:0 2px 18px rgba(10,4,16,.7);
+}
+.h-go{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ivory);background:rgba(14,8,24,.25);border:1px solid rgba(243,233,210,.4);
+  padding:.95em 1.9em .95em 2.2em;border-radius:99px;cursor:pointer;
+  transition:background .35s var(--ease),border-color .35s var(--ease);
+}
+.h-go:hover{background:rgba(232,176,96,.14);border-color:var(--gold-soft)}
+.h-go span{display:inline-block;margin-left:.6em;animation:bob 2.6s var(--ease) infinite}
+@keyframes bob{0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}
+
+.js .hero>*{opacity:0;animation:rise 1.2s var(--ease) forwards}
+.js .h-eyebrow{animation-delay:.15s}
+.js .hero h1{animation-delay:.3s}
+.js .h-en{animation-delay:.55s}
+.js .clock-wrap{animation-delay:.75s}
+.js .h-sub{animation-delay:.95s}
+.js .h-go{animation-delay:1.15s}
+/* 시간축이 느려지는 환경에서도 히어로가 반드시 나타나도록 하는 안전장치 */
+.js.heroDone .hero>*{opacity:1!important;transform:none!important;animation:none!important}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+
+/* ── 장면 섹션 ─────────────────────── */
+.scene-sec{position:relative;padding:20vh 1.5rem 18vh;min-height:100vh}
+.copy{
+  position:relative;z-index:1;max-width:36rem;margin-inline:auto;text-align:center;
+}
+.watermark{
+  position:absolute;z-index:0;top:-2rem;left:50%;transform:translateX(-50%);
+  font-family:var(--latin);font-style:italic;font-weight:800;
+  font-size:clamp(8rem,26vw,21rem);line-height:1;color:rgba(243,233,210,.055);
+  user-select:none;pointer-events:none;white-space:nowrap;
+}
+.yr{
+  font-family:var(--latin);font-style:italic;font-weight:800;
+  font-size:clamp(3rem,7vw,5rem);color:var(--gold-soft);line-height:1;margin:0 0 .4rem;
+  text-shadow:0 0 44px rgba(217,164,65,.28);
+}
+.t-en{
+  font-family:var(--mono);font-size:10px;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--ivory-faint);margin:0 0 2rem;display:flex;align-items:center;justify-content:center;gap:1.1em;
+}
+.t-en::before,.t-en::after{content:"";width:2.4rem;height:1px;background:rgba(217,164,65,.4)}
+.scene-sec h2{
+  margin:0 0 1.8rem;font-family:var(--disp);font-weight:900;
+  font-size:clamp(2.1rem,5.4vw,3.6rem);line-height:1.22;
+  text-shadow:0 3px 34px rgba(8,3,14,.6);
+}
+.body{margin:0;font-size:1.05rem;line-height:2.1;color:var(--ivory-dim)}
+.body b{color:var(--ivory);font-weight:400}
+.obs{
+  margin:2.5rem auto 0;max-width:30rem;font-family:var(--mono);font-size:12px;line-height:1.9;
+  color:#b7a689;display:flex;gap:.85em;align-items:baseline;text-align:left;
+}
+.obs .tag{color:var(--ivory-faint);letter-spacing:.2em;font-size:9.5px;white-space:nowrap;text-transform:uppercase}
+.obs i{width:5px;height:5px;border-radius:50%;background:var(--gold-soft);flex:none;align-self:center;animation:obsPulse 2.8s ease-in-out infinite}
+@keyframes obsPulse{0%,100%{opacity:.35}50%{opacity:1}}
+
+/* 장면 일러스트 */
+.scene{position:relative;z-index:1;margin:3.2rem auto 0;max-width:640px}
+.scene svg{width:100%;height:auto;display:block;overflow:visible}
+.js .scene{opacity:0;transform:translateY(30px);transition:opacity 1.1s var(--ease),transform 1.1s var(--ease)}
+.js .scene.in{opacity:1;transform:none}
+.js .scene.in-locked{transition:none!important}
+
+/* 1944 : 달과 코끼리 */
+.stage{position:relative;height:min(58vh,460px);margin-top:3rem;overflow:visible}
+.moon{
+  position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);
+  width:min(54vw,340px);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 38% 34%, #f7eed6 0%, #e9dcb8 46%, #cdb98e 78%, #b49d72 100%);
+  box-shadow:0 0 90px 26px rgba(233,220,184,.22), 0 0 260px 80px rgba(233,220,184,.08);
+}
+.moon::before,.moon::after{
+  content:"";position:absolute;border-radius:50%;background:rgba(90,72,48,.13);
+}
+.moon::before{width:19%;height:19%;left:26%;top:22%}
+.moon::after{width:11%;height:11%;left:60%;top:58%}
+.ele-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.ele{will-change:transform}
+.ele-bob{animation:bob2 5.2s ease-in-out infinite alternate}
+@keyframes bob2{from{transform:translateY(0)}to{transform:translateY(7px)}}
+.stage-cap{
+  font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--ivory-faint);
+  text-transform:uppercase;margin:1.6rem 0 0;text-align:center;
+}
+
+/* 1952 : 구체의 갈라 */
+.gala-wrap{position:relative;max-width:560px;margin:3.4rem auto 0}
+.gala-wrap::before{
+  content:"";position:absolute;inset:-14%;z-index:0;
+  background:radial-gradient(50% 46% at 50% 46%, rgba(232,176,96,.1), transparent 70%);
+}
+#gala{position:relative;z-index:1;width:100%;aspect-ratio:400/470;display:block;cursor:crosshair}
+
+/* ── 에필로그 ─────────────────────── */
+.epilogue{position:relative;padding:26vh 1.5rem 20vh;text-align:center}
+.q-es{
+  font-family:var(--latin);font-style:italic;font-weight:600;
+  font-size:clamp(1rem,2.4vw,1.4rem);letter-spacing:.06em;color:var(--gold-soft);margin:0 0 1.6rem;
+}
+.q-kr{
+  margin:0 auto;max-width:34rem;font-family:var(--disp);font-weight:900;
+  font-size:clamp(1.8rem,4.6vw,3.2rem);line-height:1.5;
+  text-shadow:0 3px 34px rgba(8,3,14,.6);
+}
+.q-sub{margin:2.6rem auto 0;max-width:26rem;color:var(--ivory-dim);font-size:1rem;line-height:2}
+
+/* ── 푸터 ─────────────────────── */
+footer{
+  padding:3.5rem 1.5rem 6rem;text-align:center;
+  font-family:var(--mono);font-size:11px;line-height:2.2;color:var(--ivory-faint);
+}
+.btn-top{
+  margin-top:1.8rem;display:inline-block;
+  font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--ivory);background:transparent;border:1px solid rgba(243,233,210,.4);
+  padding:.9em 1.9em .9em 2.2em;border-radius:99px;cursor:pointer;
+  transition:background .35s var(--ease);
+}
+.btn-top:hover{background:rgba(232,176,96,.12)}
+.btn-top span{display:inline-block;margin-left:.6em}
+
+/* 밝은 배경 위에서도 읽히도록 하는 부드러운 어스럼 */
+.body,.obs{text-shadow:0 1px 12px rgba(12,5,14,.6)}
+.h-sub{text-shadow:0 1px 16px rgba(16,6,14,.75),0 0 42px rgba(16,6,14,.5)}
+
+.js .copy,.js .q-es,.js .q-kr,.js .q-sub{opacity:0;transform:translateY(26px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.js .in{opacity:1;transform:none}
+.js .in-locked{transition:none!important}
+
+@media (max-width:640px){
+  .scene-sec{padding:16vh 1.2rem 14vh}
+  .obs{max-width:100%}
+  .stage{height:46vh}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .js .hero>*{animation:none;opacity:1;transform:none}
+  .js .copy,.js .q-es,.js .q-kr,.js .q-sub,.js .scene{transition:none;opacity:1;transform:none}
+  .sag,.droplet,.h-go span,.obs i,.hud .h-rot,.ele-bob{animation:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+
+<div class="hud" aria-hidden="true">
+  <svg width="24" height="24" viewBox="0 0 24 24">
+    <circle cx="12" cy="11" r="9" fill="none" stroke="#e8b060" stroke-width="1.4"/>
+    <g class="h-rot"><line x1="12" y1="11" x2="12" y2="5.4" stroke="#e8b060" stroke-width="1.6" stroke-linecap="round"/></g>
+    <line x1="12" y1="11" x2="8.6" y2="14.4" stroke="#9d8b6f" stroke-width="1.4" stroke-linecap="round"/>
+  </svg>
+  <span class="y-label">지금</span><span id="nowYear">정오</span>
+</div>
+
+<main>
+  <!-- ═══ 수면 : 석양 ═══ -->
+  <header class="hero" id="top">
+    <p class="h-eyebrow">Figueres · Cadaqués · Port Lligat — 1904–1989</p>
+    <h1>시간이 녹는 밤</h1>
+    <p class="h-en">A Surreal Night — Scroll into the Dream</p>
+
+    <div class="clock-wrap" aria-hidden="true">
+      <svg viewBox="0 0 520 310">
+        <defs>
+          <linearGradient id="clockG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#dcb672"/>
+            <stop offset=".55" stop-color="#b98c4e"/>
+            <stop offset="1" stop-color="#8f6a3a"/>
+          </linearGradient>
+          <g id="clockFull">
+            <path class="sag" d="M 158 92 C 200 70 292 68 328 88 C 350 98 358 126 352 156 C 344 194 322 226 294 244 C 284 250 274 242 264 247 C 252 253 242 245 232 250 C 218 255 206 247 198 248 C 180 250 164 238 158 218 C 152 184 154 132 158 104 C 158 98 158 94 158 92 Z"
+              fill="url(#clockG)" stroke="#3a2a16" stroke-width="1.6"/>
+            <g class="sag" stroke="#3a2a16" stroke-width="1.5" opacity=".7">
+              <line x1="252" y1="80" x2="252" y2="90" transform="rotate(0 252 128)"/>
+              <line x1="252" y1="80" x2="252" y2="90" transform="rotate(30 252 128)"/>
+              <line x1="252" y1="80" x2="252" y2="90" transform="rotate(60 252 128)"/>
+              <line x1="252" y1="80" x2="252" y2="90" transform="rotate(90 252 128)"/>
+              <line x1="252" y1="80" x2="252" y2="90" transform="rotate(120 252 128)"/>
+              <line x1="252" y1="80" x2="252" y2="90" transform="rotate(150 252 128)"/>
+              <line x1="252" y1="80" x2="252" y2="90" transform="rotate(180 252 128)"/>
+              <line x1="252" y1="80" x2="252" y2="90" transform="rotate(210 252 128)"/>
+              <line x1="252" y1="80" x2="252" y2="90" transform="rotate(240 252 128)"/>
+              <line x1="252" y1="80" x2="252" y2="90" transform="rotate(270 252 128)"/>
+              <line x1="252" y1="80" x2="252" y2="90" transform="rotate(300 252 128)"/>
+              <line x1="252" y1="80" x2="252" y2="90" transform="rotate(330 252 128)"/>
+            </g>
+            <g class="sag" stroke-linecap="round">
+              <line x1="252" y1="128" x2="218" y2="178" stroke="#2e1f12" stroke-width="5"/>
+              <line x1="252" y1="128" x2="296" y2="166" stroke="#2e1f12" stroke-width="3.4"/>
+            </g>
+            <g class="sag"><circle cx="252" cy="128" r="3.4" fill="#2e1f12"/></g>
+          </g>
+        </defs>
+        <g id="heroClock">
+          <rect x="36" y="96" width="448" height="9" fill="#1b1116"/>
+          <rect x="36" y="96" width="448" height="1.6" fill="rgba(232,176,96,.5)"/>
+          <use href="#clockFull"/>
+          <line id="heroSecond" x1="252" y1="128" x2="252" y2="76" stroke="#4a2e18" stroke-width="1.6" stroke-linecap="round"/>
+          <circle class="droplet" cx="298" cy="250" r="3" fill="#c69c58"/>
+          <circle class="droplet d2" cx="206" cy="252" r="2.4" fill="#b98c4e"/>
+        </g>
+      </svg>
+    </div>
+
+    <p class="h-sub">이 페이지는 한 밤의 수면입니다. 스크롤할수록 해는 지고, 꿈은 깊어지고, 시간은 서서히 제 모양을 잃습니다. 눈을 뜨면 — 다시 정오였습니다.</p>
+    <button class="h-go" id="dive" type="button">잠들다<span aria-hidden="true">↓</span></button>
+  </header>
+
+  <!-- ═══ 1931 : 지속되는 기억 ═══ -->
+  <section class="scene-sec" id="s1931" aria-labelledby="t1931">
+    <span class="watermark" aria-hidden="true">1931</span>
+    <div class="copy">
+      <p class="yr">1931</p>
+      <p class="t-en"><span>La persistencia de la memoria</span></p>
+      <h2 id="t1931">지속되는 기억</h2>
+      <p class="body">포트 리가트의 오후, 풍경은 그대로 서 있다. <b>시계만이 항복한다.</b> 가지에 걸려 흘러내리는 시계, 상 위에서 말라붙는 시계, 개미가 기어오르는 회중시계 — 단단해야 할 것들이 전부 물이 된다. 달리는 이렇게 썼다. 시간은 절대적이지 않으며, 공간과 함께 구겨진다고.</p>
+      <p class="obs"><i aria-hidden="true"></i><span class="tag">관측 기록</span>녹는 시계의 영감은 태양에 두고 말랑해진 카망베르 치즈 — 달리는 그렇게 말했다</p>
+    </div>
+    <div class="scene" aria-hidden="true">
+      <svg viewBox="0 0 520 380">
+        <path d="M 30 84 C 130 58 240 94 350 70 C 392 61 434 66 474 56" fill="none" stroke="#2a1e15" stroke-width="7" stroke-linecap="round"/>
+        <path d="M 152 72 C 162 92 156 106 164 120" fill="none" stroke="#2a1e15" stroke-width="3.4" stroke-linecap="round"/>
+        <path d="M 302 78 C 298 64 288 58 286 44" fill="none" stroke="#2a1e15" stroke-width="3" stroke-linecap="round"/>
+        <use href="#clockFull" transform="translate(196 -7) scale(.8)"/>
+        <circle class="droplet" cx="432" cy="204" r="2.8" fill="#b98c4e" style="animation-duration:5.2s"/>
+        <!-- 돌 위의 회중시계 -->
+        <ellipse cx="478" cy="352" rx="96" ry="9" fill="rgba(6,3,10,.4)"/>
+        <rect x="336" y="266" width="134" height="14" fill="#3a2a24"/>
+        <rect x="340" y="280" width="126" height="66" fill="#241a18"/>
+        <rect x="340" y="280" width="126" height="3" fill="rgba(232,176,96,.18)"/>
+        <ellipse cx="398" cy="260" rx="30" ry="11" fill="#dcc79a" stroke="#3a2a16" stroke-width="2"/>
+        <ellipse cx="398" cy="260" rx="22.5" ry="7.6" fill="none" stroke="#8a744c" stroke-width="1"/>
+        <rect x="394" y="244" width="8" height="6" rx="2" fill="#3a2a16"/>
+        <g class="ant-march" fill="#150e0e" stroke="#150e0e">
+          <g class="ant" data-o="0"><ellipse cx="0" cy="0" rx="2.7" ry="1.4" stroke="none"/><circle cx="3.1" cy="0" r="1.15" stroke="none"/><path d="M-1.4 1.1 L-3.4 3 M.2 1.5 L.2 3.6 M1.6 1 L3.2 2.9 M-1.4 -1.1 L-3.4 -3 M.2 -1.5 L.2 -3.6 M1.6 -1 L3.2 -2.9" stroke-width=".7" fill="none"/></g>
+          <g class="ant" data-o="1.6"><ellipse cx="0" cy="0" rx="2.7" ry="1.4" stroke="none"/><circle cx="3.1" cy="0" r="1.15" stroke="none"/><path d="M-1.4 1.1 L-3.4 3 M.2 1.5 L.2 3.6 M1.6 1 L3.2 2.9 M-1.4 -1.1 L-3.4 -3 M.2 -1.5 L.2 -3.6 M1.6 -1 L3.2 -2.9" stroke-width=".7" fill="none"/></g>
+          <g class="ant" data-o="3.1"><ellipse cx="0" cy="0" rx="2.7" ry="1.4" stroke="none"/><circle cx="3.1" cy="0" r="1.15" stroke="none"/><path d="M-1.4 1.1 L-3.4 3 M.2 1.5 L.2 3.6 M1.6 1 L3.2 2.9 M-1.4 -1.1 L-3.4 -3 M.2 -1.5 L.2 -3.6 M1.6 -1 L3.2 -2.9" stroke-width=".7" fill="none"/></g>
+          <g class="ant" data-o="4.7"><ellipse cx="0" cy="0" rx="2.7" ry="1.4" stroke="none"/><circle cx="3.1" cy="0" r="1.15" stroke="none"/><path d="M-1.4 1.1 L-3.4 3 M.2 1.5 L.2 3.6 M1.6 1 L3.2 2.9 M-1.4 -1.1 L-3.4 -3 M.2 -1.5 L.2 -3.6 M1.6 -1 L3.2 -2.9" stroke-width=".7" fill="none"/></g>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══ 1936 : 이상한 물건들 ═══ -->
+  <section class="scene-sec" id="s1936" aria-labelledby="t1936">
+    <span class="watermark" aria-hidden="true">1936</span>
+    <div class="copy">
+      <p class="yr">1936</p>
+      <p class="t-en"><span>Objetos surrealistas</span></p>
+      <h2 id="t1936">이상한 물건들</h2>
+      <p class="body">일상의 물건을 이상하게 만들면, 세계가 다시 낯설어진다. 서랍을 단 비너스는 몸속에 기억을 보관했고, 로브스터 전화기는 벨 대신 갑각으로 대답했다. 달리의 조립법은 <b>편집증적 비판적 방법</b> — 편집증처럼 보고, 비판적으로 짓는다. 꿈속에서 서랍이 떠다니는 이유다.</p>
+      <p class="obs"><i aria-hidden="true"></i><span class="tag">관측 기록</span>"미친 자와 나의 차이는 단 하나 — 나는 미치지 않았다는 것" — 달리</p>
+    </div>
+    <div class="scene" aria-hidden="true">
+      <svg viewBox="0 0 540 400">
+        <defs>
+          <linearGradient id="drawerGlow" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#ffb45e" stop-opacity=".65"/>
+            <stop offset="1" stop-color="#ffb45e" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="wingG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#e8b060"/><stop offset="1" stop-color="#8a4a2a"/>
+          </linearGradient>
+          <filter id="soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="7"/></filter>
+        </defs>
+        <g class="floaty" style="animation-duration:8s">
+          <ellipse cx="152" cy="158" rx="86" ry="12" fill="rgba(6,3,10,.42)" filter="url(#soft)"/>
+          <g transform="translate(78 78) rotate(-7)">
+            <rect width="152" height="66" rx="7" fill="#33231e" stroke="rgba(217,164,65,.55)" stroke-width="1.2"/>
+            <rect x="12" y="12" width="128" height="42" rx="4" fill="#0d0812"/>
+            <rect x="12" y="36" width="128" height="18" fill="url(#drawerGlow)"/>
+            <g transform="translate(76 34)">
+              <g class="flutter">
+                <path d="M0 0 C -19 -17 -36 -6 -23 6 C -32 15 -14 19 0 6 Z" fill="url(#wingG)"/>
+                <path d="M0 0 C 19 -17 36 -6 23 6 C 32 15 14 19 0 6 Z" fill="url(#wingG)" transform="scale(-1 1) translate(0 0)" opacity=".9"/>
+              </g>
+              <line x1="0" y1="-3" x2="0" y2="10" stroke="#2e1f14" stroke-width="1.6"/>
+            </g>
+            <circle cx="76" cy="60" r="2.4" fill="#d9a441"/>
+          </g>
+        </g>
+        <g class="floaty" style="animation-duration:10s;animation-delay:1.2s">
+          <ellipse cx="352" cy="236" rx="86" ry="12" fill="rgba(6,3,10,.42)" filter="url(#soft)"/>
+          <g transform="translate(276 156) rotate(4)">
+            <rect width="152" height="66" rx="7" fill="#33231e" stroke="rgba(217,164,65,.55)" stroke-width="1.2"/>
+            <rect x="12" y="12" width="128" height="42" rx="4" fill="#0d0812"/>
+            <rect x="12" y="36" width="128" height="18" fill="url(#drawerGlow)"/>
+            <g transform="translate(76 36)" stroke="#d9a441" fill="none" stroke-linecap="round">
+              <circle cx="0" cy="-9" r="7" stroke-width="3"/>
+              <line x1="0" y1="-2" x2="0" y2="18" stroke-width="3"/>
+              <line x1="0" y1="14" x2="8" y2="14" stroke-width="3"/>
+              <line x1="0" y1="18.5" x2="6" y2="18.5" stroke-width="3"/>
+            </g>
+            <circle cx="76" cy="60" r="2.4" fill="#d9a441"/>
+          </g>
+        </g>
+        <g class="floaty" style="animation-duration:12s;animation-delay:2.4s">
+          <ellipse cx="196" cy="332" rx="86" ry="12" fill="rgba(6,3,10,.42)" filter="url(#soft)"/>
+          <g transform="translate(120 252) rotate(-3)">
+            <rect width="152" height="66" rx="7" fill="#33231e" stroke="rgba(217,164,65,.55)" stroke-width="1.2"/>
+            <rect x="12" y="12" width="128" height="42" rx="4" fill="#0d0812"/>
+            <rect x="12" y="36" width="128" height="18" fill="url(#drawerGlow)"/>
+            <path d="M 76 24 A 13 13 0 1 0 76 50 A 10 10 0 1 1 76 24 Z" fill="#efe3c4"/>
+            <circle cx="76" cy="60" r="2.4" fill="#d9a441"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══ 1944 : 깨어나기 1초 전 ═══ -->
+  <section class="scene-sec" id="s1944" aria-labelledby="t1944">
+    <span class="watermark" aria-hidden="true">1944</span>
+    <div class="copy">
+      <p class="yr">1944</p>
+      <p class="t-en"><span>Sueño causado por el vuelo de una abeja</span></p>
+      <h2 id="t1944">깨어나기 1초 전</h2>
+      <p class="body">석류 위를 맴도는 벌 한 마리. 그 날갯짓 소리에 꿈은 이제 1초 남았다. 꿈속에서 바다 위 받침대에 선 코끼리들이 창끝처럼 가느다란 다리로 걷고, 물고기의 입에서 <b>호랑이 두 마리</b>가 뛰쳐나온다. 그 모든 것은 벌의 날갯짓 하나로 연결되어 있다.</p>
+      <p class="obs"><i aria-hidden="true"></i><span class="tag">관측 기록</span>제목이 곧 그림의 재생 시간이다 — "벌의 비행이 일으킨 꿈, 깨어나기 1초 전"</p>
+    </div>
+    <div class="stage" aria-hidden="true">
+      <div class="moon"></div>
+      <svg class="ele-svg" viewBox="0 0 900 400" preserveAspectRatio="xMidYMid meet">
+        <g id="eleA" class="ele"><g class="ele-bob">
+          <polygon points="106,78 140,78 132,20 122,8 115,20" fill="#150f1d"/>
+          <path d="M 90 86 C 104 74 122 70 138 74 C 148 77 156 76 162 72 C 176 62 196 58 210 66 C 224 72 232 84 231 98 C 230 106 227 112 223 116 C 232 120 237 130 235 140 C 232 154 220 162 210 160 C 216 150 214 140 207 138 C 200 142 194 143 189 141 C 181 152 170 155 164 147 C 156 151 149 147 147 141 C 128 145 108 145 96 139 C 82 131 75 112 79 97 C 82 89 85 87 90 86 Z" fill="#150f1d"/>
+          <path d="M 196 84 C 186 74 172 78 170 92 C 175 100 190 100 196 94 Z" fill="#150f1d"/>
+          <g stroke="#150f1d" stroke-width="4.6" stroke-linecap="round" fill="none">
+            <path d="M 154 144 C 150 190 158 212 148 252 C 142 282 150 302 146 326"/>
+            <path d="M 136 146 C 132 196 140 218 132 256 C 128 284 134 302 128 324"/>
+            <path d="M 98 142 C 92 190 100 214 92 254 C 88 284 94 304 88 326"/>
+            <path d="M 80 134 C 74 182 82 208 74 250 C 70 282 76 302 70 322"/>
+          </g>
+          <path d="M 82 100 C 70 128 76 156 66 176" fill="none" stroke="#150f1d" stroke-width="2.4" stroke-linecap="round"/>
+        </g></g>
+        <g id="eleB" class="ele" opacity=".85"><g class="ele-bob" style="animation-delay:1.4s">
+          <polygon points="106,78 140,78 132,20 122,8 115,20" fill="#150f1d"/>
+          <path d="M 90 86 C 104 74 122 70 138 74 C 148 77 156 76 162 72 C 176 62 196 58 210 66 C 224 72 232 84 231 98 C 230 106 227 112 223 116 C 232 120 237 130 235 140 C 232 154 220 162 210 160 C 216 150 214 140 207 138 C 200 142 194 143 189 141 C 181 152 170 155 164 147 C 156 151 149 147 147 141 C 128 145 108 145 96 139 C 82 131 75 112 79 97 C 82 89 85 87 90 86 Z" fill="#150f1d"/>
+          <path d="M 196 84 C 186 74 172 78 170 92 C 175 100 190 100 196 94 Z" fill="#150f1d"/>
+          <g stroke="#150f1d" stroke-width="4.6" stroke-linecap="round" fill="none">
+            <path d="M 154 144 C 150 190 158 212 148 252 C 142 282 150 302 146 326"/>
+            <path d="M 136 146 C 132 196 140 218 132 256 C 128 284 134 302 128 324"/>
+            <path d="M 98 142 C 92 190 100 214 92 254 C 88 284 94 304 88 326"/>
+            <path d="M 80 134 C 74 182 82 208 74 250 C 70 282 76 302 70 322"/>
+          </g>
+          <path d="M 82 100 C 70 128 76 156 66 176" fill="none" stroke="#150f1d" stroke-width="2.4" stroke-linecap="round"/>
+        </g></g>
+      </svg>
+    </div>
+    <p class="stage-cap">scroll — they cross the moon</p>
+  </section>
+
+  <!-- ═══ 1952 : 구체의 갈라테아 ═══ -->
+  <section class="scene-sec" id="s1952" aria-labelledby="t1952">
+    <span class="watermark" aria-hidden="true">1952</span>
+    <div class="copy">
+      <p class="yr">1952</p>
+      <p class="t-en"><span>Galatea de las esferas</span></p>
+      <h2 id="t1952">구체의 갈라테아</h2>
+      <p class="body">달리는 평생 그린 갈라를 원자의 세계로 옮긴다. 핵처럼 떠 있는 구체들이 모여 얼굴이 되고, 다시 흩어진다. 양자역학을 공부한 뒤 그는 믿었다 — 물질도, 기억도, 전부 떠 있는 알갱이라고. <b>손끝을 대어 보라.</b> 구체들은 흩어졌다가, 다시 갈라가 된다.</p>
+      <p class="obs"><i aria-hidden="true"></i><span class="tag">관측 기록</span>달리는 말년의 작업을 '핵미스티시즘(nuclear mysticism)'이라 불렀다</p>
+    </div>
+    <div class="gala-wrap" aria-hidden="true">
+      <canvas id="gala"></canvas>
+    </div>
+  </section>
+
+  <!-- ═══ 새벽 : 에필로그 ═══ -->
+  <section class="epilogue" id="dawn">
+    <p class="q-es">« No tomo drogas. Yo soy drogas. »</p>
+    <p class="q-kr">"나는 약물을 하지 않는다.<br>나 자신이 약물이다."</p>
+    <p class="q-sub">— 살바도르 달리<br>완벽을 두려워하지 말라. 당신은 결코 그것에 닿을 수 없으니까.</p>
+  </section>
+</main>
+
+<footer>
+  <p style="margin:0">1904년 피게레스에서 태어나, 1989년 같은 곳에서 잠들다<br>
+  하나의 HTML 파일 · 인라인 SVG와 Canvas 2D로만 그렸습니다</p>
+  <button class="btn-top" id="wake" type="button">눈을 뜨기<span aria-hidden="true">↑</span></button>
+</footer>
+
+<noscript><style>.hud{display:none}</style></noscript>
+
+<script>
+(function(){
+'use strict';
+document.documentElement.classList.add('js');
+
+var clamp=function(v,a,b){return Math.max(a,Math.min(b,v));};
+var lerp=function(a,b,t){return a+(b-a)*t;};
+var hx=function(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];};
+
+/* ── 하늘 램프 : 한 밤의 시간 ── */
+var SKY=[
+  {p:0.00, top:hx('#241b3a'), mid:hx('#7c4438'), low:hx('#d9914a'), glow:hx('#f4c377')},
+  {p:0.22, top:hx('#1d1633'), mid:hx('#5c3340'), low:hx('#b06a3e'), glow:hx('#e0a35c')},
+  {p:0.45, top:hx('#120e24'), mid:hx('#2c1c38'), low:hx('#63383a'), glow:hx('#96543f')},
+  {p:0.62, top:hx('#0c091a'), mid:hx('#171128'), low:hx('#241632'), glow:hx('#3a2238')},
+  {p:0.85, top:hx('#0a0818'), mid:hx('#120e22'), low:hx('#1a1228'), glow:hx('#261832')},
+  {p:1.00, top:hx('#161028'), mid:hx('#38223e'), low:hx('#8a4a44'), glow:hx('#e09a68')}
+];
+function skyAt(p){
+  if(p<=SKY[0].p)return SKY[0];
+  for(var i=1;i<SKY.length;i++){
+    if(p<=SKY[i].p){
+      var a=SKY[i-1],b=SKY[i],t=(p-a.p)/(b.p-a.p),mix=function(u,v){return [lerp(u[0],v[0],t),lerp(u[1],v[1],t),lerp(u[2],v[2],t)];};
+      return {top:mix(a.top,b.top),mid:mix(a.mid,b.mid),low:mix(a.low,b.low),glow:mix(a.glow,b.glow)};
+    }
+  }
+  return SKY[SKY.length-1];
+}
+var rgb=function(c){return 'rgb('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+')';};
+
+/* ── 캔버스 ── */
+var canvas=document.getElementById('sky');
+var ctx=canvas.getContext('2d');
+var W=0,H=0,dpr=1,horizonY=0;
+
+function sizeCanvas(){
+  W=window.innerWidth;H=window.innerHeight;
+  dpr=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  horizonY=H*0.74;
+}
+
+var stars=[],dust=[],clouds=[];
+function seed(){
+  stars=[];dust=[];clouds=[];
+  var i,n=Math.round(W*H/14000);
+  n=clamp(n,90,190);
+  for(i=0;i<n;i++)stars.push({x:Math.random()*W,y:Math.random()*(H*0.7),r:.5+Math.random()*1.1,ph:Math.random()*6.28,sp:.6+Math.random()*1.6});
+  for(i=0;i<52;i++)dust.push({x:Math.random()*W,y:Math.random()*H,r:.7+Math.random()*1.7,vx:-2-Math.random()*6,vy:-3-Math.random()*7,ph:Math.random()*6.28});
+  for(i=0;i<3;i++)clouds.push({y:.56+i*.07,w:.34+i*.09,h:22+i*9,ph:i*2.1,sp:.008+i*.004,a:.08-i*.014});
+}
+
+/* ── HUD 연도 ── */
+var yearEl=document.getElementById('nowYear');
+var years={top:'정오',s1931:'1931',s1936:'1936',s1944:'1944',s1952:'1952',dawn:'새벽'};
+var yearIO=null;
+if('IntersectionObserver' in window){
+  yearIO=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){
+        var y=years[e.target.id];
+        if(y){
+          yearEl.classList.add('fade');
+          setTimeout(function(){yearEl.textContent=y;yearEl.classList.remove('fade');},380);
+        }
+      }
+    });
+  },{threshold:.4});
+  Object.keys(years).forEach(function(id){var el=document.getElementById(id);if(el)yearIO.observe(el);});
+}
+
+/* ── 등장 애니메이션 ── */
+function lockLater(el){setTimeout(function(){el.classList.add('in-locked');},2600);}
+if('IntersectionObserver' in window){
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('in');lockLater(e.target);io.unobserve(e.target);}
+    });
+  },{threshold:.16,rootMargin:'0px 0px -6% 0px'});
+  document.querySelectorAll('.copy,.q-es,.q-kr,.q-sub,.scene').forEach(function(el){io.observe(el);});
+}else{
+  document.querySelectorAll('.copy,.q-es,.q-kr,.q-sub,.scene').forEach(function(el){el.classList.add('in','in-locked');});
+}
+/* 히어로 등장 보증 */
+setTimeout(function(){document.documentElement.classList.add('heroDone');},2800);
+
+/* ── 버튼 ── */
+document.getElementById('dive').addEventListener('click',function(){
+  document.getElementById('s1931').scrollIntoView();
+});
+document.getElementById('wake').addEventListener('click',function(){
+  window.scrollTo({top:0});
+});
+
+/* ── 히어로 초침 : 꿈의 시간 ── */
+var heroSecond=document.getElementById('heroSecond');
+var secRot=0,secV=20,secTarget=20,secNext=0;
+
+/* ── 개미 행진 ── */
+var ants=document.querySelectorAll('.ant');
+var antT=[0,1.6,3.1,4.7];
+
+/* ── 코끼리 ── */
+var s1944=document.getElementById('s1944');
+var eleA=document.getElementById('eleA'),eleB=document.getElementById('eleB');
+var rect1944={top:1e9,h:1};
+function measure1944(){
+  var r=s1944.getBoundingClientRect();
+  rect1944={top:r.top+window.scrollY,h:r.height};
+}
+
+/* ── 구체의 갈라 ── */
+var gala=document.getElementById('gala');
+var gctx=gala.getContext('2d');
+var gw=0,gh=0,spheres=[],galaPath=null,galaVisible=false;
+var gmx=-9999,gmy=-9999;
+
+var PROFILE="M 206 36 C 178 42 156 64 150 94 C 147 112 150 124 146 136 C 141 148 128 158 130 166 C 131 174 142 173 146 179 C 140 187 139 196 146 202 C 138 211 138 222 149 228 C 141 238 143 252 158 261 C 173 271 189 272 200 270 C 197 300 195 322 205 344 C 176 366 136 380 114 404 C 102 418 98 436 100 452 L 330 452 C 334 414 330 380 306 356 C 288 340 272 322 266 296 C 262 272 268 246 276 224 C 294 196 302 158 294 118 C 286 74 254 42 206 36 Z";
+
+function pearlSprite(core,edge){
+  var s=64,c=document.createElement('canvas');c.width=c.height=s;
+  var g=c.getContext('2d');
+  var rg=g.createRadialGradient(s*.36,s*.34,1,s*.5,s*.5,s*.5);
+  rg.addColorStop(0,core);
+  rg.addColorStop(.55,edge);
+  rg.addColorStop(1,'rgba(60,38,20,0)');
+  g.fillStyle=rg;g.beginPath();g.arc(s/2,s/2,s/2,0,6.2832);g.fill();
+  return c;
+}
+var spIvory=pearlSprite('rgba(255,253,244,1)','rgba(236,217,176,.85)');
+var spAmber=pearlSprite('rgba(255,217,160,1)','rgba(176,106,46,.85)');
+
+function buildGala(){
+  var rect=gala.getBoundingClientRect();
+  gw=rect.width;gh=rect.height;
+  if(gw<10)return;
+  var d=Math.min(window.devicePixelRatio||1,2);
+  gala.width=Math.round(gw*d);gala.height=Math.round(gh*d);
+  gctx.setTransform(d,0,0,d,0,0);
+  /* 실루엣 샘플링 (400×470 공간) */
+  var oc=document.createElement('canvas');oc.width=400;oc.height=470;
+  var og=oc.getContext('2d');
+  galaPath=new Path2D(PROFILE);
+  var pts=[],tries=0;
+  var want=clamp(Math.round(gw*gh/280),800,1900);
+  while(pts.length<want&&tries<want*40){
+    tries++;
+    var x=Math.random()*400,y=Math.random()*470;
+    if(og.isPointInPath(galaPath,x,y)){
+      var fdx=(x-172)/104,fdy=(y-160)/128;
+      pts.push({x:x/400,y:y/470,hair:fdx*fdx+fdy*fdy>=1});
+    }
+  }
+  var s=gw/400;
+  spheres=pts.map(function(p){
+    var hx0=p.x*gw,hy0=p.y*gh;
+    return {hx:hx0,hy:hy0,x:hx0,y:hy0,vx:0,vy:0,
+      hair:p.hair,r:(p.hair?s*4.4:s*5.0)*(0.72+Math.random()*.62),
+      f1:.5+Math.random()*.7,f2:.4+Math.random()*.6,
+      p1:Math.random()*6.28,p2:Math.random()*6.28,
+      amp:s*(1.6+Math.random()*2.6)};
+  });
+}
+gala.addEventListener('pointermove',function(e){
+  var r=gala.getBoundingClientRect();
+  gmx=e.clientX-r.left;gmy=e.clientY-r.top;
+},{passive:true});
+gala.addEventListener('pointerleave',function(){gmx=-9999;gmy=-9999;});
+
+function drawGala(t,dt){
+  gctx.clearRect(0,0,gw,gh);
+  for(var i=0;i<spheres.length;i++){
+    var s=spheres[i];
+    var tx=s.hx+Math.sin(t*s.f1+s.p1)*s.amp;
+    var ty=s.hy+Math.cos(t*s.f2+s.p2)*s.amp;
+    s.vx+=(tx-s.x)*.018;s.vy+=(ty-s.y)*.018;
+    var dx=s.x-gmx,dy=s.y-gmy,d2=dx*dx+dy*dy;
+    if(d2<110*110&&d2>.01){
+      var d=Math.sqrt(d2),f=Math.pow(1-d/110,2)*3.4;
+      s.vx+=dx/d*f;s.vy+=dy/d*f;
+    }
+    s.vx*=.86;s.vy*=.86;s.x+=s.vx;s.y+=s.vy;
+    gctx.globalAlpha=.92;
+    gctx.drawImage(s.hair?spAmber:spIvory,s.x-s.r,s.y-s.r,s.r*2,s.r*2);
+  }
+  gctx.globalAlpha=1;
+  /* 감은 눈 */
+  gctx.save();gctx.scale(gw/400,gh/470);
+  gctx.strokeStyle='rgba(40,22,14,.4)';gctx.lineWidth=2;gctx.lineCap='round';
+  gctx.beginPath();gctx.moveTo(146,152);gctx.quadraticCurveTo(160,160,176,150);gctx.stroke();
+  gctx.beginPath();gctx.moveTo(138,128);gctx.quadraticCurveTo(158,118,178,128);gctx.stroke();
+  gctx.restore();
+}
+
+/* ── 하늘 그리기 ── */
+function drawSky(t,p,sunY,sunUp){
+  var s=skyAt(p);
+  var hRatio=horizonY/H;
+  var grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,rgb(s.top));
+  grad.addColorStop(Math.max(.01,hRatio*.62),rgb(s.mid));
+  grad.addColorStop(hRatio,rgb(s.low));
+  grad.addColorStop(Math.min(1,hRatio+.012),rgb([s.low[0]*.45,s.low[1]*.45,s.low[2]*.5]));
+  grad.addColorStop(1,rgb([s.top[0]*.55+8,s.top[1]*.5+4,s.top[2]*.6+8]));
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+
+  /* 수평선 빛 */
+  var hGrad=ctx.createLinearGradient(0,horizonY-90,0,horizonY+30);
+  hGrad.addColorStop(0,'rgba('+s.glow.map(Math.round).join(',')+',0)');
+  hGrad.addColorStop(.78,'rgba('+s.glow.map(Math.round).join(',')+',.55)');
+  hGrad.addColorStop(1,'rgba('+s.glow.map(Math.round).join(',')+',0)');
+  ctx.fillStyle=hGrad;ctx.fillRect(0,horizonY-90,W,120);
+
+  /* 해 */
+  if(sunUp>0.01){
+    var sunX=W*.3;
+    ctx.save();ctx.globalCompositeOperation='lighter';
+    var halo=ctx.createRadialGradient(sunX,sunY,10,sunX,sunY,180);
+    halo.addColorStop(0,'rgba(255,214,150,'+(0.5*sunUp)+')');
+    halo.addColorStop(1,'rgba(255,180,94,0)');
+    ctx.fillStyle=halo;ctx.fillRect(sunX-190,sunY-190,380,380);
+    var disc=ctx.createRadialGradient(sunX,sunY,4,sunX,sunY,44);
+    disc.addColorStop(0,'rgba(255,244,214,'+(0.95*sunUp)+')');
+    disc.addColorStop(.8,'rgba(255,196,110,'+(0.85*sunUp)+')');
+    disc.addColorStop(1,'rgba(255,180,94,0)');
+    ctx.fillStyle=disc;ctx.beginPath();ctx.arc(sunX,sunY,46,0,6.2832);ctx.fill();
+    ctx.restore();
+  }
+  /* 바다 */
+  var sea=ctx.createLinearGradient(0,horizonY,0,H);
+  var base=rgb([s.low[0]*.4+6,s.low[1]*.38+4,s.low[2]*.5+10]);
+  sea.addColorStop(0,base);
+  sea.addColorStop(1,rgb([s.top[0]*.7,s.top[1]*.62,s.top[2]*.75]));
+  ctx.fillStyle=sea;ctx.fillRect(0,horizonY,W,H-horizonY);
+  ctx.fillStyle='rgba(255,220,170,'+(0.35*sunUp)+')';
+  ctx.fillRect(0,horizonY,W,1.4);
+
+  /* 빛 기둥 */
+  if(sunUp>0.02){
+    var sunX2=W*.3;
+    for(var i=0;i<22;i++){
+      var row=i/22;
+      var y=horizonY+4+row*(H*.18);
+      var w=(58-46*row)*(0.9+0.2*Math.sin(t*1.5+i*1.1));
+      var x=sunX2+Math.sin(t*.6+i*1.3)*4*row;
+      ctx.globalAlpha=(0.24*sunUp)*(1-row);
+      ctx.fillStyle='#ffcf8e';
+      ctx.fillRect(x-w/2,y,w,1.4);
+    }
+    ctx.globalAlpha=1;
+  }
+}
+
+function drawClouds(t,p){
+  var s=skyAt(p);
+  for(var i=0;i<clouds.length;i++){
+    var c=clouds[i];
+    var x=W*.5+Math.sin(t*c.sp*6+c.ph)*W*.18-W*.09;
+    var y=horizonY*c.y;
+    var g=ctx.createRadialGradient(x,y,4,x,y,c.w*W*.5);
+    g.addColorStop(0,'rgba('+s.glow.map(Math.round).join(',')+','+c.a+')');
+    g.addColorStop(1,'rgba('+s.glow.map(Math.round).join(',')+',0)');
+    ctx.fillStyle=g;
+    ctx.save();ctx.translate(x,y);ctx.scale(1,c.h/(c.w*W*.5));ctx.translate(-x,-y);
+    ctx.beginPath();ctx.arc(x,y,c.w*W*.5,0,6.2832);ctx.fill();
+    ctx.restore();
+  }
+}
+
+function drawStars(t,p){
+  var night=clamp((p-.3)/.22,0,1)*clamp((0.99-p)/.06,0,1);
+  if(night<=.02)return;
+  ctx.fillStyle='#f5eede';
+  for(var i=0;i<stars.length;i++){
+    var st=stars[i];
+    var a=(0.25+0.75*Math.pow(Math.max(0,Math.sin(t*st.sp+st.ph)),2))*.8*night;
+    ctx.globalAlpha=a;
+    ctx.fillRect(st.x,st.y,st.r,st.r);
+  }
+  ctx.globalAlpha=1;
+}
+
+function drawDust(t,p,dt){
+  var warm=Math.max(1-clamp(p/.34,0,1),clamp((p-.86)/.14,0,1)*.8);
+  if(warm<=.02)return;
+  for(var i=0;i<dust.length;i++){
+    var d0=dust[i];
+    d0.x+=d0.vx*dt;d0.y+=d0.vy*dt;
+    if(d0.x<-10)d0.x=W+10;if(d0.y<-10)d0.y=H+10;
+    ctx.globalAlpha=(0.12+0.25*Math.sin(t*1.2+d0.ph)*.5+.12)*warm;
+    ctx.globalAlpha=clamp((0.1+0.18*Math.abs(Math.sin(t*.9+d0.ph)))*warm,0,.4);
+    ctx.fillStyle='#ffd9a0';
+    ctx.beginPath();ctx.arc(d0.x,d0.y,d0.r,0,6.2832);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+}
+
+/* ── 초침 오작동 ── */
+function tickClock(now,dt){
+  if(now>secNext){secNext=now+1200+Math.random()*2600;secTarget=(Math.random()<.24?-1:1)*(30+Math.random()*220);}
+  secV+=(secTarget-secV)*.08;
+  secRot+=secV*dt;
+  if(heroSecond)heroSecond.setAttribute('transform','rotate('+secRot+' 252 128)');
+}
+
+function tickAnts(dt){
+  for(var i=0;i<ants.length;i++){
+    antT[i]+=dt*.5;
+    var th=antT[i];
+    var x=398+Math.cos(th)*28,y=260+Math.sin(th)*9.4;
+    ants[i].setAttribute('transform','translate('+x+' '+y+') rotate('+(th*57.3+90)+' )');
+  }
+}
+
+function tickElephants(){
+  var vh=window.innerHeight;
+  var pr=clamp((vh*.9-(rect1944.top-window.scrollY))/(rect1944.h+vh*.7),0,1);
+  var xA=lerp(-320,940,pr);
+  var xB=lerp(-600,840,clamp(pr*.85+.05,0,1));
+  eleA.setAttribute('transform','translate('+xA+' 34)');
+  eleB.setAttribute('transform','translate('+xB+' 100) scale(.55)');
+}
+
+/* ── 루프 ── */
+var reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+var rafId=null,lastT=0;
+
+function frame(now){
+  rafId=requestAnimationFrame(frame);
+  var t=now/1000;
+  var dt=Math.min(.05,(now-lastT)/1000)||.016;
+  lastT=now;
+  var maxScroll=Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
+  var p=clamp(window.scrollY/maxScroll,0,1);
+  var sunY=lerp(H*.3,H*.82,clamp(p/.5,0,1));
+  var sunUp=clamp(1-(p-.42)/.1,0,1);
+  drawSky(t,p,sunY,sunUp);
+  drawClouds(t,p);
+  drawStars(t,p);
+  drawDust(t,p,dt);
+  tickClock(now,dt);
+  tickAnts(dt);
+  tickElephants();
+  if(galaVisible)drawGala(t,dt);
+}
+
+function drawStatic(){
+  var maxScroll=Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
+  var p=clamp(window.scrollY/maxScroll,0,1);
+  var sunY=lerp(H*.3,H*.82,clamp(p/.5,0,1));
+  var sunUp=clamp(1-(p-.42)/.1,0,1);
+  drawSky(0,p,sunY,sunUp);
+  drawStars(0,p);
+}
+
+function start(){
+  if(reduced.matches){
+    if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+    drawStatic();
+  }else if(!rafId){
+    lastT=performance.now();
+    rafId=requestAnimationFrame(frame);
+  }
+}
+
+/* 갈라 캔버스 가시성 */
+if('IntersectionObserver' in window){
+  new IntersectionObserver(function(es){
+    es.forEach(function(e){galaVisible=e.isIntersecting;});
+  },{rootMargin:'80px'}).observe(gala);
+}else{galaVisible=true;}
+
+/* ── 초기화 ── */
+function init(){
+  sizeCanvas();seed();measure1944();buildGala();start();
+}
+var qd=false;
+function queue(){
+  if(qd)return;qd=true;
+  requestAnimationFrame(function(){
+    qd=false;
+    sizeCanvas();seed();measure1944();buildGala();
+    if(reduced.matches)drawStatic();
+  });
+}
+if('ResizeObserver' in window){new ResizeObserver(queue).observe(document.documentElement);}
+window.addEventListener('resize',queue);
+window.addEventListener('load',queue);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(queue);
+reduced.addEventListener?reduced.addEventListener('change',start):reduced.addListener(start);
+
+init();
+window.__dali_ok=true;
+})();
+</script>
+</body>
+</html>
