@@ -1,0 +1,2163 @@
+<!DOCTYPE html>
+<html lang="ko" data-world="here">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>거울 나라의 앨리스 — 둘째 칸에서 여덟째 칸까지</title>
+<meta name="description" content="루이스 캐럴 『거울 나라의 앨리스』(1871)를 위한 한 장의 화면. 거울 글씨로 인쇄된 재버워키를 손거울로 비춰 읽고, 앨리스의 열한 수를 따라 여덟째 칸까지 걷는다.">
+<meta name="author" content="Lewis Carroll (원작, 1871)">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#E7EDE9">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='9' fill='%2304100E'/%3E%3Cellipse cx='32' cy='27' rx='16' ry='20' fill='none' stroke='%23D9B36B' stroke-width='2.4'/%3E%3Cellipse cx='32' cy='27' rx='11.5' ry='15.5' fill='%23A9C0B7' opacity='.55'/%3E%3Cpath d='M32 47v11' stroke='%23D9B36B' stroke-width='3.4' stroke-linecap='round'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..800&family=IBM+Plex+Mono:wght@300;400;500&family=Nanum+Myeongjo:wght@400;700;800&family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   거울 나라의 앨리스
+   ───────────────────────────────────────────────────────────────────────
+   세 개의 세계, 세 개의 팔레트. 책의 구조가 곧 화면의 구조다.
+     here   · 이쪽   — 눈 내리는 겨울 응접실. 차가운 은녹색.
+     beyond · 저쪽   — 거울 나라. 유리 단면의 짙은 녹흑과 수은빛.
+     waking · 깨어남 — 1862년 7월의 강가. 황혼의 금빛.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* 렌즈 반지름만 등록해 둔다. 이러면 열고 닫힘은 부드럽게 번지고,
+   위치는 한 프레임도 늦지 않고 손거울을 따라간다. */
+@property --r{
+  syntax:"<length>";
+  inherits:true;
+  initial-value:0px;
+}
+
+:root{
+  /* ── 이쪽: 겨울 응접실 ───────────────────────────────── */
+  --bg:#E7EDE9;   --bg-2:#F2F5F1;  --bg-3:#D6E0DA;
+  --ink:#0F201C;  --ink-2:#3C534C; --ink-3:#71877F;
+  --line:rgba(15,32,28,.15);       --line-2:rgba(15,32,28,.07);
+  --gilt:#8C6B30; --gilt-2:#AF8C46;
+  --carmine:#A31F2E;
+  --glow:rgba(255,255,255,.92);
+  --sq-l:#E9EFEA; --sq-d:#B9C9C1;
+  --grain:.055;
+
+  /* ── 조판 ────────────────────────────────────────────── */
+  --display:'Bodoni Moda','Didot','Bodoni MT',Georgia,serif;
+  /* Spectral 을 앞에 두어 한글 문장 속 라틴 글자를 받게 한다.
+     한글은 그대로 나눔명조로 떨어진다. */
+  --kr:'Spectral','Nanum Myeongjo','Batang','Apple SD Gothic Neo',serif;
+  /* 라틴·숫자는 플렉스 모노, 한글은 나눔명조로 떨어뜨린다.
+     한글이 시스템 고딕으로 새는 것을 막는다. */
+  --mono:'IBM Plex Mono','SFMono-Regular',Consolas,'Nanum Myeongjo','Batang',monospace;
+
+  /* ── 운동 ────────────────────────────────────────────── */
+  --ease:cubic-bezier(.22,.72,.16,1);
+  --ease-soft:cubic-bezier(.4,0,.2,1);
+  --swing:cubic-bezier(.34,1.24,.5,1);
+
+  /* ── 여백 ────────────────────────────────────────────── */
+  --pad:clamp(1.25rem,5vw,4.5rem);
+  --measure:74ch;
+}
+
+/* ── 저쪽: 거울 나라 ─────────────────────────────────────── */
+:root[data-world="beyond"]{
+  --bg:#04100E;   --bg-2:#08201C;  --bg-3:#020A09;
+  --ink:#E9F2EC;  --ink-2:#A7BFB6; --ink-3:#7A928A;
+  --line:rgba(200,228,216,.17);    --line-2:rgba(200,228,216,.075);
+  --gilt:#D9B36B; --gilt-2:#F1D399;
+  --carmine:#E05066;
+  --glow:rgba(148,255,220,.32);
+  --sq-l:#26473F; --sq-d:#0B1D19;
+  --grain:.075;
+}
+
+/* ── 깨어남: 1862년 7월의 강 ─────────────────────────────── */
+:root[data-world="waking"]{
+  --bg:#F6EEDC;   --bg-2:#FCF7EA;  --bg-3:#E7DBBF;
+  --ink:#2C2317;  --ink-2:#5E4E33; --ink-3:#8D7A56;
+  --line:rgba(44,35,23,.17);       --line-2:rgba(44,35,23,.08);
+  --gilt:#A87A1F; --gilt-2:#C99A34;
+  --carmine:#A8452B;
+  --glow:rgba(255,232,178,.95);
+  --sq-l:#F1E7D0; --sq-d:#C7B287;
+  --grain:.05;
+}
+
+/* ═══ 기본 ═══════════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+html{
+  background:var(--bg);
+  scroll-behavior:smooth;
+  -webkit-text-size-adjust:100%;
+  transition:background-color 1s var(--ease-soft);
+}
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--kr);
+  font-size:clamp(15px,.42vw + 14px,17px);
+  line-height:1.85;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  transition:background-color 1s var(--ease-soft),color 1s var(--ease-soft);
+}
+
+::selection{background:var(--gilt);color:var(--bg)}
+
+:where(a){color:inherit;text-decoration:none}
+
+:where(a,button,[tabindex]):focus-visible{
+  outline:2px solid var(--gilt-2);
+  outline-offset:4px;
+  border-radius:2px;
+}
+
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--bg-3)}
+::-webkit-scrollbar-thumb{background:var(--ink-3);border:3px solid var(--bg-3);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--gilt)}
+
+/* ═══ 대기: 입자 · 결 · 광택 ═════════════════════════════════════════ */
+
+/* 눈 · 티끌. 이쪽에서는 내려오고, 저쪽에서는 거꾸로 올라간다. */
+#motes{
+  position:fixed;inset:0;z-index:1;
+  pointer-events:none;
+  opacity:.85;
+}
+
+/* 오래된 유리의 결 */
+.grain{
+  position:fixed;inset:-50%;z-index:40;
+  pointer-events:none;
+  opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='170' height='170' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;
+  transition:opacity 1s var(--ease-soft);
+}
+
+/* 비네트 */
+.vignette{
+  position:fixed;inset:0;z-index:41;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 42%,transparent 40%,rgba(0,0,0,.09) 78%,rgba(0,0,0,.2) 100%);
+  opacity:.65;
+}
+:root[data-world="beyond"] .vignette{opacity:1}
+
+/* ═══ 막 오름 ════════════════════════════════════════════════════════ */
+.curtain{position:fixed;inset:0;z-index:300;pointer-events:none}
+.curtain-half{
+  position:absolute;top:0;bottom:0;width:50.2%;
+  background:var(--bg);
+  transition:transform 1.15s cubic-bezier(.78,0,.16,1);
+}
+.curtain-half--l{left:0}
+.curtain-half--r{right:0}
+.curtain-seam{
+  position:absolute;left:50%;top:0;bottom:0;width:1px;
+  transform:translateX(-50%) scaleY(0);
+  transform-origin:50% 50%;
+  background:linear-gradient(to bottom,transparent,var(--gilt-2) 22%,var(--glow) 50%,var(--gilt-2) 78%,transparent);
+  box-shadow:0 0 22px 2px var(--gilt-2);
+  transition:transform .8s var(--ease),opacity .5s ease .75s;
+}
+html.lit .curtain-seam{transform:translateX(-50%) scaleY(1);opacity:0}
+html.lit .curtain-half--l{transform:translateX(-101%)}
+html.lit .curtain-half--r{transform:translateX(101%)}
+html.done .curtain{display:none}
+
+/* ═══ 진행: 앨리스의 승격 ════════════════════════════════════════════ */
+.rail{
+  position:fixed;z-index:60;
+  left:clamp(14px,2.1vw,30px);top:50%;
+  transform:translateY(-50%);
+  display:flex;flex-direction:column;align-items:center;
+  height:min(58vh,430px);
+  transition:opacity .6s ease;
+}
+.rail-track{
+  position:relative;flex:1;width:1px;
+  background:linear-gradient(to bottom,transparent,var(--line) 8%,var(--line) 92%,transparent);
+}
+/* 폰이 위로 오를수록 승격에 가까워진다 */
+.rail-pawn{
+  position:absolute;left:50%;bottom:0;
+  width:19px;height:23px;
+  transform:translate(-50%,50%);
+  color:var(--gilt);
+  filter:drop-shadow(0 0 7px var(--glow));
+  transition:bottom .16s linear,color .8s ease;
+}
+.rail-pawn svg{display:block;width:100%;height:100%;fill:currentColor}
+.rail-pawn .rp-queen{display:none}
+.rail.is-crowned .rail-pawn{color:var(--gilt-2)}
+.rail.is-crowned .rail-pawn .rp-pawn{display:none}
+.rail.is-crowned .rail-pawn .rp-queen{display:block}
+
+.rail-stop{
+  position:absolute;left:50%;
+  width:19px;height:19px;
+  transform:translate(-50%,50%);
+  display:grid;place-items:center;
+  background:none;border:0;cursor:pointer;
+}
+.rail-stop::after{
+  content:"";width:5px;height:5px;
+  border:1px solid var(--ink-3);
+  transform:rotate(45deg);
+  background:var(--bg);
+  transition:background-color .35s ease,border-color .35s ease,transform .35s var(--swing);
+}
+.rail-stop:hover::after{border-color:var(--gilt);transform:rotate(45deg) scale(1.35)}
+.rail-stop[aria-current="true"]::after{background:var(--gilt);border-color:var(--gilt);transform:rotate(45deg) scale(1.2)}
+.rail-stop .rail-tip{
+  position:absolute;left:24px;white-space:nowrap;
+  font-family:var(--mono);font-size:9.5px;font-weight:400;
+  letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);
+  opacity:0;transform:translateX(-5px);
+  transition:opacity .3s ease,transform .3s var(--ease);
+  pointer-events:none;
+}
+.rail-stop:hover .rail-tip,
+.rail-stop:focus-visible .rail-tip{opacity:1;transform:none}
+
+/* 좁은 화면에서는 상단 실선으로 */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:2px;z-index:60;
+  background:var(--line-2);display:none;
+}
+.topbar span{
+  display:block;height:100%;width:0;
+  background:linear-gradient(90deg,var(--gilt),var(--gilt-2));
+  transition:width .16s linear;
+}
+
+/* ═══ 공통 조판 ══════════════════════════════════════════════════════ */
+.wrap{
+  position:relative;z-index:10;
+  width:min(100%,1180px);
+  margin-inline:auto;
+  padding-inline:var(--pad);
+}
+
+.sec{position:relative;z-index:10;padding-block:clamp(5.5rem,13vh,10rem)}
+
+.eyebrow{
+  font-family:var(--mono);
+  font-size:clamp(9.5px,.62vw,11px);
+  font-weight:400;
+  letter-spacing:.34em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+}
+
+.sec-head{display:flex;flex-direction:column;gap:.85rem;margin-bottom:clamp(2.5rem,6vh,4.5rem)}
+.sec-rule{width:100%;height:1px;background:var(--line);margin-top:.35rem}
+
+.sec-title{
+  font-family:var(--kr);font-weight:800;
+  font-size:clamp(1.7rem,4.4vw,3.1rem);
+  line-height:1.24;letter-spacing:-.015em;
+}
+.sec-title em{
+  display:block;
+  font-family:var(--display);font-style:italic;font-weight:400;
+  font-size:.42em;letter-spacing:.02em;
+  color:var(--ink-3);
+  margin-top:.5em;
+}
+
+/* 원문 인용 — 보도니 이탤릭 */
+.en{
+  font-family:var(--display);font-style:italic;font-weight:400;
+  font-size:clamp(1.05rem,1.9vw,1.5rem);
+  line-height:1.62;letter-spacing:.004em;
+  color:var(--ink);
+}
+.ko{font-family:var(--kr);color:var(--ink-2);line-height:1.95}
+.body-txt{font-family:var(--kr);color:var(--ink-2);max-width:var(--measure)}
+
+.cite{
+  display:block;margin-top:1rem;
+  font-family:var(--mono);font-size:11px;font-weight:300;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-3);
+}
+.cite::before{content:"— "}
+
+/* 등장 */
+.rise{opacity:0;transform:translateY(20px);
+  transition:opacity .9s var(--ease-soft),transform .9s var(--ease);
+  transition-delay:calc(var(--i,0) * 95ms);
+}
+.rise.in{opacity:1;transform:none}
+
+/* ═══ 1 · 거울 앞에서 ════════════════════════════════════════════════ */
+.hero{
+  position:relative;z-index:10;
+  min-height:100svh;
+  display:grid;place-items:center;
+  padding:clamp(4rem,9vh,6rem) var(--pad) clamp(2rem,5vh,3.5rem);
+  text-align:center;
+}
+/* 벽난로 위 아치형 거울의 액자 — 헤어라인으로만 */
+.hero-frame{
+  position:absolute;inset:clamp(12px,2.6vw,38px);
+  border:1px solid var(--gilt);
+  opacity:.4;
+  border-radius:min(44vw,430px) min(44vw,430px) 6px 6px / min(28vh,290px) min(28vh,290px) 6px 6px;
+  pointer-events:none;
+  transition:opacity 1s ease,border-color 1s ease;
+}
+.hero-frame::after{
+  content:"";position:absolute;inset:7px;
+  border:1px solid currentColor;color:var(--gilt);
+  opacity:.42;
+  border-radius:inherit;
+}
+:root[data-world="beyond"] .hero-frame{opacity:.5}
+
+.hero-inner{position:relative;width:min(100%,900px);display:flex;flex-direction:column;align-items:center}
+
+.hero-eyebrow{margin-bottom:clamp(1.6rem,4vh,2.6rem)}
+
+.titleblock{display:flex;flex-direction:column;align-items:center;gap:.35em}
+
+.title-over{
+  font-family:var(--display);font-style:italic;font-weight:400;
+  font-size:clamp(.95rem,2.4vw,1.6rem);
+  letter-spacing:.06em;
+  color:var(--gilt);
+}
+.title-main{
+  font-family:var(--kr);font-weight:800;
+  font-size:clamp(2.05rem,7.9vw,5.4rem);
+  line-height:1.06;letter-spacing:.028em;
+  text-wrap:balance;
+}
+.title-under{
+  font-family:var(--display);font-weight:500;
+  font-size:clamp(.62rem,1.62vw,1.1rem);
+  letter-spacing:.44em;
+  text-transform:uppercase;
+  color:var(--ink-2);
+  padding-left:.44em;
+}
+
+/* 수면 — 여기서부터 아래는 상(像)이다 */
+.surface{
+  position:relative;
+  width:min(100%,720px);
+  height:1px;
+  margin-block:clamp(.9rem,2.2vh,1.5rem) 0;
+  background:linear-gradient(90deg,transparent,var(--gilt) 18%,var(--gilt-2) 50%,var(--gilt) 82%,transparent);
+  opacity:.55;
+}
+.surface::after{
+  content:"";position:absolute;left:50%;top:0;
+  width:34%;height:1px;transform:translateX(-50%);
+  background:var(--glow);
+  filter:blur(1.6px);
+}
+
+/* 상(像)은 수면에서 멀어질수록 흩어진다. 바깥 상자가 꼬리를 잘라
+   히어로가 한 화면에 담기게 한다. */
+.reflect-clip{
+  width:100%;
+  max-height:clamp(3rem,10vh,7rem);
+  overflow:hidden;
+  display:flex;justify-content:center;
+  pointer-events:none;
+}
+.titleblock--reflect{
+  transform:scaleY(-1);
+  opacity:.22;
+  filter:blur(.45px);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 18%,rgba(0,0,0,.34) 55%,rgba(0,0,0,.92) 100%);
+  mask-image:linear-gradient(to bottom,transparent 18%,rgba(0,0,0,.34) 55%,rgba(0,0,0,.92) 100%);
+  animation:water 8.5s ease-in-out infinite;
+  pointer-events:none;
+  user-select:none;
+}
+@keyframes water{
+  0%,100%{opacity:.22;transform:scaleY(-1) scaleX(1)}
+  50%    {opacity:.16;transform:scaleY(-1.014) scaleX(1.005)}
+}
+
+.hero-sub{
+  margin-top:clamp(1.8rem,4.5vh,3rem);
+  font-family:var(--kr);font-weight:400;
+  font-size:clamp(.86rem,1.6vw,1.02rem);
+  letter-spacing:.14em;
+  color:var(--ink-3);
+}
+.hero-quote{
+  margin-top:clamp(1.6rem,4vh,2.4rem);
+  max-width:44ch;
+}
+.hero-quote .ko{margin-top:.7rem;font-size:.94em}
+
+.scrollcue{
+  margin-top:clamp(1.4rem,3.8vh,2.6rem);
+  display:inline-flex;flex-direction:column;align-items:center;gap:.75rem;
+  font-family:var(--mono);font-size:10px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.scrollcue i{
+  display:block;width:1px;height:52px;
+  background:linear-gradient(to bottom,var(--gilt),transparent);
+  transform-origin:50% 0;
+  animation:cue 2.4s var(--ease-soft) infinite;
+}
+@keyframes cue{
+  0%      {transform:scaleY(0);opacity:0}
+  28%     {opacity:1}
+  70%,100%{transform:scaleY(1);opacity:0}
+}
+
+/* ═══ 2 · 거울을 지나 ════════════════════════════════════════════════ */
+.pass{position:relative;z-index:10;height:250vh}
+.pass-stick{
+  position:sticky;top:0;height:100svh;
+  display:grid;place-items:center;
+  overflow:hidden;
+}
+
+/* 은빛 안개처럼 녹아내리는 유리판 */
+.pane{
+  position:relative;
+  width:min(50vw,380px);
+  aspect-ratio:.6;
+  border-radius:50% 50% 5px 5px / 34% 34% 3px 3px;
+  transform:scale(calc(1 + var(--t,0) * 3.2));
+  opacity:calc(1 - var(--t,0) * var(--t,0) * 1.16);
+  background:
+    radial-gradient(58% 34% at 26% 16%,rgba(255,255,255,.85),transparent 62%),
+    radial-gradient(24% 14% at 74% 66%,rgba(255,255,255,.4),transparent 70%),
+    linear-gradient(148deg,#F7FAF7 0%,#C9D9D2 26%,#EDF3EE 44%,#AEC3BB 63%,#E4EDE7 84%,#BDCDC5 100%);
+  box-shadow:
+    0 0 0 1px var(--gilt),
+    0 0 0 6px rgba(140,107,48,.16),
+    0 32px 90px -30px rgba(6,30,24,.55);
+  will-change:transform,opacity;
+}
+/* 오래된 거울의 반점 */
+.pane::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;
+  background:
+    radial-gradient(circle at 18% 78%,rgba(76,96,88,.3) 0 1.5px,transparent 2px),
+    radial-gradient(circle at 24% 84%,rgba(76,96,88,.22) 0 2.5px,transparent 3px),
+    radial-gradient(circle at 79% 24%,rgba(76,96,88,.26) 0 2px,transparent 2.6px),
+    radial-gradient(circle at 86% 62%,rgba(76,96,88,.18) 0 3px,transparent 3.6px),
+    radial-gradient(circle at 62% 89%,rgba(76,96,88,.2) 0 1.8px,transparent 2.3px);
+  mix-blend-mode:multiply;
+  opacity:.75;
+}
+.pane::after{
+  content:"";position:absolute;inset:6px;border-radius:inherit;
+  border:1px solid rgba(255,255,255,.55);
+  opacity:.6;
+}
+
+.pass-quote{
+  position:absolute;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:min(88vw,540px);
+  text-align:center;
+  opacity:var(--q,0);
+  transition:opacity .45s ease;
+  pointer-events:none;
+  /* 은빛 안개 위에서도 글이 읽히게 */
+  text-shadow:0 1px 16px rgba(4,16,14,.55),0 0 3px rgba(4,16,14,.3);
+}
+.pass-quote .ko{margin-top:.9rem;font-size:.92em}
+
+.pass-side{
+  position:absolute;
+  font-family:var(--mono);font-size:10px;
+  letter-spacing:.42em;text-transform:uppercase;
+  color:var(--ink-3);
+  transition:opacity .6s ease;
+}
+.pass-side--a{left:var(--pad);top:50%;transform:translateY(-50%);opacity:calc(1 - var(--t,0) * 2)}
+.pass-side--b{right:var(--pad);top:50%;transform:translateY(-50%) scaleX(-1);opacity:calc((var(--t,0) - .5) * 2.4)}
+
+/* ═══ 3 · 재버워키 ═══════════════════════════════════════════════════ */
+.jabber-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);
+  gap:clamp(2rem,5vw,4.5rem);
+  align-items:start;
+}
+
+/* — 거울 무대 — */
+.stage{
+  --sp-t:clamp(2.3rem,5vw,3.4rem);
+  --sp-x:clamp(1rem,3vw,2.4rem);
+  --sp-b:clamp(4.2rem,8vw,5.4rem);
+  position:relative;
+  container-type:inline-size;
+  border:1px solid var(--line);
+  background:
+    radial-gradient(130% 100% at 50% 0%,var(--bg-2),var(--bg-3));
+  padding:var(--sp-t) var(--sp-x) var(--sp-b);
+  overflow:hidden;
+  transition:background 1s var(--ease-soft),border-color 1s ease,--r .34s var(--ease);
+}
+.stage::before,.stage::after{
+  content:"";position:absolute;left:14px;right:14px;height:1px;
+  background:var(--gilt);opacity:.28;
+}
+.stage::before{top:14px}
+.stage::after{bottom:14px}
+.stage.is-live{cursor:none}
+
+.verse{
+  position:relative;
+  text-align:center;
+  font-family:var(--display);
+  font-size:clamp(.82rem,2.1vw,1.42rem);   /* 예비: 컨테이너 질의를 모르는 브라우저 */
+  font-weight:400;
+  line-height:2.15;
+  letter-spacing:.012em;
+  white-space:nowrap;
+}
+/* 시는 넉 줄이 그대로 유지되어야 한다. 무대 폭에 맞춰 글자를 맞춘다. */
+.verse{font-size:clamp(.78rem,5.6cqw,1.75rem)}
+.verse p{margin:0}
+
+/* 아래층 — 거울 글씨 (읽히지 않는다) */
+.verse--mirrored{
+  transform:scaleX(-1);
+  color:var(--ink-2);
+  opacity:.62;
+  user-select:none;
+}
+/* 위층 — 참 글씨. 렌즈 안에서만 보인다 */
+/* 거울 안쪽은 무대와 같은 바닥을 깔아, 아래층의 거울 글씨를 덮는다.
+   렌즈 중심에는 옅은 유리 광택을 얹는다. */
+.verse-true{
+  position:absolute;
+  inset:0;
+  padding:var(--sp-t) var(--sp-x) var(--sp-b);
+  background:
+    radial-gradient(closest-side circle at var(--x,50%) var(--y,50%),
+      rgba(233,242,236,.06),rgba(233,242,236,.015) 62%,transparent),
+    radial-gradient(130% 100% at 50% 0%,var(--bg-2),var(--bg-3));
+  clip-path:circle(var(--r,0px) at var(--x,50%) var(--y,50%));
+  pointer-events:none;
+}
+.verse-true .verse{
+  color:var(--gilt-2);
+  text-shadow:0 0 26px var(--glow),0 0 5px rgba(241,211,153,.32);
+}
+
+/* 손거울 */
+.hand{
+  position:absolute;
+  left:var(--x,50%);top:var(--y,50%);
+  /* 「시 전체 비추기」로 반지름이 폭발해도 손거울은 제 크기를 지킨다 */
+  width:min(calc(var(--r,0px) * 2),260px);
+  height:min(calc(var(--r,0px) * 2),260px);
+  transform:translate(-50%,-50%) rotate(-15deg);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .35s ease;
+}
+.stage.is-hover .hand{opacity:1}
+.stage.is-open .hand{opacity:0}
+.hand-ring{
+  position:absolute;inset:0;border-radius:50%;
+  border:2px solid var(--gilt);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.2),
+    inset 0 0 34px rgba(233,242,236,.07),
+    0 0 0 1px rgba(0,0,0,.28),
+    0 12px 34px -8px rgba(0,0,0,.6);
+  background:radial-gradient(70% 70% at 32% 24%,rgba(233,242,236,.09),transparent 66%);
+}
+.hand-ring::after{
+  content:"";position:absolute;inset:5px;border-radius:50%;
+  border:1px solid var(--gilt-2);opacity:.42;
+}
+.hand-grip{
+  position:absolute;left:50%;top:97%;
+  width:9px;height:calc(var(--r,0px) * .92);
+  transform:translateX(-50%);
+  border-radius:0 0 6px 6px;
+  background:linear-gradient(90deg,rgba(140,107,48,.55),var(--gilt) 34%,var(--gilt-2) 52%,var(--gilt) 68%,rgba(140,107,48,.55));
+  box-shadow:0 8px 20px -6px rgba(0,0,0,.6);
+}
+.hand-grip::after{
+  content:"";position:absolute;left:50%;bottom:-5px;
+  width:15px;height:11px;transform:translateX(-50%);
+  border-radius:50%;
+  background:var(--gilt);
+}
+
+.stage-hint{
+  position:absolute;left:50%;bottom:clamp(1.4rem,3vw,2rem);
+  transform:translateX(-50%);
+  font-family:var(--mono);font-size:10px;
+  letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ink-3);
+  white-space:nowrap;
+  transition:opacity .4s ease;
+}
+.stage.is-open .stage-hint,.stage.is-touched .stage-hint{opacity:0}
+
+.stage-tools{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem;align-items:center}
+
+.btn{
+  font-family:var(--mono);font-size:10.5px;font-weight:400;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-2);
+  background:transparent;
+  border:1px solid var(--line);
+  padding:.72em 1.35em;
+  cursor:pointer;
+  transition:color .3s ease,border-color .3s ease,background-color .3s ease;
+}
+.btn:hover{color:var(--gilt-2);border-color:var(--gilt)}
+.btn[aria-pressed="true"]{color:var(--bg);background:var(--gilt);border-color:var(--gilt)}
+.btn:disabled{opacity:.32;cursor:default}
+.btn:disabled:hover{color:var(--ink-2);border-color:var(--line)}
+
+.verse-ko{
+  margin-top:1.6rem;
+  font-family:var(--kr);
+  font-size:clamp(.92rem,1.55vw,1.04rem);
+  line-height:2.1;
+  color:var(--ink-2);
+}
+.verse-ko b{font-weight:700;color:var(--gilt);font-style:normal}
+
+/* — 험프티 덤프티의 주석 — */
+.gloss{
+  border-top:1px solid var(--gilt);
+  padding-top:1.4rem;
+}
+.gloss-head{
+  font-family:var(--mono);font-size:10px;
+  letter-spacing:.24em;text-transform:uppercase;
+  color:var(--gilt);
+  margin-bottom:1.4rem;
+}
+.gloss dl{display:grid;gap:1.15rem}
+.gloss dt{
+  font-family:var(--display);font-style:italic;font-weight:600;
+  font-size:1.04rem;color:var(--ink);
+  display:flex;align-items:baseline;gap:.55em;
+}
+.gloss dt span{
+  font-family:var(--mono);font-style:normal;font-weight:300;
+  font-size:9.5px;letter-spacing:.16em;
+  color:var(--ink-3);
+}
+.gloss dd{
+  font-family:var(--kr);font-size:.88rem;line-height:1.85;
+  color:var(--ink-2);
+  padding-left:.9em;
+  border-left:1px solid var(--line-2);
+  margin-top:.3rem;
+}
+
+/* ═══ 4 · 거울 나라의 세 가지 법칙 ═══════════════════════════════════ */
+.laws{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,258px),1fr));
+  gap:clamp(2rem,4vw,3.4rem);
+}
+.law{
+  display:flex;flex-direction:column;
+  border-top:1px solid var(--gilt);
+  padding-top:1.5rem;
+}
+.law-no{
+  font-family:var(--mono);font-size:10px;
+  letter-spacing:.28em;text-transform:uppercase;
+  color:var(--gilt);
+  margin-bottom:.85rem;
+}
+.law-title{
+  font-family:var(--kr);font-weight:700;
+  font-size:clamp(1.06rem,1.9vw,1.32rem);
+  line-height:1.5;letter-spacing:-.01em;
+  margin-bottom:1.6rem;
+}
+.law-fig{
+  position:relative;
+  height:132px;
+  margin-bottom:1.7rem;
+  display:grid;place-items:center;
+  color:var(--ink-3);
+}
+.law .en{font-size:clamp(.96rem,1.42vw,1.14rem);line-height:1.66}
+.law .ko{margin-top:.85rem;font-size:.9rem}
+.law .cite{margin-top:auto;padding-top:1.2rem}
+
+/* — 법칙 하나: 타원을 도는 걸음 — */
+.fig-orbit{position:relative;width:206px;height:126px}
+.fig-orbit svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.orbit-path{fill:none;stroke:currentColor;stroke-width:1;stroke-dasharray:3 5;opacity:.55}
+.orbit-goal{fill:none;stroke:var(--gilt);stroke-width:1.4}
+.orbit-goal-core{fill:var(--gilt)}
+.orbit-label{
+  font-family:var(--mono);font-size:8px;letter-spacing:.14em;
+  fill:var(--ink-3);text-transform:uppercase;
+}
+.orbit-walker{
+  position:absolute;top:0;left:0;
+  width:9px;height:9px;margin:-4.5px 0 0 -4.5px;
+  border-radius:50%;
+  background:var(--ink);
+  box-shadow:0 0 0 3px var(--bg),0 0 14px var(--glow);
+  offset-path:path("M23 63 A80 42 0 1 1 183 63 A80 42 0 1 1 23 63");
+  offset-rotate:0deg;
+  animation:orbit 9s linear infinite;
+}
+@keyframes orbit{
+  0%     {offset-distance:25%}
+  74.99% {offset-distance:100%}
+  75%    {offset-distance:0%}
+  100%   {offset-distance:25%}
+}
+@supports not (offset-path:path("M0 0")){
+  .fig-orbit .orbit-walker{
+    left:103px;top:21px;offset-path:none;
+    animation:orbit-fallback 4.5s ease-in-out infinite alternate;
+  }
+  @keyframes orbit-fallback{from{transform:translateX(-72px)}to{transform:translateX(72px)}}
+}
+
+/* — 법칙 둘: 세계만 흘러간다 — */
+.fig-race{
+  position:relative;width:100%;height:126px;overflow:hidden;
+  border-bottom:1px solid var(--line);
+}
+.race-band{
+  position:absolute;left:0;right:0;bottom:0;height:84px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='80' viewBox='0 0 200 80'%3E%3Cg fill='%2378908A'%3E%3Cpath d='M16 78 L25 30 L34 78 Z'/%3E%3Cpath d='M48 78 L54 48 L60 78 Z'/%3E%3Ccircle cx='84' cy='54' r='12'/%3E%3Crect x='82.6' y='54' width='2.8' height='24'/%3E%3Cpath d='M116 78 L126 22 L136 78 Z'/%3E%3Cpath d='M152 78 L158 50 L164 78 Z'/%3E%3Ccircle cx='184' cy='58' r='9'/%3E%3Crect x='182.8' y='58' width='2.4' height='20'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat:repeat-x;
+  background-size:200px 80px;
+  background-position:0 100%;
+  opacity:.62;
+  animation:race .78s linear infinite;
+}
+@keyframes race{to{background-position:-200px 100%}}
+.race-streak{
+  position:absolute;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--ink-3),transparent);
+  opacity:.34;
+  animation:streak 1.05s linear infinite;
+}
+/* .race-band 가 첫 번째 span 이므로 줄무늬는 2·3·4번째다 */
+.race-streak:nth-of-type(2){top:22%;animation-duration:.62s}
+.race-streak:nth-of-type(3){top:38%;animation-duration:.9s;animation-delay:-.3s}
+.race-streak:nth-of-type(4){top:12%;animation-duration:.75s;animation-delay:-.5s}
+@keyframes streak{
+  0%  {transform:translateX(60%) scaleX(.25);opacity:0}
+  25% {opacity:.42}
+  100%{transform:translateX(-140%) scaleX(.6);opacity:0}
+}
+/* 한 발짝도 움직이지 않는 표식 */
+.race-still{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:13px;height:13px;border-radius:50%;
+  border:1.5px solid var(--gilt);
+  background:var(--bg);
+  box-shadow:0 0 0 5px var(--bg),0 0 20px var(--glow);
+  z-index:2;
+}
+.race-still::after{
+  content:"";position:absolute;left:50%;top:50%;
+  width:3px;height:3px;transform:translate(-50%,-50%);
+  border-radius:50%;background:var(--gilt);
+}
+.race-tick{
+  position:absolute;left:50%;top:0;bottom:0;width:1px;
+  transform:translateX(-50%);
+  background:linear-gradient(to bottom,transparent,var(--gilt),transparent);
+  opacity:.4;
+}
+/* 나무 위쪽, 비어 있는 하늘에 둔다 — 아래는 숲이 지나간다 */
+.race-note{
+  position:absolute;left:50%;top:4px;
+  transform:translateX(-50%);
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;
+  color:var(--ink-3);text-transform:uppercase;
+  z-index:2;
+}
+
+/* — 법칙 셋: 거울에 비친 시계 — */
+.fig-clock{width:126px;height:126px;color:var(--ink-3)}
+.fig-clock svg{width:100%;height:100%;overflow:visible}
+.clock-face{fill:none;stroke:currentColor;stroke-width:1;opacity:.5}
+.clock-tick{stroke:currentColor;stroke-width:1;opacity:.42}
+.clock-num{
+  font-family:'Bodoni Moda',Georgia,serif;font-size:12px;
+  fill:var(--ink-2);text-anchor:middle;
+}
+.clock-hand{stroke-linecap:round;transform-origin:63px 63px}
+.clock-hand--h{stroke:var(--ink);stroke-width:2.4;animation:widdershins 44s linear infinite}
+.clock-hand--m{stroke:var(--gilt);stroke-width:1.4;animation:widdershins 5.5s linear infinite}
+.clock-pin{fill:var(--gilt)}
+@keyframes widdershins{to{transform:rotate(-360deg)}}
+
+/* ═══ 5 · 여덟째 칸까지 ══════════════════════════════════════════════ */
+.board-grid{
+  display:grid;
+  /* auto 로 두면 판이 min-content 로 찌그러진다. 폭을 직접 준다. */
+  grid-template-columns:minmax(240px,430px) minmax(0,1fr);
+  gap:clamp(2.2rem,5vw,4.4rem);
+  align-items:start;
+}
+
+.board-col{display:flex;flex-direction:column;align-items:center;gap:1rem}
+
+.board-frame{
+  position:relative;
+  width:min(100%,432px);
+  padding:0 0 22px 22px;
+}
+.board{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  aspect-ratio:1;
+  border:1px solid var(--gilt);
+  box-shadow:0 0 0 5px rgba(217,179,107,.14),0 30px 70px -34px rgba(0,0,0,.8);
+  transition:border-color 1s ease;
+}
+.sq{position:relative;transition:background-color 1s var(--ease-soft)}
+.sq--l{background:var(--sq-l)}
+.sq--d{background:var(--sq-d)}
+/* 앨리스가 딛는 칸 */
+.sq--stop::after{
+  content:"";position:absolute;left:50%;top:50%;
+  width:5px;height:5px;
+  transform:translate(-50%,-50%) rotate(45deg);
+  border:1px solid var(--gilt);
+  opacity:.75;
+}
+.sq--file::before{
+  content:"";position:absolute;inset:0;
+  background:rgba(217,179,107,.075);
+}
+
+/* 판을 두르는 좌표 */
+.marks-file,.marks-rank{position:absolute;display:grid;font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--ink-3)}
+.marks-file{left:22px;right:0;bottom:0;height:22px;grid-template-columns:repeat(8,1fr);place-items:center}
+.marks-rank{left:0;top:0;bottom:22px;width:22px;grid-template-rows:repeat(8,1fr);place-items:center}
+
+.trail{
+  position:absolute;
+  left:43.75%;bottom:18.75%;
+  width:1px;
+  height:calc(var(--h,0) * 12.5%);
+  transform:translateX(-50%);
+  background:linear-gradient(to top,rgba(217,179,107,0),var(--gilt));
+  transition:height .78s var(--ease);
+  z-index:2;
+}
+
+.alice{
+  position:absolute;
+  width:12.5%;height:12.5%;
+  /* --r 은 렌즈 반지름으로 등록되어 있다. 칸 좌표는 다른 이름을 쓴다. */
+  left:calc(var(--file,3) * 12.5%);
+  top:calc(var(--rank,6) * 12.5%);
+  z-index:4;
+  transition:left .52s var(--ease),top .78s var(--swing);
+}
+/* 칸 안쪽 여백은 padding 으로 주면 안 된다 — 퍼센트 padding 은 제
+   자신이 아니라 판의 폭을 기준으로 풀려 콘텐츠 박스를 0 으로 만든다.
+   말은 칸을 꽉 채우고 transform 으로 물러앉힌다. */
+.alice svg{
+  display:block;
+  width:100%;height:100%;
+  transform:scale(.84);
+  fill:#F2F8F3;
+  stroke:#3A4B45;stroke-width:.8;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.55));
+}
+.alice .pc-queen{display:none}
+.alice.is-queen .pc-pawn{display:none}
+.alice.is-queen .pc-queen{display:block}
+.alice.is-queen svg{fill:#FBF3DE;stroke:#8C6B30}
+.alice.is-queen::before{
+  content:"";position:absolute;inset:-46%;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(241,211,153,.42),transparent 66%);
+  opacity:.34;                       /* 대관이 끝난 뒤 남는 빛 */
+  animation:flare 1.6s var(--ease-soft);
+  pointer-events:none;
+}
+@keyframes flare{
+  0%  {opacity:0;transform:scale(.35)}
+  40% {opacity:1;transform:scale(.82)}
+  100%{opacity:.34;transform:scale(1)}
+}
+
+/* 붉은 여왕 — 이름이 불릴 때만 판 곁에 선다 */
+.redqueen{
+  display:flex;align-items:center;gap:.7em;
+  font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--carmine);
+  opacity:0;transform:translateY(4px);
+  transition:opacity .5s ease,transform .5s var(--ease);
+  height:22px;
+}
+.redqueen.on{opacity:1;transform:none}
+.redqueen svg{width:15px;height:17px;fill:currentColor}
+
+/* — 기보 — */
+.score{display:flex;flex-direction:column;gap:1.5rem;min-width:0}
+
+.score-top{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;border-bottom:1px solid var(--line);padding-bottom:.9rem}
+.score-no{font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-3)}
+.score-sq{
+  font-family:var(--mono);font-size:clamp(1.5rem,3.4vw,2.4rem);font-weight:300;
+  letter-spacing:.06em;color:var(--gilt-2);
+  line-height:1;
+}
+
+.score-body{min-height:clamp(9rem,20vh,11.5rem)}
+.score-ko{
+  font-family:var(--kr);font-weight:700;
+  font-size:clamp(1.15rem,2.5vw,1.72rem);
+  line-height:1.45;letter-spacing:-.012em;
+  margin-bottom:.75rem;
+}
+.score-en{
+  font-family:var(--display);font-style:italic;font-weight:400;
+  font-size:clamp(.95rem,1.5vw,1.1rem);
+  color:var(--ink-3);
+  margin-bottom:1.1rem;
+}
+.score-ch{
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gilt);
+}
+.score-note{
+  font-family:var(--kr);font-size:.9rem;line-height:1.9;
+  color:var(--ink-2);margin-top:1rem;
+  max-width:46ch;
+}
+.score-body>*{animation:score-in .5s var(--ease) both}
+@keyframes score-in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+/* 열한 수의 눈금 */
+.steps{display:flex;gap:2px;align-items:flex-end;height:26px}
+.step{
+  flex:1;position:relative;
+  height:16px;
+  background:transparent;border:0;padding:0;
+  cursor:pointer;
+}
+.step::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;
+  height:2px;background:var(--line);
+  transition:height .3s var(--swing),background-color .3s ease,opacity .3s ease;
+}
+.step:hover::after{background:var(--ink-3);height:7px}
+.step.done::after{background:var(--gilt);opacity:.5}
+.step[aria-current="step"]::after{background:var(--gilt-2);height:15px;opacity:1}
+
+.score-tools{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
+
+/* ═══ 6 · 배 한 척, 맑은 하늘 아래 ═══════════════════════════════════ */
+/* 후기는 책의 마지막 쪽이다. 이 구간만 가운데로 짠다. */
+.finale{position:relative;overflow:hidden}
+.finale .sec-head{align-items:center;text-align:center}
+.finale .body-txt{margin-inline:auto;text-align:center;max-width:56ch}
+.finale .stage-tools{justify-content:center}
+/* 낮게 걸린 7월의 해 */
+.finale::before{
+  content:"";position:absolute;
+  left:50%;top:-16vh;width:min(150vw,1300px);height:min(80vh,760px);
+  transform:translateX(-50%);
+  background:radial-gradient(50% 50% at 50% 50%,var(--glow),transparent 68%);
+  opacity:0;transition:opacity 1.6s ease;
+  pointer-events:none;
+}
+:root[data-world="waking"] .finale::before{opacity:.9}
+
+.poem-grid{display:grid;justify-items:center;gap:clamp(2.4rem,6vh,4rem)}
+.poem{
+  display:grid;
+  gap:clamp(1.5rem,3.4vh,2.3rem);
+  font-family:var(--display);
+  font-size:clamp(.98rem,1.85vw,1.32rem);
+  line-height:1.78;
+}
+.stanza{display:grid;gap:.12em}
+.pline{display:grid;grid-template-columns:1.35em 1fr;align-items:baseline;column-gap:.12em}
+.pcap{
+  font-family:var(--display);font-weight:700;
+  font-size:1.22em;line-height:1;
+  color:var(--ink-3);
+  text-align:center;
+  transition:color .55s ease,text-shadow .55s ease,transform .55s var(--swing);
+}
+.pline.lit .pcap{
+  color:var(--gilt-2);
+  text-shadow:0 0 20px var(--glow);
+  transform:translateY(-.03em) scale(1.1);
+}
+.prest{font-style:italic;font-weight:400;color:var(--ink-2);transition:color .55s ease}
+.pline.lit .prest{color:var(--ink)}
+
+.poem-ko{
+  display:none;
+  font-family:var(--kr);font-size:.86rem;line-height:2;
+  color:var(--ink-3);
+  padding-left:1.47em;
+  margin-top:.55em;
+}
+.poem.show-ko .poem-ko{display:block}
+.poem-ko span{display:block;padding-left:.7em;border-left:1px solid var(--line-2)}
+
+.acrostic{
+  display:flex;flex-direction:column;align-items:center;gap:1.1rem;
+  text-align:center;
+  padding-top:clamp(1.5rem,4vh,2.6rem);
+  border-top:1px solid var(--line);
+  width:min(100%,720px);
+}
+.acrostic-name{
+  display:flex;flex-wrap:wrap;justify-content:center;
+  font-family:var(--display);font-weight:500;
+  font-size:clamp(1.02rem,3.3vw,2.25rem);
+  letter-spacing:.24em;
+  color:var(--gilt);
+  padding-left:.24em;
+}
+.acrostic-name b{
+  font-weight:500;
+  opacity:0;transform:translateY(9px);
+  transition:opacity .5s ease,transform .5s var(--ease);
+  transition-delay:calc(var(--n) * 52ms);
+  white-space:pre;
+}
+.acrostic.in .acrostic-name b{opacity:1;transform:none}
+.acrostic-note{max-width:52ch;font-size:.9rem;color:var(--ink-2);line-height:1.95}
+
+.lastline{text-align:center;margin-top:clamp(3rem,8vh,5.5rem)}
+.lastline .en{
+  font-size:clamp(1.45rem,4.5vw,3rem);
+  line-height:1.3;
+  color:var(--ink);
+}
+.lastline .ko{
+  margin-top:1.1rem;
+  font-family:var(--kr);font-weight:700;
+  font-size:clamp(1rem,2.1vw,1.35rem);
+  letter-spacing:.02em;
+  color:var(--gilt);
+}
+
+/* 강물 */
+.river{
+  position:relative;height:120px;margin-top:clamp(2.5rem,6vh,4rem);
+  overflow:hidden;
+  -webkit-mask-image:linear-gradient(to bottom,black,transparent);
+  mask-image:linear-gradient(to bottom,black,transparent);
+}
+/* 강 위의 잔물결에 걸린 빛. 길이가 제각각인 짧은 금빛 선들. */
+.river i{
+  position:absolute;left:50%;height:1px;
+  width:var(--w,40%);
+  background:linear-gradient(90deg,transparent,var(--gilt),transparent);
+  opacity:var(--o,.34);
+  animation:ripple 7s ease-in-out infinite;
+}
+.river i:nth-child(1){top:5%; --w:54%;--o:.4; animation-duration:6.2s}
+.river i:nth-child(2){top:17%;--w:34%;--o:.26;animation-duration:8.4s;animation-delay:-2.1s}
+.river i:nth-child(3){top:29%;--w:66%;--o:.32;animation-duration:7.1s;animation-delay:-4.3s}
+.river i:nth-child(4){top:42%;--w:26%;--o:.22;animation-duration:9.3s;animation-delay:-1.2s}
+.river i:nth-child(5){top:55%;--w:48%;--o:.26;animation-duration:6.7s;animation-delay:-3.4s}
+.river i:nth-child(6){top:69%;--w:20%;--o:.18;animation-duration:8.8s;animation-delay:-5.1s}
+.river i:nth-child(7){top:84%;--w:38%;--o:.14;animation-duration:7.6s;animation-delay:-2.7s}
+@keyframes ripple{
+  0%,100%{transform:translateX(-53%) scaleX(1)}
+  50%    {transform:translateX(-47%) scaleX(1.12)}
+}
+
+/* ═══ 판권 ═══════════════════════════════════════════════════════════ */
+.colophon{
+  position:relative;z-index:10;
+  border-top:1px solid var(--line);
+  padding-block:clamp(2.6rem,6vh,4rem);
+}
+.colophon-in{
+  display:flex;flex-wrap:wrap;gap:1.4rem 2.6rem;
+  justify-content:space-between;align-items:flex-end;
+}
+.colophon p{
+  font-family:var(--mono);font-size:10px;font-weight:300;
+  letter-spacing:.16em;line-height:2.1;
+  color:var(--ink-3);
+  text-transform:uppercase;
+}
+.colophon .kr-note{
+  font-family:var(--kr);font-size:.82rem;letter-spacing:.02em;
+  text-transform:none;max-width:44ch;line-height:1.95;
+}
+
+.sr-only{
+  position:absolute;width:1px;height:1px;
+  padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0;
+}
+
+/* ═══ 한글이 들어가는 작은 활자 ══════════════════════════════════════
+   넓게 벌린 라틴 소문자용 눈금은 한글에 그대로 쓰면 읽히지 않는다.
+   한글이 오는 자리는 명조로, 조금 크고 조금 좁게 다시 짠다.        */
+.btn{font-family:var(--kr);font-size:12px;letter-spacing:.1em;text-transform:none}
+.stage-hint{font-family:var(--kr);font-size:11.5px;letter-spacing:.1em;text-transform:none}
+.cite{font-family:var(--kr);font-size:11.5px;letter-spacing:.04em;text-transform:none}
+.law-no{font-family:var(--kr);font-size:11.5px;letter-spacing:.2em}
+.score-no{letter-spacing:.2em}
+.score-ch{font-family:var(--kr);font-size:11.5px;letter-spacing:.06em;text-transform:none}
+.redqueen{font-family:var(--kr);font-size:11px;letter-spacing:.1em;text-transform:none}
+.rail-tip{font-family:var(--kr);font-size:11px;letter-spacing:.1em;text-transform:none}
+.gloss-head{font-family:var(--kr);font-size:.84rem;letter-spacing:.06em;text-transform:none}
+.gloss dt span{font-size:10.5px;letter-spacing:.08em}
+.race-note{font-family:var(--kr);font-size:9.5px;letter-spacing:.14em;text-transform:none}
+.orbit-label{font-family:var(--kr);font-size:9px;letter-spacing:.1em}
+.eyebrow--ko{font-family:var(--kr);font-size:11.5px;letter-spacing:.18em;text-transform:none}
+.colophon .ko-link{font-family:var(--kr);font-size:11.5px;letter-spacing:.06em;text-transform:none}
+.colophon .ko-link a:hover{color:var(--gilt)}
+
+/* ═══ 반응 ═══════════════════════════════════════════════════════════ */
+@media (max-width:960px){
+  .jabber-grid{grid-template-columns:minmax(0,1fr)}
+  .board-grid{grid-template-columns:minmax(0,1fr);justify-items:center}
+  .board-col{order:-1;width:min(100%,430px)}
+  .score{width:100%}
+}
+@media (max-width:860px){
+  .rail{display:none}
+  .topbar{display:block}
+}
+@media (max-width:560px){
+  :root{--pad:1.15rem}
+  .verse{line-height:2.45}
+  .hero-frame{border-radius:min(52vw,320px) min(52vw,320px) 5px 5px / min(20vh,190px) min(20vh,190px) 3px 3px}
+  .colophon-in{flex-direction:column;align-items:flex-start}
+  .gloss dd{font-size:.85rem}
+}
+
+/* ═══ 움직임을 줄이기로 한 사람에게 ══════════════════════════════════ */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+  .rise{opacity:1;transform:none}
+  #motes{display:none}
+  .curtain{display:none}
+  .titleblock--reflect{animation:none;opacity:.24}
+}
+</style>
+</head>
+<body>
+
+<!-- 대기: 입자 · 유리의 결 · 반사광 -->
+<canvas id="motes" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<!-- 막 -->
+<div class="curtain" id="curtain" aria-hidden="true">
+  <i class="curtain-half curtain-half--l"></i>
+  <i class="curtain-half curtain-half--r"></i>
+  <i class="curtain-seam"></i>
+</div>
+
+<div class="topbar" aria-hidden="true"><span id="topbarFill"></span></div>
+
+<!-- 진행: 둘째 칸의 폰이 여덟째 칸에서 여왕이 될 때까지 -->
+<nav class="rail" id="rail" aria-label="구간 이동">
+  <div class="rail-track" id="railTrack">
+    <div class="rail-pawn" id="railPawn" aria-hidden="true">
+      <svg class="rp-pawn" viewBox="0 0 40 48"><circle cx="20" cy="10.5" r="6.2"/><path d="M12.6 18.2h14.8l-2.2 3.4H14.8z"/><path d="M16 22.6h8c0 7.6 1.6 12.4 4.4 15.6H11.6c2.8-3.2 4.4-8 4.4-15.6z"/><rect x="8.6" y="38.6" width="22.8" height="5.4" rx="2.2"/></svg>
+      <svg class="rp-queen" viewBox="0 0 44 48"><circle cx="6" cy="10" r="3"/><circle cx="14.5" cy="6.5" r="3"/><circle cx="22" cy="4.6" r="3.4"/><circle cx="29.5" cy="6.5" r="3"/><circle cx="38" cy="10" r="3"/><path d="M6 11.5 11 22h22l5-10.5-8 6-8-9-8 9z"/><rect x="10.4" y="22.6" width="23.2" height="3.6" rx="1.4"/><path d="M13 27.4h18c0 6.6 1.6 10.6 4.2 13.2H8.8c2.6-2.6 4.2-6.6 4.2-13.2z"/><rect x="6.2" y="41.2" width="31.6" height="5.2" rx="2.2"/></svg>
+    </div>
+  </div>
+</nav>
+
+<main id="top">
+
+<!-- ════════ 1 · 거울 앞에서 ════════════════════════════════════════ -->
+<section class="hero" id="s-hero">
+  <div class="hero-frame" aria-hidden="true"></div>
+
+  <div class="hero-inner">
+    <p class="eyebrow hero-eyebrow rise">Lewis Carroll · MDCCCLXXI</p>
+
+    <div class="titleblock rise" style="--i:1">
+      <p class="title-over">Through the</p>
+      <h1 class="title-main">거울 나라의 앨리스</h1>
+      <p class="title-under">Looking-Glass</p>
+    </div>
+
+    <div class="surface rise" style="--i:2" aria-hidden="true"></div>
+
+    <div class="reflect-clip rise" style="--i:2" aria-hidden="true">
+      <div class="titleblock titleblock--reflect">
+        <p class="title-over">Through the</p>
+        <p class="title-main">거울 나라의 앨리스</p>
+        <p class="title-under">Looking-Glass</p>
+      </div>
+    </div>
+
+    <p class="hero-sub rise" style="--i:3">그리고 앨리스가 거기서 발견한 것</p>
+
+    <blockquote class="hero-quote rise" style="--i:4">
+      <p class="en">&ldquo;Let&rsquo;s pretend the glass has got all soft like gauze, so that we can get through.&rdquo;</p>
+      <p class="ko">「거울이 얇은 천처럼 부드러워졌다고 치자. 그러면 우리가 지나갈 수 있잖아.」</p>
+    </blockquote>
+
+    <a class="scrollcue rise" href="#s-pass" style="--i:5">거울로 내려가기<i aria-hidden="true"></i></a>
+  </div>
+</section>
+
+<!-- ════════ 2 · 거울을 지나 ════════════════════════════════════════ -->
+<section class="pass" id="s-pass" aria-label="거울을 지나">
+  <div class="pass-stick">
+    <span class="pass-side pass-side--a" aria-hidden="true">이쪽</span>
+    <span class="pass-side pass-side--b" aria-hidden="true">저쪽</span>
+
+    <div class="pane" id="pane" aria-hidden="true"></div>
+
+    <blockquote class="pass-quote" id="passQuote">
+      <p class="en">&ldquo;And certainly the glass was beginning to melt away, just like a bright silvery mist.&rdquo;</p>
+      <p class="ko">그리고 정말로 거울이 녹기 시작했다. 밝은 은빛 안개처럼.</p>
+      <span class="cite">1장 「거울 집」</span>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ════════ 3 · 재버워키 ═══════════════════════════════════════════ -->
+<section class="sec" id="s-jabber">
+  <div class="wrap">
+
+    <header class="sec-head">
+      <p class="eyebrow rise">Chapter I · Looking-Glass House</p>
+      <h2 class="sec-title rise" style="--i:1">거울에 비춰야 읽히는 시<em>Jabberwocky</em></h2>
+      <div class="sec-rule rise" style="--i:2"></div>
+    </header>
+
+    <p class="body-txt rise" style="--i:2">
+      거울 집에서 앨리스가 처음 집어 든 책은 한 글자도 읽히지 않았다.
+      「이건 거울 나라의 책이잖아! 거울에 비추면 글자들이 다시 제대로 될 거야.」
+      아래 네 줄이 그 책의 첫 쪽이다. 손거울을 끌어 비춰 보라.
+    </p>
+
+    <div class="jabber-grid" style="margin-top:clamp(2rem,4vh,3rem)">
+
+      <div class="rise" style="--i:3">
+        <!-- 거울 무대: 아래층은 거울 글씨, 위층은 참 글씨 -->
+        <div class="stage" id="stage">
+          <div class="verse verse--mirrored" aria-hidden="true">
+            <p>&rsquo;Twas brillig, and the slithy toves</p>
+            <p>Did gyre and gimble in the wabe:</p>
+            <p>All mimsy were the borogoves,</p>
+            <p>And the mome raths outgrabe.</p>
+          </div>
+
+          <div class="verse-true" id="verseTrue">
+            <div class="verse">
+              <p>&rsquo;Twas brillig, and the slithy toves</p>
+              <p>Did gyre and gimble in the wabe:</p>
+              <p>All mimsy were the borogoves,</p>
+              <p>And the mome raths outgrabe.</p>
+            </div>
+          </div>
+
+          <div class="hand" aria-hidden="true">
+            <span class="hand-ring"></span>
+            <span class="hand-grip"></span>
+          </div>
+
+          <p class="stage-hint" id="stageHint">거울을 끌어 비추세요</p>
+        </div>
+
+        <div class="stage-tools">
+          <button class="btn" id="revealBtn" type="button" aria-pressed="false">시 전체 비추기</button>
+        </div>
+
+        <div class="verse-ko">
+          때는 <b>브릴릭</b>, <b>슬라이디</b>한 <b>토브</b>들이<br>
+          <b>웨이브</b>에서 <b>자이르</b>고 <b>김블</b>했네.<br>
+          <b>보로고브</b>들은 하나같이 <b>밈지</b>했고,<br>
+          집 잃은 <b>몸 라스</b>들은 <b>아웃그레이브</b>했네.
+        </div>
+      </div>
+
+      <!-- 험프티 덤프티가 낱말마다 뜻을 붙여 주었다 (6장) -->
+      <aside class="gloss rise" style="--i:4">
+        <p class="gloss-head">험프티 덤프티의 주석 · Chapter VI</p>
+        <dl>
+          <div>
+            <dt>brillig <span>브릴릭</span></dt>
+            <dd>오후 네 시. 저녁거리를 굽기(broil) 시작할 무렵이지.</dd>
+          </div>
+          <div>
+            <dt>slithy <span>슬라이디</span></dt>
+            <dd>&lsquo;나긋한(lithe)&rsquo;과 &lsquo;끈적한(slimy)&rsquo;. 여행 가방 하나에 두 뜻을 꾸려 넣은 낱말이야.</dd>
+          </div>
+          <div>
+            <dt>toves <span>토브</span></dt>
+            <dd>오소리 비슷하고, 도마뱀 비슷하고, 코르크 마개뽑이 비슷한 것들. 해시계 밑에 둥지를 틀고 치즈를 먹고 살지.</dd>
+          </div>
+          <div>
+            <dt>gyre &middot; gimble <span>자이르 · 김블</span></dt>
+            <dd>자이르는 자이로스코프처럼 뱅뱅 도는 것. 김블은 송곳(gimlet)처럼 구멍을 내는 것.</dd>
+          </div>
+          <div>
+            <dt>wabe <span>웨이브</span></dt>
+            <dd>해시계를 둘러싼 잔디밭. 해시계 앞으로도 한참, 뒤로도 한참 뻗어 있으니까.</dd>
+          </div>
+          <div>
+            <dt>mimsy <span>밈지</span></dt>
+            <dd>&lsquo;가냘프고(flimsy)&rsquo; &lsquo;비참한(miserable)&rsquo;. 또 하나의 여행 가방이지.</dd>
+          </div>
+          <div>
+            <dt>borogove <span>보로고브</span></dt>
+            <dd>볼품없이 여윈 새. 깃털이 사방으로 삐죽삐죽 솟아서 살아 있는 대걸레 같아.</dd>
+          </div>
+          <div>
+            <dt>mome rath <span>몸 라스</span></dt>
+            <dd>라스는 초록 돼지 같은 것. &lsquo;몸&rsquo;은 &lsquo;집을 잃은(from home)&rsquo;의 줄임말일 거야. 확실하지는 않지만.</dd>
+          </div>
+          <div>
+            <dt>outgrabe <span>아웃그레이브</span></dt>
+            <dd>&lsquo;아웃그라이브&rsquo;의 과거형. 울부짖음과 휘파람 사이쯤 되는 소리인데, 중간에 재채기가 섞여 있지.</dd>
+          </div>
+        </dl>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 4 · 거울 나라의 세 가지 법칙 ═══════════════════════════ -->
+<section class="sec" id="s-laws">
+  <div class="wrap">
+
+    <header class="sec-head">
+      <p class="eyebrow rise">Chapters II &amp; V</p>
+      <h2 class="sec-title rise" style="--i:1">거울 나라의 세 가지 법칙<em>The rules on the other side</em></h2>
+      <div class="sec-rule rise" style="--i:2"></div>
+    </header>
+
+    <div class="laws">
+
+      <article class="law rise" style="--i:3">
+        <p class="law-no">법칙 하나</p>
+        <h3 class="law-title">가려는 곳의 반대로 걸을 것</h3>
+        <div class="law-fig">
+          <div class="fig-orbit">
+            <svg viewBox="0 0 206 126" aria-hidden="true">
+              <path class="orbit-path" d="M23 63 A80 42 0 1 1 183 63 A80 42 0 1 1 23 63"/>
+              <circle class="orbit-goal" cx="103" cy="21" r="6.5"/>
+              <circle class="orbit-goal-core" cx="103" cy="21" r="2"/>
+              <text class="orbit-label" x="103" y="7" text-anchor="middle">언덕</text>
+            </svg>
+            <span class="orbit-walker" aria-hidden="true"></span>
+          </div>
+        </div>
+        <p class="en">&ldquo;You can&rsquo;t possibly do that: I should advise you to walk the other way.&rdquo;</p>
+        <p class="ko">「그건 안 될걸. 반대쪽으로 걸어가 보라고 권하고 싶은데.」</p>
+        <span class="cite">장미 · 2장 「살아 있는 꽃들의 정원」</span>
+      </article>
+
+      <article class="law rise" style="--i:4">
+        <p class="law-no">법칙 둘</p>
+        <h3 class="law-title">같은 자리에 있으려면 죽을힘을 다해 달릴 것</h3>
+        <div class="law-fig">
+          <div class="fig-race">
+            <span class="race-band" aria-hidden="true"></span>
+            <span class="race-streak" aria-hidden="true"></span>
+            <span class="race-streak" aria-hidden="true"></span>
+            <span class="race-streak" aria-hidden="true"></span>
+            <span class="race-tick" aria-hidden="true"></span>
+            <span class="race-still" aria-hidden="true"></span>
+            <span class="race-note">제자리</span>
+          </div>
+        </div>
+        <p class="en">&ldquo;It takes all the running you can do, to keep in the same place.&rdquo;</p>
+        <p class="ko">「여기서는 말이야, 보다시피, 같은 자리에 있으려면 죽을힘을 다해 달려야 해.」</p>
+        <span class="cite">붉은 여왕 · 2장</span>
+      </article>
+
+      <article class="law rise" style="--i:5">
+        <p class="law-no">법칙 셋</p>
+        <h3 class="law-title">기억은 양쪽으로 작동할 것</h3>
+        <div class="law-fig">
+          <div class="fig-clock">
+            <svg viewBox="0 0 126 126" aria-hidden="true">
+              <circle class="clock-face" cx="63" cy="63" r="52"/>
+              <g class="clock-tick">
+                <line x1="63" y1="14" x2="63" y2="21"/>
+                <line x1="63" y1="105" x2="63" y2="112"/>
+                <line x1="14" y1="63" x2="21" y2="63"/>
+                <line x1="105" y1="63" x2="112" y2="63"/>
+                <line x1="87.5" y1="20.6" x2="84" y2="26.7"/>
+                <line x1="105.4" y1="38.5" x2="99.3" y2="42"/>
+                <line x1="105.4" y1="87.5" x2="99.3" y2="84"/>
+                <line x1="87.5" y1="105.4" x2="84" y2="99.3"/>
+                <line x1="38.5" y1="105.4" x2="42" y2="99.3"/>
+                <line x1="20.6" y1="87.5" x2="26.7" y2="84"/>
+                <line x1="20.6" y1="38.5" x2="26.7" y2="42"/>
+                <line x1="38.5" y1="20.6" x2="42" y2="26.7"/>
+              </g>
+              <!-- 문자판 전체가 거울에 비쳐 있다: VI 는 IV 로, IX 는 XI 로 읽힌다 -->
+              <g transform="translate(126,0) scale(-1,1)">
+                <text class="clock-num" x="63" y="35">XII</text>
+                <text class="clock-num" x="95" y="68">III</text>
+                <text class="clock-num" x="63" y="99">VI</text>
+                <text class="clock-num" x="31" y="68">IX</text>
+              </g>
+              <line class="clock-hand clock-hand--h" x1="63" y1="63" x2="63" y2="38"/>
+              <line class="clock-hand clock-hand--m" x1="63" y1="63" x2="63" y2="26"/>
+              <circle class="clock-pin" cx="63" cy="63" r="2.6"/>
+            </svg>
+          </div>
+        </div>
+        <p class="en">&ldquo;It&rsquo;s a poor sort of memory that only works backwards.&rdquo;</p>
+        <p class="ko">「뒤로만 작동하는 기억이라니, 참 형편없는 기억이지.」 하얀 여왕은 다음 주에 일어날 일을 이미 기억한다. 그래서 비명부터 지르고, 그다음 피가 나고, 마지막에 바늘에 찔린다.</p>
+        <span class="cite">하얀 여왕 · 5장 「양털과 물」</span>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 5 · 여덟째 칸까지 ══════════════════════════════════════ -->
+<section class="sec" id="s-board">
+  <div class="wrap">
+
+    <header class="sec-head">
+      <p class="eyebrow rise">White Pawn (Alice) to play, and win in eleven moves</p>
+      <h2 class="sec-title rise" style="--i:1">둘째 칸에서 여덟째 칸까지<em>Alice&rsquo;s eleven moves</em></h2>
+      <div class="sec-rule rise" style="--i:2"></div>
+    </header>
+
+    <p class="body-txt rise" style="--i:2">
+      캐럴은 이 책 앞에 체스 문제 하나를 실었다. 앨리스는 흰 폰이고, 열한 수 만에 이긴다.
+      각 장(章)은 그 수 하나에 해당한다. 판 위에는 앨리스밖에 없다 —
+      거울 나라에서 그녀가 아는 말은 자기 자신뿐이었다.
+    </p>
+
+    <div class="board-grid" style="margin-top:clamp(2rem,4vh,3rem)">
+
+      <div class="board-col rise" style="--i:3">
+        <div class="board-frame">
+          <div class="board" id="board" role="img" aria-describedby="boardCaption"></div>
+          <div class="marks-file" aria-hidden="true"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div>
+          <div class="marks-rank" aria-hidden="true"><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span></div>
+        </div>
+        <p class="redqueen" id="redqueen" aria-hidden="true">
+          <svg viewBox="0 0 44 48"><circle cx="6" cy="10" r="3"/><circle cx="14.5" cy="6.5" r="3"/><circle cx="22" cy="4.6" r="3.4"/><circle cx="29.5" cy="6.5" r="3"/><circle cx="38" cy="10" r="3"/><path d="M6 11.5 11 22h22l5-10.5-8 6-8-9-8 9z"/><rect x="10.4" y="22.6" width="23.2" height="3.6" rx="1.4"/><path d="M13 27.4h18c0 6.6 1.6 10.6 4.2 13.2H8.8c2.6-2.6 4.2-6.6 4.2-13.2z"/><rect x="6.2" y="41.2" width="31.6" height="5.2" rx="2.2"/></svg>
+          붉은 여왕이 판 위에 있다
+        </p>
+      </div>
+
+      <div class="score rise" style="--i:4">
+        <div class="score-top">
+          <span class="score-no" id="scoreNo">시작 위치</span>
+          <span class="score-sq" id="scoreSq">d2</span>
+        </div>
+
+        <div class="score-body" id="scoreBody"></div>
+
+        <div class="steps" id="steps" role="group" aria-label="시작 위치와 열한 수"></div>
+
+        <div class="score-tools">
+          <button class="btn" id="prevBtn" type="button">이전 수</button>
+          <button class="btn" id="nextBtn" type="button">다음 수</button>
+          <button class="btn" id="playBtn" type="button" aria-pressed="false">자동으로 두기</button>
+        </div>
+
+        <p class="sr-only" id="boardCaption" aria-live="polite"></p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 6 · 배 한 척, 맑은 하늘 아래 ═══════════════════════════ -->
+<section class="sec finale" id="s-end">
+  <div class="wrap">
+
+    <header class="sec-head">
+      <p class="eyebrow rise">Envoi · 1871</p>
+      <h2 class="sec-title rise" style="--i:1">배 한 척, 맑은 하늘 아래<em>A boat, beneath a sunny sky</em></h2>
+      <div class="sec-rule rise" style="--i:2"></div>
+    </header>
+
+    <p class="body-txt rise" style="--i:2">
+      책의 마지막 장을 넘기면 제목 없는 시 한 편이 붙어 있다.
+      스물한 줄, 일곱 연. 각 줄의 첫 글자를 세로로 읽으면 이름 하나가 나온다.
+    </p>
+
+    <div class="stage-tools rise" style="--i:2;margin-top:1.6rem">
+      <button class="btn" id="koBtn" type="button" aria-pressed="false" aria-controls="poem">우리말로 함께 읽기</button>
+    </div>
+
+    <div class="poem-grid" style="margin-top:clamp(2.4rem,5vh,3.6rem)">
+
+      <div class="poem" id="poem">
+        <div class="stanza">
+          <div class="pline"><span class="pcap">A</span><span class="prest">boat, beneath a sunny sky</span></div>
+          <div class="pline"><span class="pcap">L</span><span class="prest">ingering onward dreamily</span></div>
+          <div class="pline"><span class="pcap">I</span><span class="prest">n an evening of July &mdash;</span></div>
+          <div class="poem-ko"><span>배 한 척, 맑은 하늘 아래</span><span>꿈결처럼 천천히 흘러가던</span><span>어느 칠월의 저녁 —</span></div>
+        </div>
+        <div class="stanza">
+          <div class="pline"><span class="pcap">C</span><span class="prest">hildren three that nestle near,</span></div>
+          <div class="pline"><span class="pcap">E</span><span class="prest">ager eye and willing ear,</span></div>
+          <div class="pline"><span class="pcap">P</span><span class="prest">leased a simple tale to hear &mdash;</span></div>
+          <div class="poem-ko"><span>곁에 바싹 붙어 앉은 세 아이,</span><span>반짝이는 눈과 기울인 귀로</span><span>소박한 이야기 하나를 반겼지 —</span></div>
+        </div>
+        <div class="stanza">
+          <div class="pline"><span class="pcap">L</span><span class="prest">ong has paled that sunny sky:</span></div>
+          <div class="pline"><span class="pcap">E</span><span class="prest">choes fade and memories die:</span></div>
+          <div class="pline"><span class="pcap">A</span><span class="prest">utumn frosts have slain July.</span></div>
+          <div class="poem-ko"><span>그 맑던 하늘은 오래전에 바랬고,</span><span>메아리는 스러지고 기억은 죽는다.</span><span>가을 서리가 칠월을 베어 갔다.</span></div>
+        </div>
+        <div class="stanza">
+          <div class="pline"><span class="pcap">S</span><span class="prest">till she haunts me, phantomwise,</span></div>
+          <div class="pline"><span class="pcap">A</span><span class="prest">lice moving under skies</span></div>
+          <div class="pline"><span class="pcap">N</span><span class="prest">ever seen by waking eyes.</span></div>
+          <div class="poem-ko"><span>그래도 그 아이는 환영처럼 나를 맴돈다,</span><span>깨어 있는 눈으로는 결코 볼 수 없는</span><span>하늘 아래를 걸어가는 앨리스.</span></div>
+        </div>
+        <div class="stanza">
+          <div class="pline"><span class="pcap">C</span><span class="prest">hildren yet, the tale to hear,</span></div>
+          <div class="pline"><span class="pcap">E</span><span class="prest">ager eye and willing ear,</span></div>
+          <div class="pline"><span class="pcap">L</span><span class="prest">ovingly shall nestle near.</span></div>
+          <div class="poem-ko"><span>아이들은 여전히 이야기를 들으려</span><span>반짝이는 눈과 기울인 귀로</span><span>다정하게 곁에 붙어 앉으리라.</span></div>
+        </div>
+        <div class="stanza">
+          <div class="pline"><span class="pcap">I</span><span class="prest">n a Wonderland they lie,</span></div>
+          <div class="pline"><span class="pcap">D</span><span class="prest">reaming as the days go by,</span></div>
+          <div class="pline"><span class="pcap">D</span><span class="prest">reaming as the summers die:</span></div>
+          <div class="poem-ko"><span>그들은 이상한 나라에 누워</span><span>하루가 저무는 동안 꿈을 꾸고,</span><span>여름이 죽어 가는 동안 꿈을 꾼다.</span></div>
+        </div>
+        <div class="stanza">
+          <div class="pline"><span class="pcap">E</span><span class="prest">ver drifting down the stream &mdash;</span></div>
+          <div class="pline"><span class="pcap">L</span><span class="prest">ingering in the golden gleam &mdash;</span></div>
+          <div class="pline"><span class="pcap">L</span><span class="prest">ife, what is it but a dream?</span></div>
+          <div class="poem-ko"><span>끝없이 강물을 따라 떠내려가며 —</span><span>황금빛 어스름에 머무르며 —</span><span>삶이란, 꿈이 아니면 무엇이랴?</span></div>
+        </div>
+      </div>
+
+      <div class="acrostic" id="acrostic">
+        <p class="eyebrow eyebrow--ko">스물한 줄의 첫 글자</p>
+        <p class="acrostic-name" id="acrosticName" aria-label="Alice Pleasance Liddell"></p>
+        <p class="acrostic-note ko">
+          앨리스 플레전스 리델. 1862년 7월 4일 옥스퍼드의 강 위에서
+          캐럴에게 이야기를 조르던 리델가 세 자매 중 둘째다.
+          그날의 뱃놀이가 두 권의 책이 되었고, 캐럴은 두 번째 책의 맨 끝에
+          그 이름을 세로로 숨겨 두었다.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="lastline">
+      <p class="en">Life, what is it but a dream?</p>
+      <p class="ko">삶이란, 꿈이 아니면 무엇이랴?</p>
+    </div>
+
+    <div class="river" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+  </div>
+</section>
+
+</main>
+
+<footer class="colophon">
+  <div class="wrap colophon-in">
+    <div>
+      <p>Lewis Carroll &middot; Through the Looking-Glass, and What Alice Found There &middot; 1871</p>
+      <p class="kr-note">
+        인용문은 모두 원문(Public Domain)에서 가져왔습니다.
+        우리말 옮김과 화면 구성은 이 페이지의 것입니다.
+      </p>
+    </div>
+    <div>
+      <p>Bodoni Moda &middot; Nanum Myeongjo &middot; Spectral &middot; IBM Plex Mono</p>
+      <p class="ko-link"><a href="#top">맨 위로 &uarr;</a></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+
+var doc = document;
+var root = doc.documentElement;
+var mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+var mqHover  = window.matchMedia('(hover: hover)');
+var reduce   = mqReduce.matches;
+
+var $  = function(s,c){ return (c||doc).querySelector(s); };
+var $$ = function(s,c){ return Array.prototype.slice.call((c||doc).querySelectorAll(s)); };
+var clamp = function(v,a,b){ return v<a?a:(v>b?b:v); };
+
+/* ═══ 등장 ═══════════════════════════════════════════════════════════ */
+var io = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+  });
+}, { rootMargin:'0px 0px -6% 0px', threshold:0.06 }) : null;
+
+function observeRise(){
+  /* 히어로는 처음부터 화면 안에 있다. 관찰자에 맡기지 않고 막과 함께 올린다 —
+     탭이 뒤에 있으면 관찰자는 깨어나지 않는다. */
+  $$('#s-hero .rise').forEach(function(el){ el.classList.add('in'); });
+  $$('.rise:not(.in)').forEach(function(el){
+    if(io){ io.observe(el); } else { el.classList.add('in'); }
+  });
+}
+
+/* ═══ 막 오름 ════════════════════════════════════════════════════════ */
+var raised = false;
+function raise(){
+  if(raised) return;
+  raised = true;
+  root.classList.add('lit');
+  setTimeout(function(){ root.classList.add('done'); }, 1800);
+  observeRise();
+  placeStops();
+}
+if(reduce){
+  root.classList.add('lit','done');
+  raised = true;
+  observeRise();
+}else{
+  var start = function(){ setTimeout(raise, 140); };
+  if(doc.fonts && doc.fonts.ready){
+    Promise.race([ doc.fonts.ready, new Promise(function(r){ setTimeout(r, 1500); }) ]).then(start, start);
+  }else{
+    window.addEventListener('load', start);
+  }
+  /* 글꼴이 오지 않아도, 탭이 뒤에 있어도 막은 반드시 오른다 */
+  setTimeout(raise, 3000);
+}
+
+/* ═══ 대기: 눈 · 티끌 ════════════════════════════════════════════════
+   이쪽에서는 눈이 내리고, 저쪽에서는 거꾸로 올라간다.               */
+var cv = $('#motes');
+var ctx = cv && cv.getContext ? cv.getContext('2d') : null;
+var parts = [], W=0, H=0, dpr=1;
+var WORLD_AIR = {
+  here:   { vy: 0.42, vx: 0.05, rgb:'86,116,106', mul:0.42 },
+  beyond: { vy:-0.34, vx:-0.04, rgb:'196,255,232', mul:0.85 },
+  waking: { vy: 0.16, vx: 0.30, rgb:'176,138,66',  mul:0.5  }
+};
+var air = { vy: WORLD_AIR.here.vy, vx: WORLD_AIR.here.vx, rgb: WORLD_AIR.here.rgb, mul: WORLD_AIR.here.mul };
+var airTarget = WORLD_AIR.here;
+
+function sizeCanvas(){
+  if(!ctx) return;
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = cv.width  = Math.floor(window.innerWidth  * dpr);
+  H = cv.height = Math.floor(window.innerHeight * dpr);
+  cv.style.width  = window.innerWidth  + 'px';
+  cv.style.height = window.innerHeight + 'px';
+}
+function seed(){
+  if(!ctx) return;
+  var w = window.innerWidth;
+  var n = w < 640 ? 32 : (w < 1100 ? 52 : 76);
+  parts = [];
+  for(var i=0;i<n;i++){
+    parts.push({
+      x: Math.random()*W,
+      y: Math.random()*H,
+      r: (Math.random()*1.6 + 0.45) * dpr,
+      s: (Math.random()*0.75 + 0.45),
+      ph: Math.random()*Math.PI*2,
+      sw: Math.random()*0.016 + 0.005,
+      a: Math.random()*0.55 + 0.25
+    });
+  }
+}
+function drawAir(){
+  if(!ctx) return;
+  ctx.clearRect(0,0,W,H);
+  air.vy  += (airTarget.vy  - air.vy ) * 0.02;
+  air.vx  += (airTarget.vx  - air.vx ) * 0.02;
+  air.mul += (airTarget.mul - air.mul) * 0.02;
+  if(air.rgb !== airTarget.rgb && Math.abs(air.vy - airTarget.vy) < 0.14) air.rgb = airTarget.rgb;
+  for(var i=0;i<parts.length;i++){
+    var p = parts[i];
+    p.ph += p.sw;
+    p.y += air.vy * p.s * dpr;
+    p.x += (air.vx * p.s + Math.sin(p.ph) * 0.22) * dpr;
+    if(p.y < -8*dpr)   p.y = H + 6*dpr;
+    if(p.y > H + 8*dpr) p.y = -6*dpr;
+    if(p.x < -8*dpr)   p.x = W + 6*dpr;
+    if(p.x > W + 8*dpr) p.x = -6*dpr;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+    ctx.fillStyle = 'rgba(' + air.rgb + ',' + (p.a * air.mul).toFixed(3) + ')';
+    ctx.fill();
+  }
+}
+var airRunning = false;
+function airLoop(){
+  if(!airRunning) return;
+  drawAir();
+  requestAnimationFrame(airLoop);
+}
+if(ctx && !reduce){
+  sizeCanvas(); seed();
+  airRunning = true; airLoop();
+  doc.addEventListener('visibilitychange', function(){
+    if(doc.hidden){ airRunning = false; }
+    else if(!airRunning){ airRunning = true; airLoop(); }
+  });
+}
+
+/* ═══ 세계 · 진행 ════════════════════════════════════════════════════ */
+var pass      = $('#s-pass');
+var pane      = $('#pane');
+var passQuote = $('#passQuote');
+var finale    = $('#s-end');
+var rail      = $('#rail');
+var railTrack = $('#railTrack');
+var railPawn  = $('#railPawn');
+var topFill   = $('#topbarFill');
+
+var STOPS = [
+  ['s-hero',  '거울 앞에서'],
+  ['s-pass',  '거울을 지나'],
+  ['s-jabber','재버워키'],
+  ['s-laws',  '세 가지 법칙'],
+  ['s-board', '여덟째 칸까지'],
+  ['s-end',   '삶이란 꿈']
+];
+var stopEls = [];
+STOPS.forEach(function(s){
+  var b = doc.createElement('button');
+  b.type = 'button';
+  b.className = 'rail-stop';
+  b.dataset.target = s[0];
+  b.innerHTML = '<span class="rail-tip">' + s[1] + '</span>';
+  b.setAttribute('aria-label', s[1] + ' 구간으로 이동');
+  b.addEventListener('click', function(){
+    var t = doc.getElementById(s[0]);
+    if(t) t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block:'start' });
+  });
+  railTrack.appendChild(b);
+  stopEls.push(b);
+});
+
+function placeStops(){
+  var max = doc.documentElement.scrollHeight - window.innerHeight;
+  if(max <= 0) return;
+  stopEls.forEach(function(b){
+    var t = doc.getElementById(b.dataset.target);
+    if(!t) return;
+    var p = clamp(t.getBoundingClientRect().top + window.pageYOffset, 0, max) / max;
+    b.style.bottom = (p * 100) + '%';
+  });
+}
+
+function setWorld(w){
+  if(root.dataset.world === w) return;
+  root.dataset.world = w;
+  airTarget = WORLD_AIR[w] || WORLD_AIR.here;
+  var meta = $('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', w === 'beyond' ? '#04100E' : (w === 'waking' ? '#F6EEDC' : '#E7EDE9'));
+}
+
+var ticking = false;
+function onScroll(){
+  if(ticking) return;
+  ticking = true;
+  requestAnimationFrame(measure);
+}
+function measure(){
+  ticking = false;
+  var vh = window.innerHeight;
+
+  /* 거울을 지나는 진행도 */
+  var t = 0;
+  if(pass){
+    var r = pass.getBoundingClientRect();
+    var span = pass.offsetHeight - vh;
+    t = span > 0 ? clamp(-r.top / span, 0, 1) : (r.top < 0 ? 1 : 0);
+    /* 구역 전체에 걸어야 유리판과 「이쪽·저쪽」 표기가 함께 받는다 */
+    pass.style.setProperty('--t', t.toFixed(4));
+    var q = clamp(1 - Math.abs(t - 0.62) / 0.24, 0, 1);
+    passQuote.style.setProperty('--q', q.toFixed(3));
+  }
+
+  /* 세계 */
+  var w = 'here';
+  if(finale && finale.getBoundingClientRect().top < vh * 0.5) w = 'waking';
+  else if(t > 0.44) w = 'beyond';
+  setWorld(w);
+
+  /* 진행: 폰이 오른다 */
+  var max = doc.documentElement.scrollHeight - vh;
+  var p = max > 0 ? clamp(window.pageYOffset / max, 0, 1) : 0;
+  railPawn.style.bottom = (p * 100) + '%';
+  rail.classList.toggle('is-crowned', p > 0.985);
+  if(topFill) topFill.style.width = (p * 100) + '%';
+
+  /* 지금 어느 구간인가 */
+  var cur = 0;
+  for(var i = 0; i < STOPS.length; i++){
+    var el = doc.getElementById(STOPS[i][0]);
+    if(el && el.getBoundingClientRect().top <= vh * 0.42) cur = i;
+  }
+  stopEls.forEach(function(b, i){
+    if(i === cur) b.setAttribute('aria-current','true');
+    else b.removeAttribute('aria-current');
+  });
+
+  /* 거친 포인터에서는 스크롤이 손거울을 끈다 */
+  if(lensScrollDriven) driveLens();
+}
+
+/* ═══ 손거울 ═════════════════════════════════════════════════════════ */
+var stage     = $('#stage');
+var stageHint = $('#stageHint');
+var revealBtn = $('#revealBtn');
+var lensScrollDriven = false;
+var pointerOwns = false;
+var FLOOD = '1600px';   /* 「시 전체 비추기」— 렌즈가 무대를 삼킬 만큼 넓어진다 */
+
+function isOpen(){ return stage.classList.contains('is-open'); }
+function lensRadius(){ return Math.round(clamp(stage.clientWidth * 0.17, 56, 116)); }
+
+function setLens(x, y){
+  if(isOpen()) return;
+  stage.style.setProperty('--x', x.toFixed(1) + 'px');
+  stage.style.setProperty('--y', y.toFixed(1) + 'px');
+}
+function openLens(){
+  if(isOpen()) return;
+  stage.style.setProperty('--r', lensRadius() + 'px');
+  stage.classList.add('is-hover');
+}
+function closeLens(){
+  if(isOpen()) return;
+  stage.style.setProperty('--r', '0px');
+  stage.classList.remove('is-hover');
+}
+
+/* 구간이 지나가는 동안 거울이 시를 사선으로 훑는다.
+   포인터가 무대 위에 올라오면 그때부터는 사람이 든다. */
+function driveLens(){
+  if(pointerOwns || isOpen()) return;
+  var r = stage.getBoundingClientRect();
+  var vh = window.innerHeight;
+  var p = clamp((vh - r.top) / (vh + r.height), 0, 1);
+  var e = clamp((p - 0.2) / 0.6, 0, 1);
+  setLens(r.width * (0.15 + e * 0.7), r.height * (0.15 + e * 0.7));
+  if(e > 0.002 && e < 0.998){ openLens(); stage.classList.add('is-touched'); }
+  else { closeLens(); }
+}
+
+if(stage){
+  setLens(stage.clientWidth * 0.5, stage.clientHeight * 0.3);
+  stage.style.setProperty('--r', '0px');
+  lensScrollDriven = true;
+
+  if(reduce){
+    /* 움직임을 줄인 화면에서는 시를 곧바로 비춰 둔다 */
+    lensScrollDriven = false;
+    stage.classList.add('is-open');
+    stage.style.setProperty('--r', FLOOD);
+    revealBtn.setAttribute('aria-pressed','true');
+    revealBtn.textContent = '거울로 돌아가기';
+  }else if(mqHover.matches){
+    stage.classList.add('is-live');
+    stage.addEventListener('pointerenter', function(){ pointerOwns = true; openLens(); });
+    stage.addEventListener('pointerleave', function(){ pointerOwns = false; closeLens(); });
+    stage.addEventListener('pointermove', function(ev){
+      pointerOwns = true;
+      var b = stage.getBoundingClientRect();
+      setLens(ev.clientX - b.left, ev.clientY - b.top);
+      stage.classList.add('is-touched');
+    });
+  }else{
+    stageHint.textContent = '스크롤하면 거울이 지나갑니다';
+  }
+
+  revealBtn.addEventListener('click', function(){
+    var on = !isOpen();
+    stage.classList.toggle('is-open', on);
+    if(on){
+      stage.classList.remove('is-hover');
+      stage.style.setProperty('--r', FLOOD);
+    }else{
+      stage.style.setProperty('--r', '0px');
+      stage.classList.remove('is-touched');
+    }
+    revealBtn.setAttribute('aria-pressed', String(on));
+    revealBtn.textContent = on ? '거울로 돌아가기' : '시 전체 비추기';
+  });
+}
+
+/* ═══ 열한 수 ════════════════════════════════════════════════════════ */
+var MOVES = [
+  { sq:'d2', ko:'앨리스가 거울을 지나 판 위에 선다', en:'Alice enters the Looking-Glass world',
+    ch:'1장 「거울 집」',
+    note:'붉은 여왕이 일러 준다. 「너는 둘째 칸에서 시작하는 거야. 여덟째 칸에 닿으면 여왕이 되고.」', rq:false },
+  { sq:'d2', ko:'앨리스가 붉은 여왕을 만나다', en:'Alice meets R.Q.',
+    ch:'2장 「살아 있는 꽃들의 정원」',
+    note:'언덕에 닿으려면 언덕 반대쪽으로 걸어야 했다.', rq:true },
+  { sq:'d4', ko:'셋째 칸을 기차로 건너 넷째 칸으로', en:'Alice through Q&rsquo;s 3d (by railway) to Q&rsquo;s 4th',
+    ch:'3장 「거울 나라의 곤충들」 · 4장 「트위들덤과 트위들디」',
+    note:'폰의 첫 수는 두 칸이다. 셋째 칸은 기차가 실어 날랐다.', rq:false },
+  { sq:'d4', ko:'숄을 쫓아온 하얀 여왕을 만나다', en:'Alice meets W.Q. (with shawl)',
+    ch:'5장 「양털과 물」',
+    note:'하얀 여왕은 다음 주에 일어날 일을 이미 기억하고 있었다.', rq:false },
+  { sq:'d5', ko:'다섯째 칸으로 — 가게, 양, 강', en:'Alice to Q&rsquo;s 5th (shop, sheep, river)',
+    ch:'5장',
+    note:'선반 위의 물건은 쳐다보는 순간 옆 선반으로 달아났다.', rq:false },
+  { sq:'d6', ko:'여섯째 칸으로 — 험프티 덤프티', en:'Alice to Q&rsquo;s 6th (Humpty Dumpty)',
+    ch:'6장 「험프티 덤프티」',
+    note:'「내가 낱말을 쓰면, 그 낱말은 딱 내가 고른 뜻이 돼. 그 이상도 그 이하도 아니야.」', rq:false },
+  { sq:'d7', ko:'일곱째 칸으로 — 숲', en:'Alice to Q&rsquo;s 7th (forest)',
+    ch:'7장 「사자와 유니콘」',
+    note:'', rq:false },
+  { sq:'d7', ko:'하얀 기사가 붉은 기사를 잡다', en:'W.Kt. takes R.Kt.',
+    ch:'8장 「내가 직접 지어낸 것이오」',
+    note:'앨리스를 배웅하며 하얀 기사는 몇 번이고 말에서 떨어졌다. 캐럴이 자신을 그려 넣은 자리다.', rq:false },
+  { sq:'d8', ko:'여덟째 칸에 닿다 — 대관', en:'Alice to Q&rsquo;s 8th (coronation)',
+    ch:'9장 「앨리스 여왕」',
+    note:'', rq:false },
+  { sq:'d8', ko:'앨리스가 여왕이 되다', en:'Alice becomes Queen',
+    ch:'9장',
+    note:'정신을 차려 보니 머리 위에 무겁고 단단한 금관이 얹혀 있었다.', rq:false },
+  { sq:'d8', ko:'앨리스가 캐슬링하다 — 만찬', en:'Alice castles (feast)',
+    ch:'9장',
+    note:'', rq:false },
+  { sq:'d8', ko:'앨리스가 붉은 여왕을 잡고 이기다', en:'Alice takes R.Q. &amp; wins',
+    ch:'10장 「흔들기」 · 11장 「깨어나기」',
+    note:'붉은 여왕은 손안에서 자꾸 작아지더니, 새까만 새끼 고양이가 되었다.', rq:true }
+];
+var STOP_SQUARES = ['d2','d4','d5','d6','d7','d8'];
+
+var board   = $('#board');
+var steps   = $('#steps');
+var scoreNo = $('#scoreNo');
+var scoreSq = $('#scoreSq');
+var scoreBd = $('#scoreBody');
+var caption = $('#boardCaption');
+var redq    = $('#redqueen');
+var prevBtn = $('#prevBtn');
+var nextBtn = $('#nextBtn');
+var playBtn = $('#playBtn');
+var alice, trail, stepEls = [], at = 0, timer = null;
+
+var PAWN_SVG  = '<svg class="pc-pawn" viewBox="0 0 40 48" aria-hidden="true"><circle cx="20" cy="10.5" r="6.2"/><path d="M12.6 18.2h14.8l-2.2 3.4H14.8z"/><path d="M16 22.6h8c0 7.6 1.6 12.4 4.4 15.6H11.6c2.8-3.2 4.4-8 4.4-15.6z"/><rect x="8.6" y="38.6" width="22.8" height="5.4" rx="2.2"/></svg>';
+var QUEEN_SVG = '<svg class="pc-queen" viewBox="0 0 44 48" aria-hidden="true"><circle cx="6" cy="10" r="3"/><circle cx="14.5" cy="6.5" r="3"/><circle cx="22" cy="4.6" r="3.4"/><circle cx="29.5" cy="6.5" r="3"/><circle cx="38" cy="10" r="3"/><path d="M6 11.5 11 22h22l5-10.5-8 6-8-9-8 9z"/><rect x="10.4" y="22.6" width="23.2" height="3.6" rx="1.4"/><path d="M13 27.4h18c0 6.6 1.6 10.6 4.2 13.2H8.8c2.6-2.6 4.2-6.6 4.2-13.2z"/><rect x="6.2" y="41.2" width="31.6" height="5.2" rx="2.2"/></svg>';
+
+function buildBoard(){
+  if(!board) return;
+  var frag = doc.createDocumentFragment();
+  for(var rank = 8; rank >= 1; rank--){
+    for(var file = 0; file < 8; file++){
+      var name = 'abcdefgh'[file] + rank;
+      var d = doc.createElement('div');
+      d.className = 'sq ' + (((file + rank) % 2) ? 'sq--l' : 'sq--d');
+      if(file === 3) d.className += ' sq--file';
+      if(STOP_SQUARES.indexOf(name) >= 0) d.className += ' sq--stop';
+      frag.appendChild(d);
+    }
+  }
+  trail = doc.createElement('div');
+  trail.className = 'trail';
+  frag.appendChild(trail);
+
+  alice = doc.createElement('div');
+  alice.className = 'alice';
+  alice.innerHTML = PAWN_SVG + QUEEN_SVG;
+  frag.appendChild(alice);
+
+  board.appendChild(frag);
+
+  MOVES.forEach(function(m, i){
+    var b = doc.createElement('button');
+    b.type = 'button';
+    b.className = 'step';
+    /* 0번은 수가 아니라 시작 위치다 */
+    b.innerHTML = '<span class="sr-only">' + (i === 0 ? '시작 위치' : '제 ' + i + ' 수') + '</span>';
+    b.addEventListener('click', function(){ stop(); show(i); });
+    steps.appendChild(b);
+    stepEls.push(b);
+  });
+}
+
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+
+function show(i){
+  at = clamp(i, 0, MOVES.length - 1);
+  var m = MOVES[at];
+  var file = m.sq.charCodeAt(0) - 97;
+  var rank = +m.sq[1];
+
+  alice.style.setProperty('--file', file);
+  alice.style.setProperty('--rank', 8 - rank);
+  alice.classList.toggle('is-queen', at >= 9);
+  trail.style.setProperty('--h', rank - 2);
+
+  scoreNo.textContent = at === 0 ? '시작 위치' : '수 ' + pad(at) + ' / 11';
+  scoreSq.textContent = m.sq;
+
+  scoreBd.innerHTML =
+    '<p class="score-ko">' + m.ko + '</p>' +
+    '<p class="score-en">' + m.en + '</p>' +
+    '<p class="score-ch">' + m.ch + '</p>' +
+    (m.note ? '<p class="score-note">' + m.note + '</p>' : '');
+
+  redq.classList.toggle('on', !!m.rq);
+
+  stepEls.forEach(function(b, k){
+    b.classList.toggle('done', k < at);
+    if(k === at) b.setAttribute('aria-current','step');
+    else b.removeAttribute('aria-current');
+  });
+
+  prevBtn.disabled = (at === 0);
+  nextBtn.disabled = (at === MOVES.length - 1);
+  caption.textContent = (at === 0 ? '시작 위치' : '제 ' + at + ' 수') + ', 앨리스는 ' + m.sq + '. '
+    + m.ko + '.' + (m.rq ? ' 붉은 여왕이 판 위에 있다.' : '');
+}
+
+function stop(){
+  if(timer){ clearInterval(timer); timer = null; }
+  playBtn.setAttribute('aria-pressed','false');
+  playBtn.textContent = '자동으로 두기';
+}
+function play(){
+  if(at >= MOVES.length - 1) show(0);
+  playBtn.setAttribute('aria-pressed','true');
+  playBtn.textContent = '멈추기';
+  timer = setInterval(function(){
+    if(at >= MOVES.length - 1){ stop(); return; }
+    show(at + 1);
+  }, 2800);
+}
+
+if(board){
+  buildBoard();
+  show(0);
+  prevBtn.addEventListener('click', function(){ stop(); show(at - 1); });
+  nextBtn.addEventListener('click', function(){ stop(); show(at + 1); });
+  playBtn.addEventListener('click', function(){ timer ? stop() : play(); });
+  $('#s-board').addEventListener('keydown', function(ev){
+    if(ev.key === 'ArrowRight'){ stop(); show(at + 1); ev.preventDefault(); }
+    if(ev.key === 'ArrowLeft'){  stop(); show(at - 1); ev.preventDefault(); }
+  });
+}
+
+/* ═══ 이합체시 ═══════════════════════════════════════════════════════
+   스물한 줄의 첫 글자가 이름 하나를 이룬다.                          */
+var poem = $('#poem');
+var acrostic = $('#acrostic');
+var nameEl = $('#acrosticName');
+var koBtn = $('#koBtn');
+
+if(poem && nameEl){
+  var caps = $$('.pcap', poem).map(function(e){ return e.textContent.trim(); }).join('');
+  var words = [caps.slice(0, 5), caps.slice(5, 14), caps.slice(14, 21)];
+  var n = 0;
+  words.forEach(function(word, wi){
+    word.split('').forEach(function(ch){
+      var b = doc.createElement('b');
+      b.style.setProperty('--n', n++);
+      b.textContent = ch;
+      nameEl.appendChild(b);
+    });
+    if(wi < words.length - 1){
+      var sp = doc.createElement('b');
+      sp.style.setProperty('--n', n++);
+      sp.textContent = ' ';
+      nameEl.appendChild(sp);
+    }
+  });
+
+  var lines = $$('.pline', poem);
+  var litDone = false;
+  function lightUp(){
+    if(litDone) return;
+    litDone = true;
+    if(reduce){ lines.forEach(function(l){ l.classList.add('lit'); }); return; }
+    lines.forEach(function(l, i){ setTimeout(function(){ l.classList.add('lit'); }, i * 85); });
+  }
+  if(io){
+    var poemIO = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ lightUp(); poemIO.disconnect(); } });
+    }, { threshold: 0.12 });
+    poemIO.observe(poem);
+
+    var acIO = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ acrostic.classList.add('in'); acIO.disconnect(); } });
+    }, { threshold: 0.3 });
+    acIO.observe(acrostic);
+  }else{
+    lightUp();
+    acrostic.classList.add('in');
+  }
+
+  koBtn.addEventListener('click', function(){
+    var on = poem.classList.toggle('show-ko');
+    koBtn.setAttribute('aria-pressed', String(on));
+    koBtn.textContent = on ? '원문만 읽기' : '우리말로 함께 읽기';
+  });
+}
+
+/* ═══ 배선 ═══════════════════════════════════════════════════════════ */
+var resizeTimer = null;
+function onResize(){
+  sizeCanvas(); seed();
+  placeStops();
+  /* 무대 폭이 바뀌면 렌즈 반지름도 다시 잡는다 */
+  if(stage && !reduce && stage.classList.contains('is-hover')) openLens();
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+window.addEventListener('resize', function(){
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(onResize, 180);
+}, { passive: true });
+window.addEventListener('orientationchange', function(){ setTimeout(onResize, 260); });
+
+placeStops();
+measure();
+setTimeout(placeStops, 600);
+setTimeout(function(){ placeStops(); measure(); }, 1800);
+
+})();
+</script>
+
+</body>
+</html>
