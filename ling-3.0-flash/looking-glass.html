@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>거울나라의 앨리스 | Mirror Wonderland</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Ma+Shan+Zheng&family=Noto+Serif+KR:wght@200;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --deep: #0a0618;
+  --purple: #1a0a2e;
+  --crystal: #0d4a6b;
+  --gold: #d4a843;
+  --rose: #e8799c;
+  --emerald: #2dd4a0;
+  --silver: #c0c8d8;
+  --magenta: #b44dff;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--deep);
+  font-family: 'Noto Serif KR', serif;
+  color: var(--silver);
+}
+
+#canvas-bg {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+}
+
+.main-container {
+  position: relative;
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.title-section {
+  text-align: center;
+  margin-bottom: 40px;
+  animation: fadeInDown 2s ease-out forwards;
+}
+
+.title-kr {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  color: var(--gold);
+  text-shadow:
+    0 0 20px rgba(212,168,67,0.6),
+    0 0 40px rgba(212,168,67,0.3),
+    0 0 80px rgba(212,168,67,0.15);
+  letter-spacing: 0.3em;
+  position: relative;
+}
+
+.title-kr::after {
+  content: '';
+  display: block;
+  width: 60%;
+  height: 2px;
+  margin: 12px auto 0;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  box-shadow: 0 0 10px var(--gold);
+}
+
+.title-en {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(0.8rem, 2vw, 1.4rem);
+  color: var(--rose);
+  letter-spacing: 0.5em;
+  margin-top: 10px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.mirror-wrapper {
+  position: relative;
+  width: clamp(280px, 50vw, 500px);
+  height: clamp(380px, 65vh, 650px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInUp 2.5s ease-out forwards;
+  animation-delay: 0.5s;
+  opacity: 0;
+}
+
+.mirror-frame {
+  position: absolute;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #0a0618, #1a0a2e, #0d4a6b, #1a0a2e, #0a0618,
+    #2a1040, #b44dff, #2a1040, #0a0618, #1a0a2e,
+    #0d4a6b, #1a0a2e, #0a0618, #d4a843, #0a0618
+  );
+  padding: 12px;
+  box-shadow:
+    0 0 60px rgba(180,77,255,0.3),
+    0 0 120px rgba(13,74,107,0.2),
+    inset 0 0 60px rgba(0,0,0,0.8),
+    inset 0 0 120px rgba(212,168,67,0.1);
+  animation: rotateFrame 20s linear infinite;
+}
+
+.mirror-frame::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(212,168,67,0.1), transparent 50%),
+              radial-gradient(circle at 70% 70%, rgba(180,77,255,0.1), transparent 50%),
+              var(--deep);
+}
+
+.mirror-frame::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(212,168,67,0.2);
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+}
+
+.mirror-glass {
+  position: absolute;
+  inset: 22px;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 40% 35%, rgba(180,77,255,0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 65%, rgba(13,74,107,0.2) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 40%, rgba(0,0,0,0.3) 100%);
+  backdrop-filter: blur(2px);
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 80px rgba(0,0,0,0.5),
+    inset 0 -20px 60px rgba(212,168,67,0.08),
+    0 0 40px rgba(180,77,255,0.2);
+}
+
+.mirror-reflection {
+  position: absolute;
+  top: -5%; left: 10%;
+  width: 40%; height: 30%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  border-radius: 50%;
+  transform: rotate(-30deg);
+  filter: blur(3px);
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+.wonderland-inside {
+  position: absolute;
+  inset: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.wonderland-bg {
+  width: 100%; height: 100%;
+  background:
+    radial-gradient(circle at 50% 80%, rgba(45,212,160,0.1) 0%, transparent 40%),
+    radial-gradient(circle at 20% 20%, rgba(232,121,156,0.1) 0%, transparent 35%),
+    radial-gradient(circle at 80% 30%, rgba(180,77,255,0.08) 0%, transparent 35%),
+    radial-gradient(circle at 50% 50%, rgba(13,74,107,0.15) 0%, transparent 60%),
+    var(--purple);
+}
+
+.chess-piece {
+  position: absolute;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  opacity: 0.6;
+  filter: drop-shadow(0 0 8px rgba(212,168,67,0.4));
+  animation: floatPiece 6s ease-in-out infinite;
+}
+
+.chess-piece:nth-child(1) { top: 15%; left: 20%; animation-delay: 0s; color: var(--gold); }
+.chess-piece:nth-child(2) { top: 25%; right: 15%; animation-delay: 1.5s; color: var(--rose); font-size: clamp(1.2rem, 3vw, 2rem); }
+.chess-piece:nth-child(3) { bottom: 20%; left: 15%; animation-delay: 3s; color: var(--emerald); font-size: clamp(1rem, 2.5vw, 1.8rem); }
+.chess-piece:nth-child(4) { bottom: 25%; right: 18%; animation-delay: 4s; color: var(--magenta); font-size: clamp(1.3rem, 3vw, 2.2rem); }
+.chess-piece:nth-child(5) { top: 40%; left: 8%; animation-delay: 0.8s; color: var(--silver); font-size: clamp(1rem, 2.5vw, 1.6rem); }
+.chess-piece:nth-child(6) { top: 10%; left: 45%; animation-delay: 2s; color: var(--gold); font-size: clamp(0.8rem, 2vw, 1.4rem); }
+
+.clock-element {
+  position: absolute;
+  bottom: 15%; left: 50%;
+  transform: translateX(-50%);
+  width: clamp(40px, 8vw, 60px);
+  height: clamp(40px, 8vw, 60px);
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 20px rgba(212,168,67,0.3), inset 0 0 10px rgba(212,168,67,0.1);
+  background: rgba(10,6,24,0.8);
+  animation: floatPiece 5s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+.clock-element::before {
+  content: '12';
+  position: absolute; top: 15%; left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(0.4rem, 1vw, 0.6rem);
+  color: var(--gold);
+}
+.clock-element::after {
+  content: '';
+  position: absolute;
+  bottom: 48%; left: 50%;
+  width: 2px; height: 35%;
+  background: var(--rose);
+  transform-origin: bottom center;
+  transform: translateX(-50%) rotate(45deg);
+  animation: clockHand 8s linear infinite;
+}
+
+.card-flying {
+  position: absolute;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  opacity: 0.5;
+  filter: drop-shadow(0 0 6px rgba(232,121,156,0.5));
+  animation: cardSpin 8s ease-in-out infinite;
+}
+
+.card-flying:nth-child(7) { top: 8%; right: 25%; animation-delay: 1s; color: var(--rose); }
+.card-flying:nth-child(8) { bottom: 30%; left: 25%; animation-delay: 4.5s; color: var(--emerald); transform: scaleX(-1); }
+
+.flower-element {
+  position: absolute;
+  width: clamp(20px, 4vw, 40px);
+  height: clamp(20px, 4vw, 40px);
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: bloom 3s ease-in-out infinite alternate;
+}
+
+.flower-element:nth-child(9) { top: 30%; right: 10%; background: radial-gradient(circle, var(--rose), transparent); box-shadow: 0 0 20px var(--rose); animation-delay: 0s; }
+.flower-element:nth-child(10) { top: 50%; left: 5%; background: radial-gradient(circle, var(--emerald), transparent); box-shadow: 0 0 20px var(--emerald); animation-delay: 1s; width: clamp(15px, 3vw, 30px); height: clamp(15px, 3vw, 30px); }
+.flower-element:nth-child(11) { bottom: 10%; right: 30%; background: radial-gradient(circle, var(--magenta), transparent); box-shadow: 0 0 20px var(--magenta); animation-delay: 2s; }
+
+.mushroom {
+  position: absolute;
+  bottom: 5%;
+  width: clamp(25px, 5vw, 50px);
+  height: clamp(30px, 6vw, 60px);
+  opacity: 0.5;
+}
+
+.mushroom::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 4px; height: 40%;
+  background: linear-gradient(to top, #8B4513, #a0522d);
+  border-radius: 2px;
+}
+
+.mushroom::after {
+  content: '';
+  position: absolute;
+  bottom: 35%; left: 50%;
+  transform: translateX(-50%);
+  width: clamp(20px, 4vw, 40px);
+  height: clamp(20px, 4vw, 35px);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(ellipse at 50% 30%, var(--rose), #8b0040);
+  box-shadow: 0 0 15px rgba(232,121,156,0.3);
+}
+
+.mushroom:nth-child(12) { left: 20%; }
+.mushroom:nth-child(13) { right: 20%; }
+
+.mushroom:nth-child(12)::after { background: radial-gradient(ellipse at 50% 30%, var(--gold), #b8860b); box-shadow: 0 0 15px rgba(212,168,67,0.3); }
+.mushroom:nth-child(13)::after { background: radial-gradient(ellipse at 50% 30%, var(--emerald), #006400); box-shadow: 0 0 15px rgba(45,212,160,0.3); }
+
+.star-field {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s ease-in-out infinite alternate;
+}
+
+.subtitle {
+  margin-top: 40px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(0.9rem, 1.8vw, 1.3rem);
+  color: var(--silver);
+  font-style: italic;
+  opacity: 0.7;
+  letter-spacing: 0.2em;
+  animation: fadeInUp 2s ease-out forwards;
+  animation-delay: 2s;
+  opacity: 0;
+}
+
+.particles-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.glow-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+  animation: orbFloat 15s ease-in-out infinite alternate;
+}
+
+.glow-orb:nth-child(1) { width: 300px; height: 300px; background: var(--magenta); top: 10%; left: 10%; animation-delay: 0s; }
+.glow-orb:nth-child(2) { width: 250px; height: 250px; background: var(--rose); top: 60%; right: 10%; animation-delay: -5s; }
+.glow-orb:nth-child(3) { width: 350px; height: 350px; background: var(--crystal); bottom: 10%; left: 30%; animation-delay: -10s; }
+.glow-orb:nth-child(4) { width: 200px; height: 200px; background: var(--gold); top: 40%; left: 60%; animation-delay: -7s; }
+
+.sentence-float {
+  position: absolute;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(0.6rem, 1.5vw, 1rem);
+  color: var(--gold);
+  opacity: 0.3;
+  animation: sentenceFloat 10s ease-in-out infinite;
+  white-space: nowrap;
+}
+
+.sentence-float:nth-child(14) { top: 5%; left: 5%; transform: rotate(-15deg); animation-delay: 0s; }
+.sentence-float:nth-child(15) { bottom: 10%; right: 5%; transform: rotate(10deg); animation-delay: -3s; color: var(--rose); }
+.sentence-float:nth-child(16) { top: 45%; right: 3%; transform: rotate(5deg); animation-delay: -6s; color: var(--emerald); font-size: clamp(0.4rem, 1vw, 0.8rem); }
+
+@keyframes rotateFrame {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes floatPiece {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(5deg); }
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.3; transform: rotate(-30deg) translateX(0); }
+  50% { opacity: 0.7; transform: rotate(-30deg) translateX(10px); }
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.2; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes cardSpin {
+  0% { transform: rotateY(0deg) translateY(0); }
+  25% { transform: rotateY(90deg) translateY(-10px); }
+  50% { transform: rotateY(180deg) translateY(0); }
+  75% { transform: rotateY(270deg) translateY(10px); }
+  100% { transform: rotateY(360deg) translateY(0); }
+}
+
+@keyframes bloom {
+  0% { transform: scale(0.8); opacity: 0.3; }
+  100% { transform: scale(1.3); opacity: 0.6; }
+}
+
+@keyframes clockHand {
+  from { transform: translateX(-50%) rotate(45deg); }
+  to { transform: translateX(-50%) rotate(405deg); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes orbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(30px, -30px) scale(1.2); }
+}
+
+@keyframes sentenceFloat {
+  0%, 100% { transform: translateY(0); opacity: 0.2; }
+  50% { transform: translateY(-20px); opacity: 0.4; }
+}
+
+.cursor-glow {
+  position: fixed;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(180,77,255,0.1), transparent 70%);
+  pointer-events: none;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.divider-line {
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(212,168,67,0.3), transparent);
+  left: 50%;
+  top: 0;
+  opacity: 0.3;
+}
+
+.footer-text {
+  position: fixed;
+  bottom: 20px;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.6rem;
+  color: rgba(212,168,67,0.3);
+  letter-spacing: 0.3em;
+  z-index: 5;
+}
+</style>
+</head>
+<body>
+
+<div class="glow-orb"></div>
+<div class="glow-orb"></div>
+<div class="glow-orb"></div>
+<div class="glow-orb"></div>
+
+<canvas id="canvas-bg"></canvas>
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="particles-overlay" id="particlesOverlay"></div>
+
+<div class="main-container">
+  <div class="title-section">
+    <div class="title-kr">거울나라의 앨리스</div>
+    <div class="title-en">Through the Looking Glass</div>
+  </div>
+
+  <div class="mirror-wrapper">
+    <div class="mirror-frame">
+      <div class="mirror-glass">
+        <div class="mirror-reflection"></div>
+        <div class="wonderland-inside">
+          <div class="wonderland-bg"></div>
+
+          <div class="star-field" id="starField"></div>
+
+          <div class="chess-piece">♛</div>
+          <div class="chess-piece">♜</div>
+          <div class="chess-piece">♞</div>
+          <div class="chess-piece">♝</div>
+          <div class="chess-piece">♚</div>
+          <div class="chess-piece">♔</div>
+
+          <div class="card-flying">♥</div>
+          <div class="card-flying">♦</div>
+
+          <div class="flower-element"></div>
+          <div class="flower-element"></div>
+          <div class="flower-element"></div>
+
+          <div class="mushroom"></div>
+          <div class="mushroom"></div>
+
+          <div class="clock-element"></div>
+
+          <div class="sentence-float">I'm not strange</div>
+          <div class="sentence-float">Curiouser and curiouser</div>
+          <div class="sentence-float">Fall down the rabbit hole</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subtitle">여기서는 모든 것이 거울처럼 뒤집혀 있습니다</div>
+</div>
+
+<div class="footer-text">MIRROR WONDERLAND</div>
+
+<script>
+const canvas = document.getElementById('canvas-bg');
+const ctx = canvas.getContext('2d');
+const particlesOverlay = document.getElementById('particlesOverlay');
+const starField = document.getElementById('starField');
+const cursorGlow = document.getElementById('cursorGlow');
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+const particleCount = 120;
+const particles = [];
+
+for (let i = 0; i < particleCount; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    size: Math.random() * 2 + 0.5,
+    opacity: Math.random() * 0.5 + 0.1,
+    color: ['#d4a843', '#b44dff', '#e8799c', '#2dd4a0', '#c0c8d8'][Math.floor(Math.random() * 5)]
+  });
+}
+
+function createStars() {
+  starField.innerHTML = '';
+  for (let i = 0; i < 80; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = Math.random() * 3 + 's';
+    star.style.animationDuration = (Math.random() * 2 + 2) + 's';
+    starField.appendChild(star);
+  }
+}
+createStars();
+
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  cursorGlow.style.left = e.clientX + 'px';
+  cursorGlow.style.top = e.clientY + 'px';
+});
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+
+    const dx = mouseX - p.x;
+    const dy = mouseY - p.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 200) {
+      const force = (200 - dist) / 200 * 0.02;
+      p.vx += (dx / dist) * force;
+      p.vy += (dy / dist) * force;
+    }
+
+    p.vx *= 0.99;
+    p.vy *= 0.99;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.opacity;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.opacity * 0.15;
+    ctx.fill();
+  });
+
+  ctx.globalAlpha = 1;
+
+  particles.forEach((a, i) => {
+    particles.slice(i + 1).forEach(b => {
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle = `rgba(212, 168, 67, ${(1 - dist / 120) * 0.08})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    });
+  });
+
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+const mirrorWrapper = document.querySelector('.mirror-wrapper');
+mirrorWrapper.addEventListener('mousemove', (e) => {
+  const rect = mirrorWrapper.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const angleY = (e.clientX - centerX) / rect.width * 20;
+  const angleX = (e.clientY - centerY) / rect.height * 20;
+  mirrorWrapper.style.transform = `perspective(800px) rotateX(${angleX}deg) rotateY(${-angleY}deg)`;
+});
+
+mirrorWrapper.addEventListener('mouseleave', () => {
+  mirrorWrapper.style.transform = 'perspective(800px) rotateX(0) rotateY(0)';
+  mirrorWrapper.style.transition = 'transform 0.8s ease-out';
+});
+
+mirrorWrapper.addEventListener('mouseenter', () => {
+  mirrorWrapper.style.transition = 'transform 0.1s ease-out';
+});
+
+document.addEventListener('click', (e) => {
+  const burst = document.createElement('div');
+  burst.style.position = 'fixed';
+  burst.style.left = e.clientX + 'px';
+  burst.style.top = e.clientY + 'px';
+  burst.style.width = '10px';
+  burst.style.height = '10px';
+  burst.style.borderRadius = '50%';
+  burst.style.background = 'radial-gradient(circle, var(--gold), transparent)';
+  burst.style.boxShadow = '0 0 30px var(--gold), 0 0 60px var(--magenta)';
+  burst.style.pointerEvents = 'none';
+  burst.style.zIndex = '10';
+  burst.style.animation = 'fadeInUp 0.8s ease-out forwards';
+  document.body.appendChild(burst);
+
+  for (let i = 0; i < 12; i++) {
+    const spark = document.createElement('div');
+    const angle = (Math.PI * 2 / 12) * i;
+    const dist = 50 + Math.random() * 80;
+    spark.style.position = 'fixed';
+    spark.style.left = e.clientX + 'px';
+    spark.style.top = e.clientY + 'px';
+    spark.style.width = '3px';
+    spark.style.height = '3px';
+    spark.style.borderRadius = '50%';
+    spark.style.background = ['#d4a843', '#b44dff', '#e8799c', '#2dd4a0'][Math.floor(Math.random() * 4)];
+    spark.style.boxShadow = '0 0 10px currentColor';
+    spark.style.pointerEvents = 'none';
+    spark.style.zIndex = '10';
+    spark.style.transition = 'all 1s ease-out';
+    spark.style.color = ['#d4a843', '#b44dff', '#e8799c', '#2dd4a0'][Math.floor(Math.random() * 4)];
+    document.body.appendChild(spark);
+
+    requestAnimationFrame(() => {
+      spark.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px)`;
+      spark.style.opacity = '0';
+    });
+
+    setTimeout(() => spark.remove(), 1200);
+  }
+
+  setTimeout(() => burst.remove(), 1000);
+});
+
+setInterval(() => {
+  const orbs = document.querySelectorAll('.glow-orb');
+  orbs.forEach(orb => {
+    orb.style.animationDuration = (12 + Math.random() * 8) + 's';
+  });
+}, 5000);
+</script>
+</body>
+</html>
