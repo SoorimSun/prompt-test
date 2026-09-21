@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>거울나라의 앨리스</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --fg: #f0f0f5;
+      --m1: #1e1e2f;
+      --m2: #2a2a3e;
+      --accent: #e94a6f;
+      --glow: rgba(233, 74, 111, 0.4);
+      --glass: rgba(255, 255, 255, 0.04);
+      --glass-hover: rgba(255, 255, 255, 0.08);
+    }
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Nanum Gothic', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+    }
+    #root {
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+    /* mirror frame */
+    .mirror-frame {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      margin: 2rem auto;
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 0 1px var(--glow);
+    }
+    .mirror-pane {
+      height: 400px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #0d0d17 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .mirror-pane::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle at 30% 20%, rgba(233,74,111,0.12) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(233,74,111,0.08) 0%, transparent 50%);
+      animation: glimmer 8s ease-in-out infinite;
+    }
+    @keyframes glimmer {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(30%, 30%) scale(1.1); }
+    }
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, #e94a6f 0%, #c13a5a 50%, #9a2a45 100%);
+      opacity: 0.6;
+      animation: ripple-anim 3s ease-out infinite;
+    }
+    @keyframes ripple-anim {
+      0% { transform: scale(0.8); opacity: 0.6; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    .glass-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+    }
+    .glass-text h1 {
+      font-size: 4rem;
+      font-weight: 900;
+      letter-spacing: 0.3em;
+      background: linear-gradient(135deg, #fff 0%, #e0e0e8 50%, #fff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      margin-bottom: 1rem;
+      background-size: 200% 200%;
+      animation: gradientShift 6s ease infinite;
+    }
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .glass-text p {
+      font-size: 1.3rem;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.1em;
+    }
+    /* particles canvas */
+    #particles {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    /* navigation */
+    nav {
+      display: flex; justify-content: space-around; padding: 1rem 0;
+    }
+    nav a {
+      color: var(--fg);
+      text-decoration: none;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      transition: color 0.3s;
+    }
+    nav a:hover {
+      color: var(--accent);
+    }
+    .footer {
+      padding: 2rem; text-align: center; color: rgba(255,255,255,0.4);
+      font-size: 0.85rem;
+    }
+    /* subtle mouse follower */
+    .cursor-glow {
+      position: fixed;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--glow);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .cursor-glow.active {
+      opacity: 0.4;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+  <div class="cursor-glow" id="cursorGlow"></div>
+
+  <div id="root">
+    <nav>
+      <a href="#">홈</a>
+      <a 대해="#">이야기</a>
+      <a href="#">갤러리</a>
+    </nav>
+
+    <section class="mirror-frame">
+      <div class="mirror-pane">
+        <div class="glass-text">
+          <h1>거울나라의 앨리스</h1>
+          <p>거울 너머 환상의 세계로...</p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p> inspired by Lewis Carroll • created with imagination </p>
+    </footer>
+  </div>
+
+  <script>
+    // particle system
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let width, height;
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = (Math.random() - 0.5) * 0.3;
+        this.opacity = Math.random() * 0.5 + 0.1;
+        this.color = 'rgba(233,74,111,' + this.opacity + ')';
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+          this.reset();
+        }
+      }
+      draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const count = Math.floor((width * height) / 15000);
+      for (let i = 0; i < count; i++) {
+        particles.push(new Particle());
+      }
+    }
+    initParticles();
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // mouse interaction for cursor glow
+    const glow = document.getElementById('cursorGlow');
+    let mouseX = 0, mouseY = 0;
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      glow.style.left = mouseX + 'px';
+      glow.style.top = mouseY + 'px';
+      glow.classList.add('active');
+    });
+    document.addEventListener('mouseleave', () => {
+      glow.classList.remove('active');
+    });
+
+    // loop glow pulse
+    setInterval(() => {
+      glow.classList.toggle('active');
+    }, 1500);
+  </script>
+</body>
+</html>
