@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#211832">
+  <meta name="description" content="거울나라의 앨리스 HTML 제작에 사용된 시간, 토큰, 결과물 크기와 검증 기록. 실제 Codex 세션 로그를 바탕으로 작성한 벤치마크 보고서.">
+  <title>앨리스 제작 벤치마크 — 11분 46초의 기록</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --plum: #211832;
+      --plum-deep: #171122;
+      --plum-mid: #423354;
+      --paper: #f7f3ef;
+      --paper-light: #fffcf9;
+      --ink: #302739;
+      --muted: #756c77;
+      --line: #ddd4d4;
+      --gold: #e0bf8f;
+      --rose: #d78e98;
+      --lavender: #978cb9;
+      --fresh: #7567a5;
+      --display: 'Cormorant Garamond', Georgia, serif;
+      --body: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      --utility: 'DM Sans', Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    ::selection { background: #edd0bd; color: var(--plum); }
+    :focus-visible { outline: 2px solid #b9717e; outline-offset: 5px; }
+    .wrap { width: min(100% - 88px, 1200px); margin-inline: auto; }
+    .eyebrow, .section-label, .micro { font-family: var(--utility); font-weight: 700; text-transform: uppercase; letter-spacing: .22em; }
+
+    .hero { position: relative; isolation: isolate; overflow: hidden; min-height: 740px; color: #fff9f1; background: radial-gradient(ellipse at 76% 35%,#534168 0%,#322540 35%,transparent 65%), linear-gradient(132deg,#1d152e,#261a37 63%,#151020); }
+    .hero::before { content: ''; position: absolute; inset: 0; z-index: -1; opacity: .4; background-image: radial-gradient(#fff 0.65px,transparent 1px),radial-gradient(#f3c9ab 0.7px,transparent 1px); background-size: 98px 107px,161px 143px; background-position: 28px 14px,78px 56px; mask-image: linear-gradient(#000,transparent 95%); }
+    .hero::after { content: ''; position: absolute; z-index: -1; right: max(-150px,calc((100vw - 1460px)/2)); top: 108px; width: min(63vw,780px); aspect-ratio: 1; border: 1px solid rgba(237,207,164,.17); border-radius: 50%; box-shadow: 0 0 0 24px rgba(230,192,146,.025),0 0 0 25px rgba(237,207,164,.11),0 0 0 70px rgba(230,192,146,.025),0 0 0 71px rgba(237,207,164,.07),inset 0 0 0 22px rgba(230,192,146,.025),inset 0 0 0 23px rgba(237,207,164,.11); transform: rotate(-17deg); pointer-events: none; }
+    .hero-corners { position: absolute; inset: 16px; border: 1px solid rgba(240,214,180,.16); pointer-events: none; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 24px; height: 86px; border-bottom: 1px solid rgba(240,214,180,.18); }
+    .brand { display: inline-flex; gap: 12px; align-items: center; color: #f8e6cd; font: 600 20px/1 var(--display); letter-spacing: .16em; white-space: nowrap; }
+    .brand svg { width: 24px; height: 32px; }
+    .topbar-note { color: #d4c1c9; font: 700 9px/1 var(--utility); letter-spacing: .2em; text-transform: uppercase; }
+    .topbar-link { display: inline-flex; gap: 9px; align-items: center; border-bottom: 1px solid rgba(243,215,186,.65); padding: 9px 0; color: #ffedda; font-size: 11px; font-weight: 600; white-space: nowrap; transition: gap .25s,color .25s; }
+    .topbar-link:hover { gap: 15px; color: #fff; }
+    .hero-main { position: relative; padding-top: 112px; padding-bottom: 83px; }
+    .eyebrow { margin: 0 0 26px; color: var(--gold); font-size: 10px; }
+    .eyebrow::before { content: ''; display: inline-block; width: 27px; height: 1px; margin-right: 13px; vertical-align: middle; background: currentColor; }
+    h1 { max-width: 910px; margin: 0; font-size: clamp(44px,6.2vw,86px); font-weight: 500; line-height: 1.33; letter-spacing: -.09em; word-break: keep-all; }
+    h1 em { color: #ecc0b7; font-style: normal; }
+    .hero-english { display: block; margin-top: 8px; color: #d8c6d2; font: italic 500 clamp(23px,2.3vw,32px)/1.4 var(--display); }
+    .hero-lead { max-width: 590px; margin: 30px 0 50px; color: #e0d4dc; font-size: 13px; line-height: 2; word-break: keep-all; }
+    .elapsed { display: flex; align-items: end; flex-wrap: wrap; gap: 14px 27px; }
+    .elapsed-number { color: #f9e2c5; font: 500 clamp(72px,10vw,135px)/.8 var(--display); letter-spacing: -.06em; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+    .elapsed-copy { padding-bottom: 7px; color: #ebd6cf; }
+    .elapsed-copy strong { display: block; margin-bottom: 9px; font-size: 14px; font-weight: 600; }
+    .elapsed-copy span { font: 600 10px/1.8 var(--utility); letter-spacing: .09em; color: #bbaabf; }
+    .hero-stamp { position: absolute; right: 34px; top: 100px; width: 230px; aspect-ratio: 1; display: grid; place-items: center; color: #eacb9e; opacity: .82; transform: rotate(16deg); }
+    .hero-stamp::before { content: ''; position: absolute; inset: 0; border: 1px solid rgba(234,203,158,.45); border-radius: 50%; box-shadow: inset 0 0 0 11px rgba(234,203,158,.03),inset 0 0 0 12px rgba(234,203,158,.3),inset 0 0 0 27px rgba(234,203,158,.03),inset 0 0 0 28px rgba(234,203,158,.23); }
+    .hero-stamp b { font: 500 78px/.8 var(--display); }
+    .hero-stamp small { position: absolute; bottom: 43px; font: 700 8px/1 var(--utility); letter-spacing: .3em; }
+    .hero-bottom { display: flex; justify-content: space-between; gap: 20px; padding: 25px 0; border-top: 1px solid rgba(240,214,180,.18); color: #c7b8c9; font: 600 9px/1.5 var(--utility); letter-spacing: .18em; text-transform: uppercase; }
+    .hero-bottom span:last-child { color: #efd8c2; }
+
+    main { padding-bottom: 110px; }
+    .intro-strip { display: grid; grid-template-columns: 1.25fr repeat(3,1fr); gap: 0; margin-top: -1px; background: #e9dedc; border-bottom: 1px solid #d9c9c9; }
+    .strip-cell { min-height: 130px; padding: 27px 29px; border-right: 1px solid #d9c9c9; }
+    .strip-cell:last-child { border-right: 0; }
+    .strip-cell:first-child { background: #eee6e3; }
+    .strip-cell small { display: block; margin-bottom: 17px; color: #8c7580; font: 700 9px/1 var(--utility); letter-spacing: .19em; text-transform: uppercase; }
+    .strip-cell strong { display: block; font-size: 17px; font-weight: 600; letter-spacing: -.04em; }
+    .strip-cell .number { font: 600 32px/1 var(--display); letter-spacing: -.03em; color: #3f344b; }
+    .strip-cell .number span { margin-left: 4px; font: 600 12px/1 var(--utility); letter-spacing: 0; }
+
+    .section { padding-top: 100px; }
+    .section-head { display: flex; justify-content: space-between; align-items: start; gap: 25px; margin-bottom: 46px; }
+    .section-label { margin: 4px 0 17px; color: #b57982; font-size: 10px; }
+    h2 { margin: 0; font-size: clamp(30px,3.7vw,49px); font-weight: 500; line-height: 1.4; letter-spacing: -.075em; word-break: keep-all; }
+    h2 em { color: #b66e7a; font-style: normal; }
+    .section-note { max-width: 350px; margin: 17px 0 0; color: var(--muted); font-size: 12px; line-height: 1.9; word-break: keep-all; }
+    .total-panel { position: relative; overflow: hidden; padding: 42px 46px 46px; background: var(--paper-light); border: 1px solid #e7ddda; box-shadow: 0 18px 45px rgba(65,39,55,.055); }
+    .total-panel::after { content: '✧'; position: absolute; right: 25px; top: -59px; color: rgba(189,139,143,.09); font: 240px/1 Georgia,serif; pointer-events: none; }
+    .total-overline { display: block; margin-bottom: 10px; color: #a3757f; font: 700 10px/1 var(--utility); letter-spacing: .23em; text-transform: uppercase; }
+    .total-figure { display: block; margin-bottom: 12px; color: var(--plum); font: 500 clamp(58px,7.3vw,100px)/1 var(--display); letter-spacing: -.06em; font-variant-numeric: lining-nums tabular-nums; }
+    .total-panel p { position: relative; max-width: 720px; margin: 0; color: #675b69; font-size: 12px; line-height: 1.9; word-break: keep-all; }
+    .meter { display: flex; width: 100%; height: 20px; margin-top: 37px; overflow: hidden; background: #e5dce4; border-radius: 30px; }
+    .meter span { display: block; height: 100%; }
+    .meter .cached { width: 94.07%; background: #8e82b2; }
+    .meter .fresh { width: 4.36%; background: #d6909b; }
+    .meter .output { width: 1.57%; background: #c8a26c; }
+    .meter-legend { display: grid; grid-template-columns: repeat(3,1fr); gap: 15px; margin-top: 17px; }
+    .meter-legend div { display: flex; align-items: center; gap: 9px; min-width: 0; color: #625966; font-size: 11px; }
+    .dot { display: inline-block; width: 9px; height: 9px; flex: 0 0 auto; border-radius: 50%; }
+    .dot.cached { background: #8e82b2; } .dot.fresh { background: #d6909b; } .dot.output { background: #c8a26c; }
+    .meter-legend strong { margin-left: auto; color: #43394a; font: 700 11px/1 var(--utility); white-space: nowrap; }
+    .metric-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 14px; }
+    .metric-card { padding: 31px 30px 35px; min-height: 207px; background: #fefbf8; border: 1px solid #e7ddda; }
+    .metric-card:nth-child(2) { background: #f2edf1; }
+    .metric-card small { display: block; margin-bottom: 23px; color: #986e78; font: 700 9px/1 var(--utility); letter-spacing: .19em; text-transform: uppercase; }
+    .metric-card strong { display: block; color: #423550; font: 500 clamp(33px,3.4vw,48px)/1 var(--display); letter-spacing: -.02em; font-variant-numeric: lining-nums tabular-nums; }
+    .metric-card p { margin: 14px 0 0; color: #786e79; font-size: 11px; line-height: 1.8; word-break: keep-all; }
+    .definition { display: flex; gap: 15px; align-items: start; margin-top: 20px; padding: 21px 25px; background: #eae3e8; color: #504452; border-left: 2px solid #a98da8; }
+    .definition span { flex: 0 0 auto; color: #8b6896; font: 600 23px/1 var(--display); }
+    .definition p { margin: 0; font-size: 12px; line-height: 1.9; word-break: keep-all; }
+
+    .time-section { margin-top: 112px; padding: 105px 0 100px; background: #ece5e6; border-block: 1px solid #dfd3d5; }
+    .time-section .section { padding-top: 0; }
+    .time-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 30px; }
+    .timeline { position: relative; display: grid; grid-template-columns: repeat(3,1fr); gap: 0; padding-top: 22px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; right: 8px; top: 27px; height: 1px; background: #bca5af; }
+    .time-point { position: relative; padding: 28px 22px 0 0; }
+    .time-point::before { content: ''; position: absolute; z-index: 1; top: -1px; left: 0; width: 13px; height: 13px; border: 3px solid #b97986; border-radius: 50%; background: #eee5e6; }
+    .time-point:nth-child(2)::before { border-color: #9685b2; }
+    .time-point:nth-child(3)::before { border-color: #bb9a66; }
+    .time-point small { display: block; margin-bottom: 10px; color: #887782; font: 700 9px/1 var(--utility); letter-spacing: .16em; text-transform: uppercase; }
+    .time-point strong { display: block; color: var(--plum); font: 500 clamp(25px,2.6vw,37px)/1.1 var(--display); font-variant-numeric: lining-nums tabular-nums; }
+    .time-point p { margin: 11px 0 0; color: #7c707a; font-size: 11px; line-height: 1.8; }
+    .time-aside { align-self: start; padding: 34px 37px 37px; background: #f8f3f0; border: 1px solid #ded2d4; }
+    .time-aside .micro { display: block; margin-bottom: 16px; color: #a3767d; font-size: 9px; }
+    .time-aside strong { display: block; color: #3f334a; font: 500 67px/.9 var(--display); }
+    .time-aside p { margin: 18px 0 0; color: #716673; font-size: 12px; line-height: 1.9; word-break: keep-all; }
+
+    .artifact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+    .artifact-preview { position: relative; display: grid; place-items: center; min-height: 354px; overflow: hidden; background: radial-gradient(circle at 50% 42%,#63517a,#2d2244 54%,#1a142d); }
+    .artifact-preview::after { content: ''; position: absolute; inset: 16px; border: 1px solid rgba(252,229,192,.28); pointer-events: none; }
+    .artifact-preview svg { width: min(68%,300px); height: auto; filter: drop-shadow(0 17px 23px rgba(11,7,23,.35)); }
+    .artifact-copy { align-self: center; }
+    .artifact-copy h2 { margin-bottom: 22px; }
+    .artifact-copy > p:not(.section-label) { margin: 0 0 32px; max-width: 500px; color: #746976; font-size: 12px; line-height: 2; word-break: keep-all; }
+    .specs { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 19px; border-top: 1px solid var(--line); }
+    .spec { padding: 21px 0; border-bottom: 1px solid var(--line); }
+    .spec small { display: block; margin-bottom: 8px; color: #a37b85; font: 700 9px/1 var(--utility); letter-spacing: .16em; text-transform: uppercase; }
+    .spec strong { color: #3f3545; font: 600 24px/1.2 var(--display); }
+    .art-link { display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; padding-bottom: 7px; color: #8f5966; border-bottom: 1px solid #ac7c85; font-size: 12px; font-weight: 700; transition: gap .25s; }
+    .art-link:hover { gap: 17px; }
+
+    .method { margin-top: 110px; padding: 42px 48px; color: #f5eced; background: #2b2138; }
+    .method .section-label { color: #dcb998; }
+    .method h2 { margin-bottom: 25px; font-size: clamp(28px,3.2vw,40px); }
+    .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
+    .method p, .method li { color: #d6cbd6; font-size: 11px; line-height: 2; word-break: keep-all; }
+    .method p { margin: 0; }
+    .method ul { margin: 0; padding-left: 18px; }
+    .method code { color: #f3d3b7; font: 600 11px/1.7 var(--utility); }
+    .method .source { grid-column: 1 / -1; padding-top: 18px; border-top: 1px solid rgba(242,217,202,.18); color: #a99bac; font: 500 10px/1.8 var(--utility); letter-spacing: .02em; }
+    .footer { display: flex; justify-content: space-between; gap: 20px; padding: 25px 0 34px; color: #8c7c87; font: 700 9px/1.5 var(--utility); letter-spacing: .15em; text-transform: uppercase; }
+
+    @media (max-width: 900px) {
+      .wrap { width: min(100% - 48px,1200px); }
+      .hero-stamp { opacity: .3; right: -45px; top: 138px; }
+      .topbar-note { display: none; }
+      .intro-strip { grid-template-columns: repeat(2,1fr); }
+      .strip-cell:nth-child(2) { border-right: 0; }
+      .strip-cell:nth-child(-n+2) { border-bottom: 1px solid #d9c9c9; }
+      .section-head { display: block; }
+      .section-note { margin-top: 15px; }
+      .time-grid { grid-template-columns: 1fr; }
+      .artifact-grid { gap: 28px; }
+    }
+    @media (max-width: 640px) {
+      .wrap { width: calc(100% - 36px); }
+      .hero { min-height: 0; }
+      .hero-corners { inset: 9px; }
+      .topbar { height: 68px; }
+      .brand { font-size: 17px; letter-spacing: .09em; gap: 8px; }
+      .brand svg { width: 19px; }
+      .topbar-link { font-size: 10px; }
+      .hero-main { padding: 82px 0 70px; }
+      .eyebrow { font-size: 8px; letter-spacing: .17em; }
+      h1 { font-size: clamp(40px,10.6vw,65px); }
+      .hero-lead { font-size: 12px; margin: 24px 0 46px; }
+      .elapsed { gap: 15px; }
+      .elapsed-number { font-size: clamp(66px,17vw,99px); }
+      .elapsed-copy strong { font-size: 12px; }
+      .hero-bottom { font-size: 8px; flex-direction: column; gap: 6px; }
+      .intro-strip { grid-template-columns: 1fr 1fr; }
+      .strip-cell { min-height: 100px; padding: 19px 16px; }
+      .strip-cell small { margin-bottom: 12px; font-size: 7px; }
+      .strip-cell strong { font-size: 14px; }
+      .strip-cell .number { font-size: 27px; }
+      .section { padding-top: 78px; }
+      .section-head { margin-bottom: 32px; }
+      .total-panel { padding: 30px 23px 30px; }
+      .total-figure { font-size: clamp(52px,14vw,78px); }
+      .meter { height: 16px; margin-top: 28px; }
+      .meter-legend { display: block; }
+      .meter-legend div + div { margin-top: 10px; }
+      .meter-legend strong { margin-left: 4px; }
+      .metric-grid { display: block; }
+      .metric-card { min-height: 0; padding: 23px; }
+      .metric-card + .metric-card { margin-top: 10px; }
+      .metric-card small { margin-bottom: 14px; }
+      .metric-card strong { font-size: 37px; }
+      .definition { padding: 18px; }
+      .time-section { margin-top: 75px; padding: 76px 0; }
+      .timeline { display: block; padding: 10px 0 0 22px; }
+      .timeline::before { left: 5px; right: auto; top: 14px; bottom: 28px; width: 1px; height: auto; }
+      .time-point { padding: 0 0 34px 15px; }
+      .time-point::before { top: 1px; left: -23px; }
+      .time-point:last-child { padding-bottom: 3px; }
+      .time-point strong { font-size: 31px; }
+      .time-aside { padding: 28px; }
+      .time-aside strong { font-size: 56px; }
+      .artifact-grid { display: block; }
+      .artifact-preview { min-height: 300px; margin-bottom: 31px; }
+      .method { margin-top: 80px; padding: 29px 24px; }
+      .method-grid { display: block; }
+      .method-grid > * + * { margin-top: 17px; }
+      .method .source { margin-top: 21px; }
+      .footer { display: block; font-size: 8px; }
+      .footer span { display: block; }
+      .footer span + span { margin-top: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *,*::before,*::after { transition-duration: .01ms !important; } }
+    @media print {
+      :root { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .hero { min-height: 0; }
+      .hero-main { padding-block: 55px; }
+      .topbar-link,.art-link { display: none; }
+      .section { padding-top: 55px; }
+      .time-section { margin-top: 60px; padding-block: 50px; }
+      .method { margin-top: 55px; }
+      .metric-card,.total-panel,.time-aside,.method { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <span class="hero-corners" aria-hidden="true"></span>
+    <div class="wrap">
+      <nav class="topbar" aria-label="보고서 탐색">
+        <a class="brand" href="./looking-glass.html" aria-label="앨리스 작품 열기">
+          <svg viewBox="0 0 24 32" fill="none" aria-hidden="true"><path d="M12 1C5 1 2 7 2 15s4 15 10 15 10-7 10-15S19 1 12 1Z" stroke="#e5c996" stroke-width="1.2"/><path d="M12 5C8 5 5 9 5 15s3 11 7 11 7-5 7-11-3-10-7-10ZM12 27v4M8 31h8" stroke="#e5c996" stroke-width="1"/></svg>
+          WONDER / LAND
+        </a>
+        <span class="topbar-note">Creation record · 2026.09.23</span>
+        <a class="topbar-link" href="./looking-glass.html">앨리스 작품 보기 <span aria-hidden="true">↗</span></a>
+      </nav>
+      <div class="hero-main">
+        <div class="hero-stamp" aria-hidden="true"><b>♛</b><small>G P T · 6 · S O L</small></div>
+        <p class="eyebrow">The making of an impossible world</p>
+        <h1>거울 속 세계를<br>만드는 데 <em>걸린 시간.</em></h1>
+        <span class="hero-english">A measured record of wonder</span>
+        <p class="hero-lead">《거울나라의 앨리스》 HTML을 만든 첫 작업의 실제 실행 기록입니다. 모델 사용량, 경과 시간, 결과물과 브라우저 검증을 한 장에 담았습니다.</p>
+        <div class="elapsed"><strong class="elapsed-number">11:46.443</strong><div class="elapsed-copy"><strong>완료까지 11분 46.443초</strong><span>09:08:32 → 09:20:18 KST<br>첫 응답까지 3.887초</span></div></div>
+      </div>
+      <div class="hero-bottom"><span>GPT-6-SOL / REASONING EFFORT: XHIGH</span><span>ONE ORIGINAL HTML · ONE COMPLETED TASK</span></div>
+    </div>
+  </header>
+
+  <div class="intro-strip" aria-label="핵심 수치">
+    <div class="strip-cell"><small>Report scope</small><strong>앨리스 HTML 제작 1회</strong></div>
+    <div class="strip-cell"><small>Processed tokens</small><strong class="number">2,179,937</strong></div>
+    <div class="strip-cell"><small>Output tokens</small><strong class="number">34,261</strong></div>
+    <div class="strip-cell"><small>HTML artifact</small><strong class="number">45,896<span>bytes</span></strong></div>
+  </div>
+
+  <main>
+    <section class="section wrap" id="tokens" aria-labelledby="tokens-title">
+      <div class="section-head">
+        <div><p class="section-label">01 / Token ledger</p><h2 id="tokens-title">총량 안에 숨은 <em>캐시의 비중.</em></h2></div>
+        <p class="section-note">입력 맥락이 여러 번 재사용되었습니다. 큰 총량을 새로 작성한 텍스트의 양이나 비용으로 해석하지 않도록 분리해 표시합니다.</p>
+      </div>
+      <div class="total-panel">
+        <span class="total-overline">Input + output · cumulative processed tokens</span>
+        <strong class="total-figure">2,179,937</strong>
+        <p>첫 요청부터 완성 답변까지의 누적 모델 사용량입니다. 입력 2,145,676토큰과 출력 34,261토큰의 합계입니다.</p>
+        <div class="meter" role="img" aria-label="전체 토큰 중 캐시 입력 94.07퍼센트, 비캐시 입력 4.36퍼센트, 출력 1.57퍼센트"><span class="cached"></span><span class="fresh"></span><span class="output"></span></div>
+        <div class="meter-legend">
+          <div><span class="dot cached"></span>캐시 입력 <strong>94.07%</strong></div>
+          <div><span class="dot fresh"></span>비캐시 입력 <strong>4.36%</strong></div>
+          <div><span class="dot output"></span>출력 <strong>1.57%</strong></div>
+        </div>
+      </div>
+      <div class="metric-grid">
+        <div class="metric-card"><small>Cached input</small><strong>2,050,688</strong><p>반복 사용된 입력 맥락. 전체 입력의 95.57%입니다.</p></div>
+        <div class="metric-card"><small>Uncached input</small><strong>94,988</strong><p>전체 입력에서 캐시 입력을 뺀 값입니다. 고유 텍스트량과는 다릅니다.</p></div>
+        <div class="metric-card"><small>Model output</small><strong>34,261</strong><p>추론 출력 9,724토큰을 포함합니다. 추론은 별도로 더하지 않습니다.</p></div>
+      </div>
+      <div class="definition"><span>✦</span><p><strong>읽는 법:</strong> 캐시 입력은 입력 토큰의 부분집합이고, 추론 출력은 출력 토큰의 부분집합입니다. 따라서 두 수치를 총량에 다시 더하면 중복 계산됩니다.</p></div>
+    </section>
+
+    <section class="time-section" id="time" aria-labelledby="time-title">
+      <div class="section wrap">
+        <div class="section-head"><div><p class="section-label">02 / Time record</p><h2 id="time-title">시작부터 완성까지의 <em>관측 지점.</em></h2></div><p class="section-note">시각은 한국 표준시(KST). 실행 시간은 세션의 <span lang="en">task_complete.duration_ms</span> 값입니다.</p></div>
+        <div class="time-grid">
+          <div class="timeline" aria-label="제작 타임라인">
+            <div class="time-point"><small>Task started</small><strong>09:08:32</strong><p>앨리스 HTML 제작 작업 시작<br>세션 이벤트 기준</p></div>
+            <div class="time-point"><small>File created</small><strong>09:15:32</strong><p>원본 HTML 파일 최초 생성<br>파일 시스템 기록 기준</p></div>
+            <div class="time-point"><small>Task complete</small><strong>09:20:18</strong><p>최종 답변 및 작업 종료<br>세션 이벤트 기준</p></div>
+          </div>
+          <aside class="time-aside"><span class="micro">Time to first token</span><strong>3.887s</strong><p>첫 응답까지의 시간입니다. 파일 생성까지의 시간이나 페이지 로딩 속도와는 다른 지표입니다.</p></aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="artifact" aria-labelledby="artifact-title">
+      <div class="artifact-grid">
+        <div class="artifact-preview" aria-hidden="true">
+          <svg viewBox="0 0 300 330" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff2c9"/><stop offset=".46" stop-color="#b78a62"/><stop offset="1" stop-color="#f3d39b"/></linearGradient><linearGradient id="world" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#595484"/><stop offset=".6" stop-color="#e8b2b4"/><stop offset="1" stop-color="#516181"/></linearGradient><clipPath id="glass"><ellipse cx="150" cy="164" rx="78" ry="117"/></clipPath></defs><path d="M150 23c-59 0-99 55-99 141s40 142 99 142 99-56 99-142S209 23 150 23Z" fill="#6c4b48" stroke="url(#gold)" stroke-width="17"/><ellipse cx="150" cy="164" rx="81" ry="120" fill="url(#world)" stroke="#ffeed0" stroke-width="3"/><g clip-path="url(#glass)"><circle cx="185" cy="93" r="18" fill="#fff0d7"/><circle cx="191" cy="88" r="17" fill="#a49aba"/><path d="M60 203c38-28 58-27 91-15 44-27 73-18 92 8v99H60Z" fill="#425a76"/><path d="M144 201h12l102 108H45Z" fill="#f6e2d5"/><path d="m144 201 5 0-15 108H45Zm19 0 5 0 90 108h-75Z" fill="#4b4e6a"/><path d="M119 175h62v32h-62ZM129 154h42v22h-42ZM141 133h18v23h-18Z" fill="#f9dfd0"/><path d="M149 121h2v13h-2Z" fill="#f9dfd0"/><path d="M150 225c-8 0-14 8-16 20l-16 32c19 12 47 12 64 0l-16-32c-2-12-8-20-16-20Z" fill="#a1c6d5"/><ellipse cx="150" cy="216" rx="10" ry="13" fill="#f8d9c7"/><path d="M140 213c0-13 18-16 20-1-7-4-13-4-20 1Z" fill="#5b3c40"/><path d="M80 60c8 76 3 144-20 204m160-204c-9 76-3 144 20 204" stroke="#34405d" stroke-width="20" fill="none"/></g><path d="M150 23c-59 0-99 55-99 141s40 142 99 142 99-56 99-142S209 23 150 23Z" fill="none" stroke="#fff1c7" stroke-opacity=".6" stroke-width="2"/><path d="M150 27c-12-12-11-22 0-30 11 8 12 18 0 30Zm0 281c-10 10-14 18-10 22h20c4-4 0-12-10-22Z" fill="url(#gold)"/></svg>
+        </div>
+        <div class="artifact-copy"><p class="section-label">03 / The artifact</p><h2 id="artifact-title">남은 것은 <em>하나의 HTML.</em></h2><p>금빛 거울과 체스판 정원을 인라인 SVG로 그린 단일 페이지입니다. 거울을 누르면 세계의 색과 문구가 바뀌고, 세 장면의 이야기가 아래로 이어집니다.</p>
+          <div class="specs">
+            <div class="spec"><small>File size</small><strong>45,896 bytes</strong></div>
+            <div class="spec"><small>Source lines</small><strong>447 lines</strong></div>
+            <div class="spec"><small>Responsive checks</small><strong>5 viewports</strong></div>
+            <div class="spec"><small>Browser page errors</small><strong>0 observed</strong></div>
+          </div>
+          <a class="art-link" href="./looking-glass.html">완성된 앨리스 HTML 열기 <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <div class="definition"><span>✓</span><p><strong>검증 결과:</strong> Chrome에서 320 · 390 · 840 · 1024 · 1440px 화면을 확인했습니다. 각 너비에서 가로 넘침과 페이지 스크립트 오류가 없었고, Enter 키로 거울 상태가 전환되고 다시 복구됐습니다.</p></div>
+    </section>
+
+    <section class="method wrap" id="method" aria-labelledby="method-title">
+      <p class="section-label">How these numbers were read</p>
+      <h2 id="method-title">측정 기준과 범위</h2>
+      <div class="method-grid">
+        <p>이 보고서는 2026년 9월 23일 첫 앨리스 제작 작업의 세션 로그와 결과물 파일 정보를 읽어 작성했습니다. 현재 보고서를 만드는 데 사용한 토큰과 시간은 포함하지 않습니다. 다른 모델 또는 다른 폴더의 결과와 비교한 수치도 아닙니다.</p>
+        <ul>
+          <li>시간: <code>task_complete.duration_ms = 706,443</code></li>
+          <li>총 토큰: <code>input_tokens + output_tokens</code></li>
+          <li>비캐시 입력: <code>input_tokens − cached_input_tokens</code></li>
+          <li>비용·에너지·웹 페이지 로딩 속도: 별도 측정 기록 없음</li>
+        </ul>
+        <p class="source">SOURCE · Codex rollout session usage record &amp; task completion event · Alice HTML file metadata · Chrome/Playwright verification from the completed task</p>
+      </div>
+    </section>
+  </main>
+  <footer class="footer wrap"><span>THE MAKING OF WONDER · GPT-6-SOL</span><span>DATA BEFORE IMPRESSION · 2026.09.23</span></footer>
+</body>
+</html>
