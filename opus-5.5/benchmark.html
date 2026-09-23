@@ -49,6 +49,9 @@ h1 .en{display:block;margin-top:.35em;font-family:var(--f-en);font-style:italic;
 .meta{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0;padding:0;list-style:none}
 .meta li{padding:4px 11px;border-radius:999px;background:var(--chip);font-size:13px;color:var(--ink-2)}
 .meta b{font-weight:500;color:var(--ink)}
+.meta a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--data);text-underline-offset:3px}
+.meta a:hover{color:var(--data)}
+.meta a:hover b{color:inherit}
 
 .hero-shot{margin:40px 0 0}
 .hero-shot img{display:block;width:100%;height:auto;border-radius:10px;box-shadow:var(--shadow)}
@@ -193,7 +196,7 @@ details table{font-size:13px}
     <li><b>2026-09-23</b> 09:09 – 10:19 KST</li>
     <li><b>claude-opus-5-5</b> · effort xhigh</li>
     <li>Claude Code · Windows 10</li>
-    <li>산출물 <b>opus-5.5/looking-glass.html</b></li>
+    <li>산출물 <a href="looking-glass.html"><b>opus-5.5/looking-glass.html</b> ↗</a></li>
   </ul>
 </header>
 
