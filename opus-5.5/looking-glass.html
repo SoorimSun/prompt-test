@@ -1,0 +1,2488 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>거울나라의 앨리스</title>
+<meta name="description" content="루이스 캐럴 『거울나라의 앨리스』 — 거울을 지나, 체스판 나라를 건너, 여왕이 되기까지.">
+<meta name="theme-color" content="#0E1133">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M22 12l4 4 6-8 6 8 4-4-2 8H24z' fill='%23CBA35A'/%3E%3Cellipse cx='32' cy='38' rx='19' ry='24' fill='%23CBA35A'/%3E%3Cellipse cx='32' cy='38' rx='13.5' ry='18.5' fill='%23DCE2EC'/%3E%3Cpath d='M26 30q6-6 12 0' stroke='%23fff' stroke-width='2' fill='none' opacity='.8'/%3E%3C/svg%3E">
+<script>document.documentElement.classList.add('js');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Diphylleia&family=Gowun+Batang:wght@400;700&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<style>
+/* ───────────── 토큰 ───────────── */
+:root{
+  --night:#0E1133; --night-deep:#0B0D2A; --quick:#DCE2EC;
+  --gilt:#CBA35A; --gilt-hi:#F3DFA2; --gilt-lo:#6E4E1C; --gilt-ink:#8A6526;
+  --red:#B3243F; --pearl:#F5F3F9; --ink:#1D1733; --ink-soft:#4F4868;
+  --f-display:'Diphylleia','Nanum Myeongjo','AppleMyungjo',serif;
+  --f-body:'Gowun Batang','Nanum Myeongjo','AppleMyungjo','Batang',serif;
+  --f-en:'IM Fell English','Iowan Old Style',Georgia,serif;
+  --f-sc:'IM Fell English SC','Iowan Old Style',Georgia,serif;
+  --fh:min(76vh,125vw);
+  --fw:calc(var(--fh) * .73529);
+  --ftop:max(2.6vh,12px);
+  --vh100:100vh;
+}
+@supports (height:1svh){ :root{ --fh:min(76svh,125vw); --vh100:100svh; } }
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--night-deep)}
+body{margin:0;background:var(--night-deep);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;word-break:keep-all;overflow-wrap:break-word}
+button{font:inherit;color:inherit}
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+:focus-visible{outline:2px solid var(--gilt);outline-offset:3px;border-radius:2px}
+::selection{background:rgba(179,36,63,.28)}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+
+/* ───────────── 고정 레이어 ───────────── */
+#room{position:fixed;inset:-6vh -6vw;z-index:0;transform-origin:0 0;pointer-events:none;
+  background:
+    radial-gradient(110% 60% at 50% 104%, rgba(240,146,72,.26), rgba(236,120,60,.07) 48%, transparent 72%),
+    radial-gradient(80% 70% at 50% 42%, transparent 35%, rgba(3,4,18,.72) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='144' viewBox='0 0 96 144'%3E%3Cg fill='none' stroke='%23CBA35A' stroke-opacity='.08' stroke-width='1'%3E%3Cpath d='M.5 0v144M6.5 0v144'/%3E%3Cpath d='M51 40c-9 11-9 22 0 31c9-9 9-20 0-31z'/%3E%3Cpath d='M51 71c-11-3-19 2-22 11c11 3 19-2 22-11zM51 71c11-3 19 2 22 11c-11 3-19-2-22-11z'/%3E%3Cpath d='M51 71v22'/%3E%3C/g%3E%3Ccircle cx='51' cy='120' r='1.4' fill='%23CBA35A' fill-opacity='.15'/%3E%3Ccircle cx='51' cy='16' r='1.4' fill='%23CBA35A' fill-opacity='.15'/%3E%3C/svg%3E"),
+    linear-gradient(180deg,#0A0C28 0%,#13154A 62%,#1C1A44 100%);}
+#room .fireglow{position:absolute;left:50%;bottom:-8vh;width:130vw;height:60vh;transform:translateX(-50%);
+  background:radial-gradient(closest-side, rgba(255,168,88,.30), rgba(255,128,60,.10) 55%, transparent);animation:fire 5.3s infinite ease-in-out}
+@keyframes fire{0%,100%{opacity:.85}17%{opacity:1}33%{opacity:.78}52%{opacity:.95}71%{opacity:.82}86%{opacity:1}}
+
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:block;pointer-events:none;opacity:0;transition:opacity 1.2s ease}
+.loaded #gl{opacity:1}
+#stage{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity 1.4s ease}
+.loaded #stage{opacity:1}
+#fx{position:fixed;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
+#snow{position:fixed;inset:0;width:100%;height:100%;z-index:6;pointer-events:none}
+#flash{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:0;visibility:hidden;display:grid;place-items:center;
+  background:radial-gradient(ellipse 80% 70% at 50% 50%, #FDFDFF 0%, #EEF0F7 48%, #D3D8E7 100%)}
+#flash p{margin:0;max-width:min(760px,86vw);text-align:center;color:#29244A;font-family:var(--f-display);font-size:clamp(22px,3.1vw,40px);line-height:1.55}
+#flash .en{display:block;margin-top:.9em;font-family:var(--f-en);font-style:italic;font-size:.5em;line-height:1.5;color:#6B6585}
+
+/* ───────────── 히어로: 거울 ───────────── */
+#scene{position:absolute;inset:0;transform-origin:0 0}
+.mirror-wrap{position:absolute;left:calc(50% - var(--fw) / 2);top:var(--ftop);width:var(--fw);height:var(--fh);pointer-events:auto;-webkit-tap-highlight-color:transparent}
+@media (hover:hover) and (pointer:fine){ .mirror-wrap{cursor:pointer} }
+.mirror-shadow{position:absolute;left:-7%;right:-7%;top:4%;bottom:-3%;border-radius:50%;background:radial-gradient(closest-side, rgba(0,0,0,.62), rgba(0,0,0,.28) 72%, transparent)}
+#frame,#frameSheen{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.glass-fallback{display:none}
+.nogl .glass-fallback{display:inline}
+.glass-text{position:absolute;left:18%;width:64%;top:20%;height:66%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#EEF1FA;perspective:700px;pointer-events:none}
+.gt-en1{font-family:var(--f-en);font-style:italic;font-size:calc(var(--fw) * .037);letter-spacing:.02em;color:#DCE0EE;opacity:0;transform:translateY(8px);transition:opacity 1.6s ease 1.5s,transform 1.6s ease 1.5s}
+.gt-title{margin:.16em 0 .2em;font-family:var(--f-display);font-weight:400;font-size:calc(var(--fw) * .118);line-height:1.14;letter-spacing:.01em;color:#F4F5FB;
+  text-shadow:0 0 calc(var(--fw) * .035) rgba(186,202,255,.45),0 2px 14px rgba(8,10,40,.55)}
+.gt-title .ln{display:block;white-space:nowrap}
+.ch{display:inline-block;transform:rotateY(180deg);opacity:0;filter:blur(7px);
+  transition:transform 2s cubic-bezier(.16,.84,.24,1) calc(var(--i) * 110ms + 350ms),opacity 1.3s ease calc(var(--i) * 110ms + 350ms),filter 1.7s ease calc(var(--i) * 110ms + 350ms)}
+.ready .ch{transform:none;opacity:1;filter:none}
+.ready .gt-en1,.ready .gt-en2,.ready .gt-by{opacity:1;transform:none}
+.gt-rule{display:block;width:calc(var(--fw) * .16);height:1px;margin:.1em auto .5em;background:linear-gradient(90deg,transparent,rgba(243,223,162,.7),transparent)}
+.gt-en2{font-family:var(--f-en);font-style:italic;font-size:calc(var(--fw) * .033);color:#DCE0EE;opacity:0;transform:translateY(8px);transition:opacity 1.6s ease 1.8s,transform 1.6s ease 1.8s}
+.gt-by{margin-top:1.3em;font-family:var(--f-sc);font-size:calc(var(--fw) * .025);letter-spacing:.2em;color:var(--gilt-hi);opacity:0;transition:opacity 1.6s ease 2.2s}
+.ready .gt-by{opacity:.82}
+
+.mantel{position:absolute;left:50%;top:calc(var(--ftop) + var(--fh) * .972);width:min(112vw,calc(var(--fw) * 2.7));height:46px;transform:translateX(-50%)}
+.mantel::before{content:"";position:absolute;left:0;right:0;top:0;height:13px;border-radius:2px;
+  background:linear-gradient(180deg,#46395E 0%,#2C2442 60%,#1E1830 100%);box-shadow:0 1px 0 rgba(243,223,162,.18) inset,0 14px 24px -6px rgba(0,0,0,.6)}
+.mantel::after{content:"";position:absolute;left:1.5%;right:1.5%;top:13px;height:33px;
+  background:linear-gradient(180deg,rgba(203,163,90,.55) 0 1px,transparent 1px),linear-gradient(180deg,#221B36,#161228);
+  box-shadow:0 1px 0 rgba(0,0,0,.4) inset}
+.candle{position:absolute;width:calc(var(--fw) * .12);aspect-ratio:60/220;top:calc(var(--ftop) + var(--fh) * .972 - var(--fw) * .12 * 3.6667 + 2px)}
+.candle.l{left:calc(50% - var(--fw) * .5 - var(--fw) * .27)}
+.candle.r{left:calc(50% + var(--fw) * .5 + var(--fw) * .15)}
+.candle svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.candle .halo{position:absolute;left:50%;top:6%;width:520%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(closest-side,rgba(255,196,120,.34),rgba(255,160,80,.10) 45%,transparent);animation:halo 3.1s infinite ease-in-out}
+.candle.r .halo{animation-delay:-1.3s}
+@keyframes halo{0%,100%{opacity:.9;transform:translate(-50%,-50%) scale(1)}40%{opacity:1;transform:translate(-50%,-50%) scale(1.04)}70%{opacity:.8;transform:translate(-50%,-50%) scale(.97)}}
+.flame{position:absolute;left:50%;top:8.4%;width:26%;height:15%;transform:translate(-50%,-100%)}
+.flame b{position:absolute;inset:0;border-radius:50% 50% 50% 50% / 64% 64% 36% 36%;transform-origin:50% 100%;
+  background:radial-gradient(ellipse 50% 60% at 50% 72%,#FFFFFF 0 14%,#FFF0B8 26%,#FFBF5A 52%,rgba(255,120,40,0) 74%);animation:flick 2.3s infinite ease-in-out}
+.candle.r .flame b{animation-delay:-.9s}
+@keyframes flick{0%,100%{transform:scale(1,1) skewX(0)}20%{transform:scale(.94,1.08) skewX(2deg)}45%{transform:scale(1.04,.95) skewX(-3deg)}70%{transform:scale(.97,1.05) skewX(1deg)}}
+@media (max-aspect-ratio:5/4){ .candle{display:none} }
+
+.hero-foot{position:absolute;left:0;right:0;top:calc(var(--ftop) + var(--fh) * .972 + 50px);padding:0 20px;text-align:center;color:var(--quick)}
+.hf-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 18px;margin-top:14px}
+.hf-in{opacity:0;transition:opacity 1.6s ease 2.6s}
+.ready .hf-in{opacity:1}
+.hf-q{margin:0 auto;max-width:640px;font-size:clamp(14px,1.25vw,17px);line-height:1.7;color:#E2E4F0}
+.hf-en{margin:.3em auto 0;max-width:640px;font-family:var(--f-en);font-style:italic;font-size:clamp(13px,1.1vw,15px);color:#9EA3C4}
+.hf-go{display:inline-flex;align-items:center;gap:.7em;padding:8px 18px;border:1px solid rgba(203,163,90,.55);border-radius:999px;background:rgba(14,17,51,.35);
+  color:var(--gilt-hi);font-family:var(--f-body);font-size:14px;letter-spacing:.06em;cursor:pointer;pointer-events:auto;transition:background .3s,border-color .3s}
+.hf-go:hover{background:rgba(203,163,90,.14);border-color:var(--gilt)}
+.hf-go i{display:block;width:1px;height:16px;background:linear-gradient(var(--gilt-hi),transparent);animation:drop 1.8s infinite ease-in-out}
+@keyframes drop{0%{transform:translateY(-4px);opacity:0}40%{opacity:1}100%{transform:translateY(6px);opacity:0}}
+.hf-hint{font-size:12.5px;letter-spacing:.08em;color:#8C91B5}
+@media (max-height:680px){ .hf-en{display:none} .hf-row{margin-top:8px} }
+@media (max-height:500px){
+  :root{--fh:min(68vh,125vw)}
+  .hero-foot{top:calc(var(--ftop) + var(--fh) * .972 + 30px)}
+  .hf-q{font-size:13px;line-height:1.5}
+  .hf-hint{display:none}
+  .hf-row{margin-top:6px}
+  .hf-go{padding:5px 14px;font-size:13px}
+}
+
+/* ───────────── 본문 ───────────── */
+main{position:relative;z-index:5;pointer-events:none;overflow-x:clip}
+main>*{pointer-events:auto}
+#hero{height:320vh;pointer-events:none}
+.chapter{position:relative;padding:20vh 0 24vh}
+.chapter.tight{padding-top:8vh}
+
+.pane{position:relative;width:min(580px,calc(100vw - 32px));margin-left:max(16px,7vw);padding:clamp(28px,4vw,48px) clamp(24px,3.6vw,46px);color:var(--ink);
+  background:linear-gradient(158deg,rgba(251,250,254,.90),rgba(233,236,245,.84));
+  -webkit-backdrop-filter:blur(12px) saturate(1.15);backdrop-filter:blur(12px) saturate(1.15);
+  border-radius:3px;box-shadow:0 44px 90px -42px rgba(22,18,70,.55),0 0 0 1px rgba(255,255,255,.6) inset,0 1px 0 rgba(255,255,255,.95) inset}
+.pane::before{content:"";position:absolute;inset:9px;border:1px solid rgba(176,138,69,.42);pointer-events:none}
+.pane::after{content:"";position:absolute;inset:4px;pointer-events:none;background:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cg fill='none' stroke='%23B08A45' stroke-width='1.2'%3E%3Cpath d='M1 27V9Q1 1 9 1h18'/%3E%3Cpath d='M5 27V11q0-6 6-6h16'/%3E%3Cpath d='M9 9c3 0 5 2 5 5s-3 4-4 2'/%3E%3C/g%3E%3Ccircle cx='9' cy='9' r='1.6' fill='%23B08A45'/%3E%3C/svg%3E") top left no-repeat,
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cg transform='translate(28 0) scale(-1 1)'%3E%3Cg fill='none' stroke='%23B08A45' stroke-width='1.2'%3E%3Cpath d='M1 27V9Q1 1 9 1h18'/%3E%3Cpath d='M5 27V11q0-6 6-6h16'/%3E%3Cpath d='M9 9c3 0 5 2 5 5s-3 4-4 2'/%3E%3C/g%3E%3Ccircle cx='9' cy='9' r='1.6' fill='%23B08A45'/%3E%3C/g%3E%3C/svg%3E") top right no-repeat,
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cg transform='translate(0 28) scale(1 -1)'%3E%3Cg fill='none' stroke='%23B08A45' stroke-width='1.2'%3E%3Cpath d='M1 27V9Q1 1 9 1h18'/%3E%3Cpath d='M5 27V11q0-6 6-6h16'/%3E%3Cpath d='M9 9c3 0 5 2 5 5s-3 4-4 2'/%3E%3C/g%3E%3Ccircle cx='9' cy='9' r='1.6' fill='%23B08A45'/%3E%3C/g%3E%3C/svg%3E") bottom left no-repeat,
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cg transform='translate(28 28) scale(-1 -1)'%3E%3Cg fill='none' stroke='%23B08A45' stroke-width='1.2'%3E%3Cpath d='M1 27V9Q1 1 9 1h18'/%3E%3Cpath d='M5 27V11q0-6 6-6h16'/%3E%3Cpath d='M9 9c3 0 5 2 5 5s-3 4-4 2'/%3E%3C/g%3E%3Ccircle cx='9' cy='9' r='1.6' fill='%23B08A45'/%3E%3C/g%3E%3C/svg%3E") bottom right no-repeat}
+.pane.right{margin-left:auto;margin-right:max(16px,7vw)}
+.pane.wide{width:min(960px,calc(100vw - 32px));margin-left:auto;margin-right:auto}
+.pane.small{width:min(460px,calc(100vw - 32px))}
+.pane + .pane{margin-top:22vh}
+.pane.warm{background:linear-gradient(160deg,rgba(255,244,236,.90),rgba(250,226,214,.84))}
+.pane.dusk{color:var(--pearl);background:linear-gradient(160deg,rgba(33,28,76,.80),rgba(18,16,50,.76));box-shadow:0 44px 90px -42px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.12) inset}
+
+.eyebrow{display:flex;flex-wrap:wrap;align-items:center;gap:.3em 1.1em;margin:0 0 16px;font-family:var(--f-sc);font-size:14.5px;line-height:1.4;letter-spacing:.05em;color:var(--gilt-ink)}
+.eyebrow .mv{display:inline-flex;align-items:baseline;gap:.45em}
+.eyebrow .mv b{font-weight:400;font-family:var(--f-en);font-size:1.05em}
+.eyebrow svg{width:11px;height:14px;align-self:center;fill:currentColor}
+.chap{margin:0 0 4px;font-size:13.5px;line-height:1.6;letter-spacing:.03em;color:var(--ink-soft)}
+.chap .en{font-family:var(--f-en);font-style:italic;font-size:14.5px;margin-left:.35em;letter-spacing:0}
+.pane h2{margin:0 0 .5em;font-family:var(--f-display);font-weight:400;font-size:clamp(38px,4.8vw,62px);line-height:1.12;letter-spacing:-.005em;color:var(--ink)}
+.pane h3{margin:1.6em 0 .6em;font-family:var(--f-display);font-weight:400;font-size:clamp(24px,2.6vw,32px);line-height:1.25}
+.pane p{margin:0 0 1em}
+.pane p:last-child{margin-bottom:0}
+.en-i{font-family:var(--f-en);font-style:italic}
+
+.q{position:relative;margin:1.7em 0;padding-left:1.35em}
+.q::before{content:"\201C";position:absolute;left:-.12em;top:-.34em;font-family:var(--f-en);font-size:3.1em;line-height:1;color:var(--gilt);opacity:.75}
+.q .ko{display:block;font-size:1.13em;line-height:1.75;color:var(--ink)}
+.q .en{display:block;margin-top:.55em;font-family:var(--f-en);font-style:italic;font-size:1.02em;line-height:1.5;color:var(--ink-soft)}
+.q cite{display:block;margin-top:.55em;font-style:normal;font-size:13px;letter-spacing:.06em;color:var(--gilt-ink)}
+.q.big .ko{font-family:var(--f-display);font-size:clamp(24px,2.6vw,32px);line-height:1.5}
+.dusk .q .ko,.dusk h2{color:#F6F2FF}
+.dusk .q .en,.dusk .chap{color:#C9C3E0}
+.dusk .eyebrow{color:var(--gilt-hi)}
+
+.hint{display:flex;align-items:center;gap:.6em;margin:.4em 0 0;font-size:13px;letter-spacing:.04em;color:var(--ink-soft)}
+.hint::before{content:"";width:18px;height:1px;background:var(--gilt)}
+.btn{display:inline-flex;align-items:center;gap:.5em;padding:7px 16px;border:1px solid rgba(176,138,69,.7);border-radius:999px;background:rgba(255,255,255,.4);cursor:pointer;font-size:14px;letter-spacing:.03em;color:var(--ink);transition:background .25s,border-color .25s}
+.btn:hover{background:rgba(203,163,90,.16);border-color:var(--gilt)}
+.dusk .btn{color:var(--pearl);background:rgba(255,255,255,.06)}
+
+.js .reveal{opacity:0;transform:translateY(28px);transition:opacity 1.1s ease,transform 1.3s cubic-bezier(.2,.7,.2,1)}
+.js .reveal.in{opacity:1;transform:none}
+
+/* ───────────── 거울 책 ───────────── */
+.mbook{margin:2em 0 1.4em}
+.mb-page{position:relative;padding:34px clamp(18px,4vw,48px) 30px;border-radius:2px;
+  background:linear-gradient(180deg,#FBF9F4,#F1EDE3);box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 0 0 1px rgba(90,70,40,.18),0 24px 40px -26px rgba(40,30,20,.5)}
+.mb-page::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:linear-gradient(transparent,rgba(90,70,40,.18) 12%,rgba(90,70,40,.18) 88%,transparent)}
+.mb-stack{position:relative;--gx:0px;--gw:240px;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:ew-resize}
+.mb-rev-wrap{-webkit-mask-image:linear-gradient(90deg,#000 var(--gx),transparent var(--gx),transparent calc(var(--gx) + var(--gw)),#000 calc(var(--gx) + var(--gw)));
+  mask-image:linear-gradient(90deg,#000 var(--gx),transparent var(--gx),transparent calc(var(--gx) + var(--gw)),#000 calc(var(--gx) + var(--gw)));transition:opacity .6s}
+.mb-rev{transform:scaleX(-1)}
+.mb-true{position:absolute;inset:0;clip-path:inset(-20px calc(100% - var(--gx) - var(--gw)) -20px var(--gx));color:#20193A}
+.poem{font-family:var(--f-en);font-size:clamp(16px,1.55vw,19px);line-height:1.62;color:#3B3348}
+.poem h4{margin:0 0 .9em;text-align:center;font-family:var(--f-sc);font-weight:400;font-size:1.15em;letter-spacing:.24em}
+.poem .cols{columns:2;column-gap:clamp(28px,6vw,76px)}
+.poem .sz{break-inside:avoid;margin:0 0 1em}
+.poem .sz span{display:block}
+.poem .sz span:nth-child(even){padding-left:1.6em}
+.mb-true .poem{color:#1E1734}
+.mb-glass{position:absolute;top:-22px;bottom:-22px;left:var(--gx);width:var(--gw);border-radius:30px;cursor:grab;touch-action:pan-y;
+  background:linear-gradient(104deg,rgba(255,255,255,.05) 0%,rgba(214,222,242,.30) 34%,rgba(255,255,255,.04) 52%,rgba(205,214,238,.24) 78%,rgba(255,255,255,.08) 100%);
+  box-shadow:0 0 0 2px #CBA35A inset,0 0 0 5px rgba(110,78,28,.55) inset,0 0 0 6px #F3DFA2 inset,0 18px 36px -18px rgba(30,20,60,.55),0 0 40px rgba(190,205,240,.35)}
+.mb-glass:active{cursor:grabbing}
+.mb-glass::before{content:"";position:absolute;inset:6px;border-radius:24px;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.45) 42%,transparent 50%);background-size:260% 100%;animation:sweep 5.5s infinite ease-in-out}
+.mb-glass::after{content:"";position:absolute;left:50%;bottom:-16px;width:26px;height:18px;transform:translateX(-50%);border-radius:0 0 10px 10px;background:linear-gradient(90deg,#6E4E1C,#F3DFA2 45%,#A07A34)}
+@keyframes sweep{0%{background-position:120% 0}60%,100%{background-position:-60% 0}}
+.mbook.all .mb-rev-wrap{opacity:0}
+.mbook.all .mb-true{clip-path:none}
+.mbook.all .mb-glass{opacity:0;pointer-events:none}
+.mb-ctrl{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:26px}
+
+/* ───────────── 붉은 여왕의 달리기 ───────────── */
+.race{position:relative;height:280vh;margin-top:10vh}
+.sticky{position:sticky;top:0;height:100vh;height:var(--vh100);overflow:hidden}
+.race-line{position:absolute;left:50%;top:15vh;width:min(980px,92vw);transform:translateX(-50%);text-align:center;opacity:0;color:var(--ink);will-change:opacity,transform}
+.race-line::before{content:"";position:absolute;inset:-26% -10%;z-index:-1;background:radial-gradient(closest-side,rgba(248,247,253,.82),rgba(248,247,253,.5) 55%,rgba(248,247,253,0))}
+.race-line .big{display:block;font-family:var(--f-display);font-size:clamp(40px,7.4vw,104px);line-height:1.1;letter-spacing:-.01em}
+.race-line .mid{display:block;font-family:var(--f-display);font-size:clamp(26px,3.5vw,46px);line-height:1.45}
+.race-line .en{display:block;margin-top:.7em;font-family:var(--f-en);font-style:italic;font-size:clamp(15px,1.5vw,20px);color:var(--ink-soft)}
+
+/* ───────────── 곤충 도감 ───────────── */
+.plate{margin:2.2em 0 1.2em;padding:26px clamp(14px,2.4vw,28px) 22px;background:linear-gradient(180deg,#FCFBF7,#F3EFE5);box-shadow:0 0 0 1px rgba(90,70,40,.18),0 24px 40px -28px rgba(40,30,20,.45)}
+.plate-t{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 18px;padding-bottom:10px;border-bottom:1px solid rgba(90,70,40,.25)}
+.plate-t b{font-family:var(--f-display);font-weight:400;font-size:24px}
+.plate-t span{font-family:var(--f-sc);font-size:13px;letter-spacing:.14em;color:#7A6848}
+.specs{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.spec{position:relative;margin:0;padding:18px 14px 16px;background:#FFFEFB;box-shadow:0 0 0 1px rgba(90,70,40,.14),0 10px 20px -16px rgba(40,30,20,.5)}
+.spec::before{content:"";position:absolute;top:10px;left:50%;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFD6DD,#B3243F 60%,#5C1020);box-shadow:0 1px 2px rgba(0,0,0,.35)}
+.spec svg{display:block;width:100%;height:auto;overflow:visible}
+.spec h4{margin:10px 0 0;font-family:var(--f-display);font-weight:400;font-size:21px;line-height:1.3}
+.spec .sn{display:block;font-family:var(--f-en);font-style:italic;font-size:14.5px;color:#6D6280}
+.spec dl{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:baseline;margin:10px 0 0;font-size:13.5px;line-height:1.6}
+.spec dt{margin:0;color:#8A6526;font-size:12px;letter-spacing:.06em;white-space:nowrap}
+.spec dd{margin:0}
+.plate-note{margin:16px 0 0;font-size:14px;color:var(--ink-soft)}
+.bug{transform-box:view-box}
+.rh-body{transform-origin:100px 142px;transition:transform .3s}
+.spec:hover .rh-body,.spec:focus-within .rh-body{animation:rock 1.6s ease-in-out infinite}
+@keyframes rock{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.wing-a,.wing-b{transform-box:view-box;transform-origin:100px 72px}
+.spec:hover .wing-a,.spec:focus-within .wing-a{animation:buzz .12s linear infinite}
+@keyframes buzz{0%,100%{transform:rotate(0)}50%{transform:rotate(-7deg)}}
+.bb-l{transform-box:view-box;transform-origin:100px 70px;animation:flapL 3.4s ease-in-out infinite}
+.bb-r{transform-box:view-box;transform-origin:100px 70px;animation:flapR 3.4s ease-in-out infinite}
+.spec:hover .bb-l,.spec:focus-within .bb-l,.spec:hover .bb-r,.spec:focus-within .bb-r{animation-duration:.5s}
+@keyframes flapL{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.55)}}
+@keyframes flapR{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.55)}}
+.sd-flame{transform-box:fill-box;transform-origin:50% 100%;animation:flick 1.4s infinite ease-in-out}
+.sd-wings{transform-box:view-box;transform-origin:92px 75px}
+.spec:hover .sd-wings,.spec:focus-within .sd-wings{animation:hum .16s linear infinite}
+@keyframes hum{0%,100%{transform:scale(1)}50%{transform:scale(.96,1.04)}}
+
+/* ───────────── 이름 없는 숲 ───────────── */
+.nm{position:relative;display:inline-block;transition:color 1.1s ease,text-shadow 1.1s ease}
+.nm::after{content:"";position:absolute;left:.05em;right:.05em;bottom:.28em;border-bottom:1px dashed rgba(79,72,104,.55);opacity:0;transition:opacity 1.1s ease}
+.nm .l{position:absolute;left:0;top:0;color:var(--gilt-ink);text-shadow:none;opacity:0;transition:opacity 1.1s ease;white-space:nowrap}
+.nameless .nm{color:transparent;text-shadow:0 0 8px rgba(79,72,104,.32)}
+.nameless .nm::after{opacity:1}
+.nameless .nm .l{opacity:1}
+.nm:nth-of-type(2){transition-delay:.25s}.nm:nth-of-type(3){transition-delay:.5s}.nm:nth-of-type(4){transition-delay:.75s}
+.fawn{opacity:0;transform:translateY(10px);transition:opacity 1.2s ease,transform 1.2s ease}
+.found .fawn{opacity:1;transform:none}
+
+/* ───────────── 붉은 왕의 촛불 ───────────── */
+.dialog{margin:1.2em 0;padding:0;list-style:none}
+.dialog li{display:grid;grid-template-columns:5.2em 1fr;gap:.6em;margin:0 0 .55em;font-size:15.5px;line-height:1.7}
+.dialog li b{font-weight:400;font-size:13px;letter-spacing:.04em;color:var(--gilt-ink);padding-top:.15em}
+.dialog li.a b{color:#6B6585}
+.redking{display:flex;align-items:center;gap:18px;margin:1.6em 0 .6em;padding:16px 18px;border:1px solid rgba(176,138,69,.4);border-radius:3px;background:rgba(255,255,255,.35)}
+.rk-candle{position:relative;flex:0 0 auto;width:34px;height:92px}
+.rk-candle .wax{position:absolute;left:9px;bottom:10px;width:16px;height:56px;border-radius:2px;background:linear-gradient(90deg,#D9D1C3,#FBF7EE 45%,#CFC6B6)}
+.rk-candle .dish{position:absolute;left:0;right:0;bottom:4px;height:8px;border-radius:50%;background:linear-gradient(90deg,#6B4A17,#E8C774,#7A5520)}
+.rk-candle .wick{position:absolute;left:16.5px;bottom:66px;width:1.5px;height:6px;background:#2A1F14}
+.rk-candle .fl{position:absolute;left:10px;bottom:70px;width:14px;height:22px;border-radius:50% 50% 50% 50%/64% 64% 36% 36%;transform-origin:50% 100%;
+  background:radial-gradient(ellipse 50% 60% at 50% 72%,#fff 0 14%,#FFF0B8 26%,#FFBF5A 52%,rgba(255,120,40,0) 74%);animation:flick 2s infinite ease-in-out;transition:opacity .15s,transform .15s}
+.rk-candle .glow{position:absolute;left:50%;bottom:74px;width:120px;height:120px;transform:translate(-50%,50%);border-radius:50%;background:radial-gradient(closest-side,rgba(255,190,110,.35),transparent);transition:opacity .2s}
+.rk-candle .smoke{position:absolute;left:14px;bottom:70px;width:6px;height:6px;border-radius:50%;background:rgba(120,115,140,.5);opacity:0}
+.out .rk-candle .fl{opacity:0;transform:scale(.2,.4)}
+.out .rk-candle .glow{opacity:0}
+.out .rk-candle .smoke{animation:smoke 2.2s ease-out forwards}
+.out .rk-candle .smoke:nth-child(6){animation-delay:.18s}
+.out .rk-candle .smoke:nth-child(7){animation-delay:.36s}
+@keyframes smoke{0%{opacity:.7;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(10px,-60px) scale(5)}}
+.rk-text{flex:1;font-size:14.5px;line-height:1.7}
+.rk-bang{display:block;font-family:var(--f-display);font-size:26px;line-height:1.2;color:var(--red);opacity:0;transform:scale(.8);transition:opacity .3s,transform .3s}
+.out .rk-bang{opacity:1;transform:none}
+.verse{margin:1.8em 0 0;display:grid;grid-template-columns:1fr 1fr;gap:18px;padding-top:1.4em;border-top:1px solid rgba(176,138,69,.35)}
+.verse p{margin:0;font-size:15px;line-height:1.75}
+.verse .en-i{font-size:15.5px;color:var(--ink-soft)}
+.verse-t{grid-column:1/-1;margin:0;font-size:12.5px;letter-spacing:.08em;color:var(--gilt-ink)}
+
+/* ───────────── 여섯 가지 / 가게 ───────────── */
+.six{margin:1.4em 0;padding:18px 22px;background:rgba(255,255,255,.45);border:1px solid rgba(176,138,69,.35)}
+.six-t{margin:0 0 .5em;font-size:12.5px;letter-spacing:.08em;color:var(--gilt-ink)}
+.six ol{margin:0;padding-left:1.6em;font-size:15.5px;line-height:1.8}
+.six li::marker{font-family:var(--f-en);color:var(--gilt-ink)}
+.shop{margin:1.8em 0 .8em}
+.cabinet{position:relative;display:grid;grid-template-columns:repeat(4,1fr);padding:14px 14px 10px;border-radius:8px 8px 3px 3px;
+  background:radial-gradient(120% 90% at 50% 20%,#3A2A36 0%,#22171F 70%);box-shadow:0 0 0 2px #7A5A2A inset,0 0 0 5px #2A1B10 inset,0 0 0 6px rgba(243,223,162,.35) inset,0 26px 40px -24px rgba(0,0,0,.6)}
+.shelf{position:relative;height:clamp(64px,8vw,86px);display:flex;align-items:flex-end;justify-content:center;gap:2px;padding:0 4px 3px;border-bottom:7px solid #5E4121;
+  box-shadow:inset 0 -12px 18px -12px rgba(0,0,0,.7),0 2px 0 rgba(243,223,162,.12);background:radial-gradient(80% 80% at 50% 100%,rgba(255,196,120,.10),transparent);outline:none}
+.shelf:focus-visible{box-shadow:inset 0 0 0 2px var(--gilt)}
+.shelf{overflow:hidden}
+.shelf svg{width:clamp(22px,2.9vw,32px);height:clamp(22px,2.9vw,32px);flex:0 1 auto;min-width:0;color:#EAD9A8;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:opacity .55s ease,transform .7s cubic-bezier(.2,.7,.2,1),width .5s ease}
+.shelf .x{width:0;opacity:0;transform:translateY(-12px)}
+.cabinet.looking .shelf:not(.watched) .x{width:clamp(22px,2.9vw,32px);opacity:1;transform:none}
+.shelf.watched svg{opacity:0;transform:translateY(-26px) scale(.8)}
+.bright{position:absolute;left:0;top:0;width:clamp(26px,3.3vw,36px);height:clamp(26px,3.3vw,36px);pointer-events:none;transition:transform .8s cubic-bezier(.2,.8,.2,1),opacity .6s ease;filter:drop-shadow(0 0 8px rgba(255,210,120,.9))}
+.bright svg{position:absolute;inset:0;width:100%;height:100%;fill:rgba(255,226,150,.35);stroke:#FFE7A8;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+.bright .b2{animation:morph 3.2s infinite ease-in-out}
+.bright .b1{animation:morph 3.2s infinite ease-in-out reverse}
+@keyframes morph{0%,35%{opacity:1}50%,85%{opacity:0}100%{opacity:1}}
+.bright.gone{opacity:0}
+.shop .hint{margin-top:12px}
+
+/* ───────────── 험프티 ───────────── */
+.gloss{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(20px,3vw,40px);margin-top:1.8em;align-items:start}
+.stanza{margin:0;font-family:var(--f-en);font-size:clamp(21px,2.2vw,29px);line-height:1.6;color:#2B2440}
+.stanza span{display:block}
+.stanza span:nth-child(even){padding-left:1.4em}
+.stanza .w{font:inherit;color:inherit;background:none;border:0;padding:0 .04em;margin:0;cursor:pointer;border-bottom:1px dashed rgba(179,36,63,.55);line-height:1.2;transition:color .25s,background .25s}
+.stanza .w:hover{color:var(--red)}
+.stanza .w[aria-pressed="true"]{color:var(--red);border-bottom:1.5px solid var(--red);background:rgba(179,36,63,.07)}
+.gl-card{position:relative;padding:22px 22px 20px;background:#FFFEFB;box-shadow:0 0 0 1px rgba(90,70,40,.16),0 16px 30px -22px rgba(40,30,20,.55);min-height:230px}
+.gl-card .gw{display:block;font-family:var(--f-en);font-style:italic;font-size:34px;line-height:1.1;color:var(--red)}
+.gl-card .gk{display:block;margin-top:14px;font-size:16px;line-height:1.75}
+.gl-card .ge{display:block;margin-top:12px;font-family:var(--f-en);font-style:italic;font-size:15.5px;line-height:1.5;color:var(--ink-soft)}
+.gl-card .gs{display:block;margin-top:12px;font-size:12px;letter-spacing:.08em;color:var(--gilt-ink)}
+.gl-card.swap .gw,.gl-card.swap .gk,.gl-card.swap .ge{animation:swapin .5s ease}
+@keyframes swapin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.unbirthday{display:flex;align-items:center;gap:22px;margin:1.6em 0;padding:16px 18px;border:1px solid rgba(176,138,69,.4);border-radius:3px;background:rgba(255,255,255,.35)}
+.sumbox{flex:0 0 auto;padding:10px 16px;border:0;border-radius:2px;background:#FFFEFB;box-shadow:0 0 0 1px rgba(90,70,40,.18);cursor:pointer}
+.sum{display:grid;justify-items:end;font-family:var(--f-en);font-size:26px;line-height:1.15;transform:rotate(180deg);transition:transform 1.1s cubic-bezier(.3,1.4,.4,1)}
+.sum i{font-style:normal}
+.sum .rule{width:100%;height:1.5px;background:currentColor;margin:3px 0}
+.sumbox:hover .sum,.sumbox:focus-visible .sum,.sumbox.fixed .sum{transform:none}
+.unbirthday p{margin:0;font-size:14.5px;line-height:1.7}
+
+/* ───────────── 하얀 기사 ───────────── */
+.names{display:grid;grid-template-columns:auto 1fr 1fr;margin:1.6em 0 1em;border-top:1px solid rgba(176,138,69,.5)}
+.names>div{padding:12px 12px;border-bottom:1px solid rgba(176,138,69,.3);font-size:15px;line-height:1.5}
+.names .hd{font-size:12px;letter-spacing:.06em;color:var(--gilt-ink);padding-top:10px;padding-bottom:10px}
+.names .rh{font-size:12.5px;letter-spacing:.04em;color:var(--ink-soft);white-space:nowrap}
+.names .en-i{display:block;font-size:14.5px;color:var(--ink-soft)}
+.names .real{background:rgba(203,163,90,.10)}
+.farewell p.lead{font-family:var(--f-display);font-size:clamp(24px,2.6vw,32px);line-height:1.5;margin-bottom:.9em}
+.farewell p{font-size:17.5px;line-height:1.95}
+.farewell .en-i{display:block;margin:.2em 0 1.2em;font-size:16px;line-height:1.55;color:#6B5A5E}
+
+/* ───────────── 대관식 ───────────── */
+.cor{position:relative;height:420vh}
+.cor .sticky{color:var(--pearl)}
+.cor-top{position:absolute;z-index:3;left:0;right:0;top:9vh;text-align:center;padding:0 16px}
+.cor-eb{display:inline-flex;gap:.5em;align-items:baseline;font-family:var(--f-sc);font-size:15px;letter-spacing:.06em;color:var(--gilt-hi);transition:opacity .4s}
+.cor-eb b{font-weight:400;font-family:var(--f-en)}
+.cor-chap{display:block;margin-top:4px;font-size:13px;letter-spacing:.06em;color:#C9C3E0}
+.cor-lines{position:absolute;z-index:3;left:0;right:0;top:18vh;height:30vh}
+.cor-line{position:absolute;left:50%;top:0;width:min(900px,92vw);transform:translateX(-50%);text-align:center;opacity:0}
+.cor-line::before{content:"";position:absolute;inset:-30% -6%;z-index:-1;background:radial-gradient(closest-side,rgba(16,13,48,.62),rgba(16,13,48,.3) 60%,rgba(16,13,48,0))}
+.cor-line .big{display:block;font-family:var(--f-display);font-size:clamp(30px,4.6vw,62px);line-height:1.3;color:#FBF8FF;text-shadow:0 0 30px rgba(255,220,160,.35),0 2px 18px rgba(10,8,40,.6)}
+.cor-line .big.long{font-size:clamp(24px,3.5vw,48px);line-height:1.45}
+.cor-line .en{display:block;margin-top:.6em;font-family:var(--f-en);font-style:italic;font-size:clamp(15px,1.5vw,20px);color:#D9D3F0;text-shadow:0 2px 10px rgba(10,8,40,.6)}
+.cor-piece{position:absolute;z-index:2;left:50%;bottom:10vh;height:52vh;aspect-ratio:120/145;transform:translateX(-50%)}
+.cor-piece svg{width:100%;height:100%;overflow:visible}
+.feast{position:absolute;z-index:1;left:0;right:0;bottom:0;height:100%;pointer-events:none;opacity:0}
+.feast .cloth{position:absolute;left:-2%;right:-2%;bottom:0;height:9vh;background:linear-gradient(180deg,#F7F4FA 0,#E6E2EE 60%,#CFC9DC 100%);box-shadow:0 -1px 0 var(--gilt) inset,0 -3px 0 rgba(203,163,90,.35),0 -20px 40px rgba(255,210,150,.12)}
+.fcs{position:absolute;left:0;right:0;bottom:9vh;height:0}
+.fc{position:absolute;bottom:0;width:clamp(10px,1.3vw,18px);transform:translateX(-50%)}
+.fc .wax{position:absolute;left:0;right:0;bottom:0;height:100%;border-radius:2px 2px 0 0;transform-origin:50% 100%;background:linear-gradient(90deg,#D6CEC0,#FFFBF2 45%,#CFC6B6)}
+.fc .fl{position:absolute;left:50%;bottom:100%;width:220%;height:130%;margin-left:-110%;transform-origin:50% 100%}
+.fc .fl::before{content:"";position:absolute;left:50%;top:45%;width:900%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(255,196,120,.32),rgba(255,160,90,.08) 55%,transparent)}
+.fc .fl b{position:absolute;inset:0;border-radius:50% 50% 50% 50%/64% 64% 36% 36%;background:radial-gradient(ellipse 50% 60% at 50% 72%,#fff 0 14%,#FFF0B8 26%,#FFBF5A 52%,rgba(255,120,40,0) 74%);animation:flick 1.9s infinite ease-in-out;transform-origin:50% 100%}
+.fc:nth-child(2n) .fl b{animation-delay:-.7s}.fc:nth-child(3n) .fl b{animation-delay:-1.3s}
+
+/* ───────────── 흔들기 · 깨어나기 · 꿈 ───────────── */
+.shaking{position:relative;height:240vh}
+.shaking .sticky{display:grid;place-items:center;color:#F1EEF8}
+.sh-in{width:min(900px,90vw);text-align:center}
+.lbl{display:block;margin-bottom:1.6em;font-family:var(--f-sc);font-size:14px;letter-spacing:.14em;color:var(--gilt-hi)}
+.lbl .ko{font-family:var(--f-body);letter-spacing:.06em;margin-right:.6em}
+.sh-s1{font-family:var(--f-display);font-size:clamp(26px,3.3vw,44px);line-height:1.5}
+.sh-s1 .c{display:inline-block;will-change:transform}
+.sh-s2{margin-top:1.4em;font-size:clamp(16px,1.6vw,20px);line-height:1.9;color:#D5D0EA;opacity:0}
+.sh-s2 .t1{display:inline-block;font-size:.72em}
+.sh-s2 .t2{display:inline-block;transform:scaleX(1.28);margin:0 .4em;font-weight:700}
+.sh-s2 .t3{display:inline-block;filter:blur(1.1px);color:#EAE6F7}
+.sh-s2 .t4{display:inline-block;transform:scaleY(.82);letter-spacing:-.04em;border-radius:40%;padding:0 .3em;background:rgba(255,255,255,.07)}
+.sh-en{display:block;margin-top:1.2em;font-family:var(--f-en);font-style:italic;font-size:clamp(14px,1.4vw,18px);color:#9D98BC}
+
+.night{position:relative;color:#EDEAF7;background:
+  radial-gradient(120% 50% at 50% 100%,rgba(236,140,70,.12),transparent 62%),
+  linear-gradient(180deg,#0B0D2A 0%,#101238 40%,#12143C 100%)}
+.waking{min-height:118vh;display:grid;place-items:center;padding:14vh 20px 10vh;text-align:center}
+.wk-s{margin:0 auto;max-width:920px;font-family:var(--f-display);font-size:clamp(32px,5vw,70px);line-height:1.35;color:#FBF9FF}
+.wk-en{display:block;margin-top:.8em;font-family:var(--f-en);font-style:italic;font-size:clamp(16px,1.7vw,22px);color:#A7A2C6}
+.wk-note{display:block;margin-top:2.2em;font-size:13px;letter-spacing:.08em;color:#8B86AE}
+.kitten{display:block;width:min(300px,64vw);margin:6vh auto 0}
+.kitten .body{transform-box:fill-box;transform-origin:50% 100%;animation:breathe 3.6s ease-in-out infinite}
+.kitten .eye{transform-box:fill-box;transform-origin:50% 50%;animation:blink 6s infinite}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,1.028)}}
+@keyframes blink{0%,46%,50%,100%{transform:scaleY(1)}48%{transform:scaleY(.08)}}
+
+.dream{padding:16vh 20px 18vh;text-align:center}
+.dream .q{max-width:720px;margin:2.2em auto 0;text-align:left}
+.dream .q .ko{color:#F1EEF8}.dream .q .en{color:#A9A4C8}
+.dream p.lede{max-width:640px;margin:0 auto;font-size:16px;line-height:1.9;color:#C9C4E2}
+.droste{position:relative;width:min(640px,88vw);aspect-ratio:1/1.1;margin:8vh auto 0;overflow:hidden;
+  -webkit-mask-image:radial-gradient(closest-side,transparent 0,rgba(0,0,0,.35) 10%,#000 26%,#000 66%,transparent 100%);mask-image:radial-gradient(closest-side,transparent 0,rgba(0,0,0,.35) 10%,#000 26%,#000 66%,transparent 100%);
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+.droste svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;animation:droste 10s linear infinite;transform-origin:50% 50%}
+@keyframes droste{from{transform:scale(1)}to{transform:scale(1.5625)}}
+.droste-q{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f-display);font-size:clamp(28px,4vw,46px);color:#FFE7A8;text-shadow:0 0 22px rgba(255,210,130,.8)}
+.which{margin:7vh auto 0;font-family:var(--f-display);font-size:clamp(34px,5.4vw,76px);line-height:1.3;color:#FFFFFF}
+.which .en{display:block;margin-top:.5em;font-family:var(--f-en);font-style:italic;font-size:.34em;color:#B6B0D6}
+
+.coda{padding:14vh 20px 12vh}
+.coda-in{max-width:1000px;margin:0 auto}
+.coda-h{text-align:center;margin-bottom:6vh}
+.coda-h .lbl{margin-bottom:.6em}
+.coda-h p{margin:0;font-size:15px;color:#A9A4C8}
+.acro{display:grid;grid-template-columns:1fr 1fr;gap:0 clamp(24px,5vw,64px)}
+.acro .st{display:contents}
+.acro .en,.acro .ko{margin:0 0 1.6em}
+.acro .en>span{display:block;font-family:var(--f-en);font-size:clamp(17px,1.8vw,22px);line-height:1.6;color:#E3DFF1}
+.acro .ko>span{display:block;font-size:clamp(14.5px,1.35vw,16.5px);line-height:1.62;color:#ACA7C9;padding-top:.28em;padding-bottom:.22em}
+.cap{display:inline-block;color:#C5B58F;transition:color .7s ease,text-shadow .7s ease,transform .7s ease;transition-delay:calc(var(--i) * 120ms)}
+.acro.lit .cap{color:#FFE3A0;text-shadow:0 0 16px rgba(255,205,120,.75);transform:translateY(-1px) scale(1.08)}
+.acro-name{margin:5vh 0 0;text-align:center;opacity:0;transform:translateY(12px);transition:opacity 1.4s ease 2.8s,transform 1.4s ease 2.8s}
+.acro.lit ~ .acro-name,.coda.lit .acro-name{opacity:1;transform:none}
+.acro-name b{display:block;font-family:var(--f-sc);font-weight:400;font-size:clamp(20px,3.2vw,40px);letter-spacing:.24em;color:#FFE7A8;text-shadow:0 0 24px rgba(255,205,120,.45)}
+.acro-name span{display:block;margin-top:1em;font-size:14.5px;line-height:1.8;color:#B3AED0}
+.last-line{margin:9vh auto 0;text-align:center;font-family:var(--f-display);font-size:clamp(30px,4.4vw,60px);line-height:1.35;color:#fff}
+.last-line .en{display:block;margin-top:.45em;font-family:var(--f-en);font-style:italic;font-size:.42em;color:#B6B0D6}
+
+.colophon{padding:12vh 20px 10vh;border-top:1px solid rgba(203,163,90,.25)}
+.colo-in{max-width:880px;margin:0 auto}
+.colo-in h2{margin:0 0 .3em;text-align:center;font-family:var(--f-display);font-weight:400;font-size:clamp(26px,3vw,36px);color:#F4F1FB}
+.colo-in .sub{display:block;text-align:center;font-family:var(--f-en);font-style:italic;font-size:16px;color:#A9A4C8;margin-bottom:5vh}
+.moves{width:100%;border-collapse:collapse;font-family:var(--f-en);font-size:clamp(14px,1.4vw,16px);color:#D7D3EA}
+.moves th{font-family:var(--f-sc);font-weight:400;letter-spacing:.14em;font-size:13px;color:var(--gilt-hi);padding:0 0 12px;text-align:left;border-bottom:1px solid rgba(203,163,90,.35)}
+.moves td{padding:9px 12px 9px 0;vertical-align:top;border-bottom:1px solid rgba(255,255,255,.07);line-height:1.45}
+.moves td i{color:#A9A4C8}
+.moves td:first-child{color:#F4F1FB}
+.colo-foot{margin-top:7vh;text-align:center;font-size:13px;line-height:1.9;color:#8B86AE}
+.colo-foot .btn{margin-top:22px;color:var(--gilt-hi);background:transparent}
+
+/* ───────────── 체스판 레일 ───────────── */
+#rail{position:fixed;right:20px;top:50%;z-index:7;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility .6s}
+#rail.on{opacity:1;visibility:visible}
+#rail .file{font-family:var(--f-sc);font-size:11px;letter-spacing:.12em;color:rgba(29,23,51,.7);text-shadow:0 0 6px rgba(255,255,255,.8)}
+#rail.dark .file{color:rgba(243,223,162,.8);text-shadow:none}
+#rail ol{position:relative;list-style:none;margin:0;padding:0;display:flex;flex-direction:column-reverse;box-shadow:0 0 0 1px rgba(203,163,90,.7),0 10px 24px -8px rgba(20,16,60,.45)}
+#rail li a{display:grid;place-items:center;width:24px;height:24px;font-family:var(--f-sc);font-size:10.5px;text-decoration:none}
+#rail li.r a{background:rgba(179,36,63,.86);color:#F7DDE3}
+#rail li.w a{background:rgba(247,245,251,.9);color:#6B6585}
+#rail li a:hover{filter:brightness(1.12)}
+.rail-mk{position:absolute;left:50%;bottom:calc(var(--rk, 2) * 24px - 12px);width:22px;height:22px;transform:translate(-50%,50%);pointer-events:none;filter:drop-shadow(0 1px 3px rgba(0,0,0,.45))}
+.rail-mk svg{position:absolute;inset:0;width:100%;height:100%;transition:opacity .5s ease,transform .5s ease}
+.rail-mk .mk-q{opacity:0;transform:scale(.5)}
+#rail.queen .mk-p{opacity:0;transform:scale(.5)}
+#rail.queen .mk-q{opacity:1;transform:none}
+@media (max-width:860px){ #rail{display:none} }
+
+.pane h2,.q.big .ko,.race-line .mid,.cor-line .big,.sh-s1,.wk-s,.which,.last-line,.farewell p.lead,#flash p{text-wrap:balance}
+
+/* ───────────── 반응형 ───────────── */
+@media (max-width:760px){
+  body{font-size:16px}
+  .pane{-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(158deg,rgba(251,250,254,.95),rgba(236,238,246,.93))}
+  .pane.warm{background:linear-gradient(160deg,rgba(255,246,240,.96),rgba(250,230,220,.94))}
+  .pane.dusk{background:linear-gradient(160deg,rgba(33,28,76,.92),rgba(18,16,50,.9))}
+  .poem .cols{columns:1}
+  .mb-page::before{display:none}
+  .specs{grid-template-columns:1fr}
+  .spec{display:grid;grid-template-columns:34% 1fr;gap:12px;align-items:center}
+  .spec h4{margin-top:0}
+  .spec dl{grid-template-columns:1fr;gap:0}
+  .spec dt{margin-top:6px}
+  .gloss{grid-template-columns:1fr}
+  .verse{grid-template-columns:1fr}
+  .names{grid-template-columns:1fr 1fr}
+  .names .rh{grid-column:1/-1;padding-bottom:4px;border-bottom:0;padding-top:14px}
+  .names .hd.blank{display:none}
+  .acro{grid-template-columns:1fr}
+  .acro .ko{margin-top:-.8em}
+  .unbirthday,.redking{align-items:flex-start}
+  .dialog li{grid-template-columns:1fr;gap:0}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important}
+}
+.nogl body{background:linear-gradient(180deg,#8FA5DA 0%,#E9E4EE 55%,#C9B9C9 100%) fixed}
+.nogl #gl{display:none}
+</style>
+</head>
+<body>
+
+<!-- 공용 정의 -->
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FCF0C2"/><stop offset=".24" stop-color="#DDBA68"/><stop offset=".52" stop-color="#A97F35"/><stop offset=".78" stop-color="#7A5520"/><stop offset="1" stop-color="#4A3212"/>
+    </linearGradient>
+    <linearGradient id="gGoldDk" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#C9A052"/><stop offset=".5" stop-color="#7A5520"/><stop offset="1" stop-color="#3A260B"/>
+    </linearGradient>
+    <linearGradient id="gGoldHi" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF8DC"/><stop offset=".45" stop-color="#F0D48A"/><stop offset="1" stop-color="#B08A45"/>
+    </linearGradient>
+    <linearGradient id="gGoldV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF3C4"/><stop offset=".45" stop-color="#DDB662"/><stop offset="1" stop-color="#8A6424"/>
+    </linearGradient>
+    <radialGradient id="gLeaf" cx=".38" cy=".38" r=".75">
+      <stop offset="0" stop-color="#FBEBB0"/><stop offset=".45" stop-color="#C99B45"/><stop offset="1" stop-color="#5E4013"/>
+    </radialGradient>
+    <radialGradient id="gPearl" cx=".35" cy=".32" r=".7">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#EDE6DA"/><stop offset="1" stop-color="#A89C8A"/>
+    </radialGradient>
+    <linearGradient id="gBrass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5A3F12"/><stop offset=".35" stop-color="#E6C473"/><stop offset=".6" stop-color="#A57C33"/><stop offset="1" stop-color="#4A3212"/>
+    </linearGradient>
+    <linearGradient id="gWax" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#CFC6B6"/><stop offset=".45" stop-color="#FDF9F0"/><stop offset="1" stop-color="#C9BFAE"/>
+    </linearGradient>
+    <linearGradient id="gPieceW" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#A9ACC6"/><stop offset=".45" stop-color="#EEEDF6"/><stop offset=".7" stop-color="#FFFFFF"/><stop offset="1" stop-color="#C9CBDC"/>
+    </linearGradient>
+    <linearGradient id="gFlameB" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#3D6BFF"/><stop offset=".45" stop-color="#9FB7FF"/><stop offset=".7" stop-color="#FFC46A"/><stop offset="1" stop-color="#FF7A2E" stop-opacity=".2"/>
+    </linearGradient>
+    <radialGradient id="gGlassFB" cx=".5" cy=".42" r=".6">
+      <stop offset="0" stop-color="#D9DDEA"/><stop offset=".6" stop-color="#8A90AA"/><stop offset="1" stop-color="#3A3F58"/>
+    </radialGradient>
+
+    <symbol id="i-pawn" viewBox="-26 -62 52 64"><path d="M-24 0C-24-5-21-8-17-9L-14-10C-11-18-8-26-9-32L-13-33C-13-36-10-38-6-38C-11-42-12-50-8-55C-4-60 4-60 8-55C12-50 11-42 6-38C10-38 13-36 13-33L9-32C8-26 11-18 14-10L17-9C21-8 24-5 24 0Z"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 40 32"><path d="M5 28 L2 9 L12 17 L20 3 L28 17 L38 9 L35 28 Z" fill="url(#gGoldV)" stroke="#6E4E1C" stroke-width="1.4" stroke-linejoin="round"/><circle cx="20" cy="4" r="2.6" fill="#fff"/><circle cx="2.5" cy="9" r="2.2" fill="#fff"/><circle cx="37.5" cy="9" r="2.2" fill="#fff"/><rect x="5" y="23" width="30" height="5" fill="#B3243F" opacity=".85"/></symbol>
+
+    <!-- 가게의 물건들 -->
+    <symbol id="o-cup" viewBox="0 0 40 40"><path d="M9 16h19v6a9.5 9.5 0 0 1-19 0z"/><path d="M28 18h2.5a3 3 0 0 1 0 6H28"/><path d="M6 33h26"/></symbol>
+    <symbol id="o-egg" viewBox="0 0 40 40"><path d="M20 5c6 0 11 10 11 18a11 11 0 0 1-22 0c0-8 5-18 11-18z"/></symbol>
+    <symbol id="o-spool" viewBox="0 0 40 40"><path d="M11 8h18M11 32h18M13 8v24M27 8v24"/><path d="M13 13h14M13 18h14M13 23h14M13 28h14" opacity=".55"/></symbol>
+    <symbol id="o-key" viewBox="0 0 40 40"><circle cx="12" cy="20" r="6"/><path d="M18 20h17M30 20v5M34 20v4"/></symbol>
+    <symbol id="o-candle" viewBox="0 0 40 40"><path d="M16 15h8v17h-8z"/><path d="M20 15v-3"/><path d="M20 4c2.4 3 2.4 5.4 0 7.6c-2.4-2.2-2.4-4.6 0-7.6z"/><path d="M10 32h20"/></symbol>
+    <symbol id="o-bottle" viewBox="0 0 40 40"><path d="M17 4h6v7l3 5v18a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V16l3-5z"/><path d="M14 22h12v7H14z"/></symbol>
+    <symbol id="o-watch" viewBox="0 0 40 40"><circle cx="20" cy="23" r="10"/><path d="M20 23v-6M20 23l4 3M18 13v-4h4v4"/></symbol>
+    <symbol id="o-book" viewBox="0 0 40 40"><path d="M11 7h16a3 3 0 0 1 3 3v24H14a3 3 0 0 1-3-3z"/><path d="M11 31a3 3 0 0 1 3-3h16"/></symbol>
+    <symbol id="o-yarn" viewBox="0 0 40 40"><circle cx="18" cy="25" r="9.5"/><path d="M10 21c6 2 11 7 13 12M12 30c4-6 9-10 15-10M9 26c5-1 9 3 11 8" opacity=".7"/><path d="M26 4l-6 20M33 7l-10 17"/></symbol>
+    <symbol id="o-glass" viewBox="0 0 40 40"><path d="M12 6h16M12 34h16"/><path d="M14 6c0 8 12 8 12 14s-12 6-12 14M26 6c0 8-12 8-12 14s12 6 12 14"/></symbol>
+    <symbol id="o-jam" viewBox="0 0 40 40"><path d="M12 13h16v19a3 3 0 0 1-3 3H15a3 3 0 0 1-3-3z"/><path d="M11 8h18v5H11z"/><path d="M15 20h10v7H15z"/></symbol>
+    <symbol id="o-thimble" viewBox="0 0 40 40"><path d="M13 32V18a7 7 0 0 1 14 0v14z"/><path d="M11 32h18"/><path d="M16 17h.01M20 15h.01M24 17h.01M16 22h.01M20 21h.01M24 22h.01M18 26h.01M22 26h.01" stroke-width="2.2"/></symbol>
+    <symbol id="o-pot" viewBox="0 0 40 40"><path d="M10 18h18v7a9 9 0 0 1-18 0z"/><path d="M28 20c4 0 6 2 6 5M10 21l-5-4M16 18v-3h6v3"/></symbol>
+    <symbol id="o-pawn" viewBox="0 0 40 40"><path d="M20 7a4.5 4.5 0 1 1 0 9a4.5 4.5 0 1 1 0-9zM16.5 17h7l-2 10h-3zM12 33c0-4 3.5-6 8-6s8 2 8 6z"/></symbol>
+    <symbol id="o-bell" viewBox="0 0 40 40"><path d="M12 28c2-2 2-6 2-10a6 6 0 0 1 12 0c0 4 0 8 2 10z"/><path d="M10 28h20"/><circle cx="20" cy="31.5" r="2"/></symbol>
+    <symbol id="o-scissors" viewBox="0 0 40 40"><circle cx="13" cy="29" r="4"/><circle cx="27" cy="29" r="4"/><path d="M15 26L27 8M25 26L13 8"/></symbol>
+    <symbol id="o-doll" viewBox="0 0 40 40"><circle cx="20" cy="10" r="5"/><path d="M14 35l3-15h6l3 15z"/><path d="M17 21l-6 6M23 21l6 6"/></symbol>
+    <symbol id="o-box" viewBox="0 0 40 40"><path d="M7 17h26v16H7z"/><path d="M7 17l3-5h20l3 5"/><path d="M17 12a3 3 0 0 1 6 0M7 24h26"/></symbol>
+
+    <!-- 호랑가시 잎, 빵 조각 -->
+    <path id="holly" d="M0 0Q-3-7-14-8Q-9-14-12-19Q-18-22-18-27Q-11-30-14-39Q-6-38 0-52Q6-38 14-39Q11-30 18-27Q18-22 12-19Q9-14 14-8Q3-7 0 0Z"/>
+    <path id="slice" d="M-21 0L-21-33C-29-35-31-49-21-53C-17-63-4-65 0-59C4-65 17-63 21-53C31-49 29-35 21-33L21 0Z"/>
+  </defs>
+</svg>
+
+<div id="room" aria-hidden="true"><div class="fireglow"></div></div>
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<header id="stage">
+  <div id="scene">
+    <div class="candle l" aria-hidden="true">
+      <i class="halo"></i>
+      <svg viewBox="0 0 60 220"><rect x="22" y="22" width="16" height="96" rx="2" fill="url(#gWax)"/><path d="M24 30q-1.5 9 0 14" stroke="#F4EEE2" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M30 22v-5" stroke="#2A1F14" stroke-width="1.4"/><ellipse cx="30" cy="120" rx="18" ry="4.5" fill="url(#gBrass)"/><path d="M25 123h10l2 9q-7 4-14 0z" fill="url(#gBrass)"/><rect x="27" y="132" width="6" height="50" fill="url(#gBrass)"/><ellipse cx="30" cy="148" rx="7.5" ry="4" fill="url(#gBrass)"/><ellipse cx="30" cy="168" rx="5.5" ry="3" fill="url(#gBrass)"/><path d="M13 207q17-34 34 0z" fill="url(#gBrass)"/><ellipse cx="30" cy="207" rx="19" ry="4.5" fill="url(#gBrass)"/></svg>
+      <span class="flame"><b></b></span>
+    </div>
+    <div class="candle r" aria-hidden="true">
+      <i class="halo"></i>
+      <svg viewBox="0 0 60 220"><rect x="22" y="22" width="16" height="96" rx="2" fill="url(#gWax)"/><path d="M36 34q1.5 7 0 11" stroke="#F4EEE2" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M30 22v-5" stroke="#2A1F14" stroke-width="1.4"/><ellipse cx="30" cy="120" rx="18" ry="4.5" fill="url(#gBrass)"/><path d="M25 123h10l2 9q-7 4-14 0z" fill="url(#gBrass)"/><rect x="27" y="132" width="6" height="50" fill="url(#gBrass)"/><ellipse cx="30" cy="148" rx="7.5" ry="4" fill="url(#gBrass)"/><ellipse cx="30" cy="168" rx="5.5" ry="3" fill="url(#gBrass)"/><path d="M13 207q17-34 34 0z" fill="url(#gBrass)"/><ellipse cx="30" cy="207" rx="19" ry="4.5" fill="url(#gBrass)"/></svg>
+      <span class="flame"><b></b></span>
+    </div>
+    <div class="mantel" aria-hidden="true"></div>
+
+    <div class="mirror-wrap" id="mirror">
+      <div class="mirror-shadow" aria-hidden="true"></div>
+      <svg id="frame" viewBox="0 0 1000 1360" aria-hidden="true" focusable="false">
+        <defs>
+          <g id="leaf">
+            <path d="M0-14Q7-24 15-19Q19-15 21-12Q27-21 33-15Q35-12 37-9Q44-14 49-8Q54-4 62 0Q54 4 49 8Q44 14 37 9Q35 12 33 15Q27 21 21 12Q19 15 15 19Q7 24 0 14Z" fill="url(#gLeaf)" stroke="#3A270B" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M3 0Q30-1.5 55 0" fill="none" stroke="#3A270B" stroke-width="1.6" opacity=".6"/>
+          </g>
+        </defs>
+        <ellipse class="glass-fallback" cx="500" cy="720" rx="336" ry="476" fill="url(#gGlassFB)"/>
+        <g id="leaves"></g>
+        <ellipse cx="500" cy="720" rx="404" ry="544" fill="none" stroke="#2B1D08" stroke-width="13"/>
+        <ellipse cx="500" cy="720" rx="404" ry="544" fill="none" stroke="url(#gGold)" stroke-width="6"/>
+        <ellipse cx="500" cy="720" rx="376" ry="516" fill="none" stroke="#3E2A0C" stroke-width="56"/>
+        <ellipse cx="500" cy="720" rx="376" ry="516" fill="none" stroke="url(#gGoldDk)" stroke-width="46"/>
+        <ellipse cx="500" cy="720" rx="376" ry="516" fill="none" stroke="url(#gGold)" stroke-width="32"/>
+        <ellipse cx="500" cy="720" rx="373" ry="513" fill="none" stroke="url(#gGoldHi)" stroke-width="11" opacity=".78"/>
+        <ellipse cx="500" cy="720" rx="349" ry="489" fill="none" stroke="url(#gGold)" stroke-width="5"/>
+        <ellipse cx="500" cy="721.6" rx="341" ry="481" fill="none" stroke="#2E1F08" stroke-width="9" stroke-dasharray="0 15.3" stroke-linecap="round"/>
+        <ellipse cx="500" cy="720" rx="341" ry="481" fill="none" stroke="#EBD9A4" stroke-width="8" stroke-dasharray="0 15.3" stroke-linecap="round"/>
+        <ellipse cx="500" cy="720" rx="334" ry="474" fill="none" stroke="#1C1305" stroke-width="10"/>
+        <ellipse cx="500" cy="720" rx="330.6" ry="470.6" fill="none" stroke="rgba(255,240,200,.35)" stroke-width="1.4"/>
+        <g id="rosettes"></g>
+        <g id="crest">
+          <g id="scrollL">
+            <path d="M406 158C392 116 350 102 320 120C303 131 309 153 325 151" fill="none" stroke="#3A270B" stroke-width="8" stroke-linecap="round"/>
+            <path d="M406 158C392 116 350 102 320 120C303 131 309 153 325 151" fill="none" stroke="url(#gGold)" stroke-width="5" stroke-linecap="round"/>
+            <use href="#leaf" transform="translate(372 146) rotate(-152) scale(.6)"/>
+            <use href="#leaf" transform="translate(318 214) rotate(-118) scale(.56)"/>
+            <path d="M438 176C386 150 322 156 292 196C270 226 282 262 312 264C338 266 348 238 332 226C320 218 304 228 310 240" fill="none" stroke="#3A270B" stroke-width="17" stroke-linecap="round"/>
+            <path d="M438 176C386 150 322 156 292 196C270 226 282 262 312 264C338 266 348 238 332 226C320 218 304 228 310 240" fill="none" stroke="url(#gGold)" stroke-width="11" stroke-linecap="round"/>
+            <path d="M436 173C386 148 324 154 294 192" fill="none" stroke="#FFF3CC" stroke-width="2.4" stroke-linecap="round" opacity=".75"/>
+          </g>
+          <use href="#scrollL" transform="translate(1000 0) scale(-1 1)"/>
+          <path d="M430 154L412 92Q446 120 462 86Q482 118 500 60Q518 118 538 86Q554 120 588 92L570 154Q500 166 430 154Z" fill="url(#gGold)" stroke="#3A270B" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M440 146Q446 128 452 118M500 76V140M560 146Q554 128 548 118" fill="none" stroke="#FFF3CC" stroke-width="2" opacity=".55" stroke-linecap="round"/>
+          <path d="M428 182Q500 196 572 182L570 152Q500 164 430 152Z" fill="url(#gGoldDk)" stroke="#3A270B" stroke-width="3" stroke-linejoin="round"/>
+          <ellipse cx="452" cy="170" rx="7" ry="8" fill="#B3243F" stroke="#3A270B" stroke-width="1.5"/>
+          <ellipse cx="476" cy="173" rx="6" ry="6.5" fill="url(#gPearl)"/>
+          <ellipse cx="500" cy="174" rx="9" ry="10" fill="#B3243F" stroke="#3A270B" stroke-width="1.5"/>
+          <ellipse cx="524" cy="173" rx="6" ry="6.5" fill="url(#gPearl)"/>
+          <ellipse cx="548" cy="170" rx="7" ry="8" fill="#B3243F" stroke="#3A270B" stroke-width="1.5"/>
+          <circle cx="412" cy="90" r="7.5" fill="url(#gPearl)" stroke="#3A270B" stroke-width="1"/>
+          <circle cx="462" cy="84" r="7" fill="url(#gPearl)" stroke="#3A270B" stroke-width="1"/>
+          <circle cx="538" cy="84" r="7" fill="url(#gPearl)" stroke="#3A270B" stroke-width="1"/>
+          <circle cx="588" cy="90" r="7.5" fill="url(#gPearl)" stroke="#3A270B" stroke-width="1"/>
+          <circle cx="500" cy="54" r="10" fill="url(#gGold)" stroke="#3A270B" stroke-width="2"/>
+          <path d="M495.5 45V30H487V22H495.5V12H504.5V22H513V30H504.5V45Z" fill="url(#gGold)" stroke="#3A270B" stroke-width="2" stroke-linejoin="round"/>
+        </g>
+        <g id="shell"></g>
+        <path id="scrollB" d="M442 1240C410 1252 392 1278 404 1296C414 1308 432 1300 428 1288" fill="none" stroke="#3A270B" stroke-width="12" stroke-linecap="round"/>
+        <path d="M442 1240C410 1252 392 1278 404 1296C414 1308 432 1300 428 1288" fill="none" stroke="url(#gGold)" stroke-width="7" stroke-linecap="round"/>
+        <g transform="translate(1000 0) scale(-1 1)">
+          <path d="M442 1240C410 1252 392 1278 404 1296C414 1308 432 1300 428 1288" fill="none" stroke="#3A270B" stroke-width="12" stroke-linecap="round"/>
+          <path d="M442 1240C410 1252 392 1278 404 1296C414 1308 432 1300 428 1288" fill="none" stroke="url(#gGold)" stroke-width="7" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <svg id="frameSheen" viewBox="0 0 1000 1360" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="gSheen" gradientUnits="userSpaceOnUse" x1="330" y1="160" x2="690" y2="1240">
+            <stop offset="0" stop-color="#FFF6D8" stop-opacity="0"/><stop offset=".44" stop-color="#FFF6D8" stop-opacity="0"/><stop offset=".5" stop-color="#FFFBEA" stop-opacity=".6"/><stop offset=".56" stop-color="#FFF6D8" stop-opacity="0"/><stop offset="1" stop-color="#FFF6D8" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <ellipse cx="500" cy="720" rx="376" ry="516" fill="none" stroke="url(#gSheen)" stroke-width="40"/>
+      </svg>
+      <div class="glass-text" id="glassText">
+        <span class="gt-en1">Through the Looking-Glass</span>
+        <h1 class="gt-title" aria-label="거울나라의 앨리스">
+          <span class="ln" aria-hidden="true"><span class="ch" style="--i:0">거</span><span class="ch" style="--i:1">울</span><span class="ch" style="--i:2">나</span><span class="ch" style="--i:3">라</span><span class="ch" style="--i:4">의</span></span>
+          <span class="ln" aria-hidden="true"><span class="ch" style="--i:5">앨</span><span class="ch" style="--i:6">리</span><span class="ch" style="--i:7">스</span></span>
+        </h1>
+        <span class="gt-rule" aria-hidden="true"></span>
+        <span class="gt-en2">and What Alice Found There</span>
+        <span class="gt-by">Lewis Carroll · 1871</span>
+      </div>
+    </div>
+
+    <div class="hero-foot" id="heroFoot">
+      <div class="hf-in">
+        <p class="hf-q">“거울이 얇은 망사처럼 말랑말랑해졌다고 치자, 키티. 그럼 지나갈 수 있을 거야.”</p>
+        <p class="hf-en">“Let’s pretend the glass has got all soft like gauze, so that we can get through.”</p>
+        <div class="hf-row">
+          <button class="hf-go" id="goThrough" type="button">거울 속으로 <i aria-hidden="true"></i></button>
+          <span class="hf-hint" id="wipeHint">유리를 문질러 김을 닦아 보세요</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<div id="flash" aria-hidden="true">
+  <p>그리고 정말로, 거울이 밝은 은빛 안개처럼<br>녹아내리기 시작했다.<span class="en">And certainly the glass was beginning to melt away, just like a bright silvery mist.</span></p>
+</div>
+
+<nav id="rail" aria-label="체스판 위 앨리스의 자리">
+  <span class="file" aria-hidden="true">Q’s file</span>
+  <ol>
+    <li class="w"><a href="#house" aria-label="1열: 거울 집">1</a></li>
+    <li class="r"><a href="#r2" aria-label="2열: 붉은 여왕">2</a></li>
+    <li class="w"><a href="#r3" aria-label="3열: 기차와 곤충들">3</a></li>
+    <li class="r"><a href="#r4" aria-label="4열: 트위들덤과 트위들디">4</a></li>
+    <li class="w"><a href="#r5" aria-label="5열: 하얀 여왕">5</a></li>
+    <li class="r"><a href="#r6" aria-label="6열: 험프티 덤프티">6</a></li>
+    <li class="w"><a href="#r7" aria-label="7열: 하얀 기사">7</a></li>
+    <li class="r"><a href="#r8" aria-label="8열: 앨리스 여왕">8</a></li>
+    <li class="rail-mk" aria-hidden="true"><svg class="mk-p"><use href="#i-pawn" fill="#FFFFFF" stroke="#1D1733" stroke-width="3"/></svg><svg class="mk-q"><use href="#i-crown"/></svg></li>
+  </ol>
+</nav>
+
+<main id="book">
+  <section id="hero" aria-label="거울 앞"></section>
+
+  <!-- 제1장 · 거울 집 -->
+  <section class="chapter" id="house" data-station="hill">
+    <article class="pane wide reveal">
+      <div class="eyebrow"><span class="mv">Before the game</span><span>· 게임을 시작하기 전</span></div>
+      <p class="chap">제1장 · 거울 집 <span class="en">Looking-Glass House</span></p>
+      <h2>거울 책</h2>
+      <p>거울 저편의 방은 이쪽 방과 똑같았다. 다만 모든 것이 반대였다. 벽난로에서는 진짜 불이 이쪽 불만큼이나 환하게 타올랐고, 벽의 그림들은 살아 움직였으며, 벽난로 선반 위의 시계는 조그만 할아버지의 얼굴을 하고서 앨리스를 향해 씩 웃었다.</p>
+      <p>탁자 위에는 책 한 권이 놓여 있었다. 펼쳐 보니 글자들이 전부 거꾸로 달려가고 있었다.</p>
+      <blockquote class="q"><span class="ko">“아, 이건 거울 책이구나! 거울에 비춰 보면 글자들이 다시 제대로 돌아올 거야.”</span><span class="en">“Why, it’s a Looking-glass book, of course! And if I hold it up to a glass, the words will all go the right way again.”</span></blockquote>
+
+      <div class="mbook" id="mbook">
+        <div class="mb-page">
+          <div class="mb-stack" id="mbStack">
+            <div class="mb-rev-wrap" aria-hidden="true"><div class="poem mb-rev" id="poemRev"></div></div>
+            <div class="poem mb-true" id="poemTrue" lang="en">
+              <h4>JABBERWOCKY.</h4>
+              <div class="cols">
+                <p class="sz"><span>’Twas brillig, and the slithy toves</span><span>Did gyre and gimble in the wabe;</span><span>All mimsy were the borogoves,</span><span>And the mome raths outgrabe.</span></p>
+                <p class="sz"><span>“Beware the Jabberwock, my son!</span><span>The jaws that bite, the claws that catch!</span><span>Beware the Jubjub bird, and shun</span><span>The frumious Bandersnatch!”</span></p>
+                <p class="sz"><span>He took his vorpal sword in hand:</span><span>Long time the manxome foe he sought—</span><span>So rested he by the Tumtum tree,</span><span>And stood awhile in thought.</span></p>
+                <p class="sz"><span>And as in uffish thought he stood,</span><span>The Jabberwock, with eyes of flame,</span><span>Came whiffling through the tulgey wood,</span><span>And burbled as it came!</span></p>
+                <p class="sz"><span>One, two! One, two! And through and through</span><span>The vorpal blade went snicker-snack!</span><span>He left it dead, and with its head</span><span>He went galumphing back.</span></p>
+                <p class="sz"><span>“And hast thou slain the Jabberwock?</span><span>Come to my arms, my beamish boy!</span><span>O frabjous day! Callooh! Callay!”</span><span>He chortled in his joy.</span></p>
+                <p class="sz"><span>’Twas brillig, and the slithy toves</span><span>Did gyre and gimble in the wabe;</span><span>All mimsy were the borogoves,</span><span>And the mome raths outgrabe.</span></p>
+              </div>
+            </div>
+            <div class="mb-glass" id="mbGlass" role="slider" tabindex="0" aria-label="손거울 위치 — 좌우 화살표로 움직이기" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+          </div>
+        </div>
+        <div class="mb-ctrl">
+          <span class="hint">손거울을 좌우로 끌어 책을 비춰 보세요</span>
+          <button class="btn" id="mbAll" type="button" aria-pressed="false">책 전체를 거울에 비추기</button>
+        </div>
+      </div>
+
+      <blockquote class="q"><span class="ko">“아주 예쁜 시야. 그런데 이해하기가 좀 어렵네! … 어쨌든 누군가가 뭔가를 죽였다는 것만은 분명해.”</span><span class="en">“It seems very pretty, but it’s rather hard to understand! … However, somebody killed something: that’s clear, at any rate—”</span></blockquote>
+    </article>
+  </section>
+
+  <!-- 제2장 · 붉은 여왕 (2열) -->
+  <section class="chapter" id="r2" data-station="r2">
+    <article class="pane reveal">
+      <div class="eyebrow"><span class="mv"><svg aria-hidden="true"><use href="#i-pawn"/></svg><b>1.</b> Alice meets R. Q.</span></div>
+      <p class="chap">제2장 · 살아 있는 꽃들의 정원 <span class="en">The Garden of Live Flowers</span></p>
+      <h2>붉은 여왕</h2>
+      <p>거울나라의 정원에서는 꽃들이 말을 했다. “우리도 말할 줄 알아. 말 걸 만한 상대가 있을 때는.” 참나리가 새침하게 말했다.</p>
+      <p>앨리스는 붉은 여왕과 함께 작은 언덕 꼭대기에 올라, 한동안 아무 말도 하지 못했다. 가느다란 시냇물들이 온 땅을 이쪽 끝에서 저쪽 끝까지 곧게 가로지르고, 시내와 시내 사이는 초록 산울타리로 반듯반듯 나뉘어 있었다.</p>
+      <blockquote class="q"><span class="ko">“꼭 커다란 체스판처럼 칸이 나뉘어 있잖아!”</span><span class="en">“I declare it’s marked out just like a large chessboard!”</span></blockquote>
+      <p>온 세상을 판 삼아 거대한 체스 한 판이 벌어지고 있었다. 여왕이 말했다. “하얀 여왕의 폰이 되렴. 두 번째 칸에서 시작해 여덟 번째 칸에 닿으면, 너도 여왕이 되는 거야.”</p>
+      <p class="hint">스크롤을 내려, 여왕과 함께 달리세요</p>
+    </article>
+
+    <div class="race" id="race">
+      <div class="sticky">
+        <div class="race-line"><span class="big">“더 빨리! 더 빨리!”</span><span class="en">“Faster! Faster!”</span></div>
+        <div class="race-line"><span class="mid">아무리 빨리 달려도, 나무도 그 무엇도<br>조금도 자리를 바꾸지 않았다.</span><span class="en">However fast they went, they never seemed to pass anything.</span></div>
+        <div class="race-line"><span class="mid">“어머, 우리 계속 이 나무 아래 있었잖아!<br>모든 게 그대로야!”</span><span class="en">“Why, I do believe we’ve been under this tree the whole time! Everything’s just as it was!”</span></div>
+        <div class="race-line"><span class="mid">“여기서는 말이야, 같은 자리에 있으려면<br>온 힘을 다해 달려야 해.”</span><span class="en">“Now, here, you see, it takes all the running you can do, to keep in the same place.”</span></div>
+      </div>
+    </div>
+
+    <article class="pane small right reveal">
+      <p>여왕은 줄자로 땅을 재어 말뚝을 박고, 말뚝마다 돌아서서 한 가지씩 일러 주었다. 폰은 첫 수에 두 칸을 가니 세 번째 칸은 기차로 금세 지나갈 것이고, 네 번째 칸은 트위들덤과 트위들디의 것, 다섯 번째 칸은 거의 물, 여섯 번째 칸은 험프티 덤프티의 것, 일곱 번째 칸은 온통 숲이라고. 그리고 다음 말뚝에서는—</p>
+      <blockquote class="q"><span class="ko">“영어가 생각나지 않으면 프랑스어로 말하렴. 걸을 때는 발끝을 바깥으로. 그리고 네가 누구인지 잊지 말고!”</span><span class="en">“Speak in French when you can’t think of the English for a thing—turn out your toes as you walk—and remember who you are!”</span></blockquote>
+    </article>
+  </section>
+
+  <!-- 제3장 · 기차와 곤충 (3열) -->
+  <section class="chapter" id="r3" data-station="r3">
+    <article class="pane wide reveal">
+      <div class="eyebrow"><span class="mv"><svg aria-hidden="true"><use href="#i-pawn"/></svg><b>2.</b> Alice through Q.’s 3d <i>(by railway)</i> …</span></div>
+      <p class="chap">제3장 · 거울나라 곤충들 <span class="en">Looking-Glass Insects</span></p>
+      <h2>기차를 타고, 세 번째 칸</h2>
+      <p>폰은 첫 수에 두 칸을 갈 수 있다. 그래서 앨리스는 세 번째 칸을 기차로 건넜다. 차장은 앨리스를 처음에는 망원경으로, 다음에는 현미경으로, 마지막에는 오페라글라스로 들여다보더니 한마디만 남기고 창문을 닫았다. “너, 반대 방향으로 가고 있구나.” 기차에서 만난 각다귀는 — 닭만 한 크기였다 — 이 나라의 곤충들을 하나씩 가리켜 보였다.</p>
+
+      <div class="plate">
+        <div class="plate-t"><b>거울나라 곤충 도감</b><span>Looking-Glass Insects</span></div>
+        <div class="specs">
+          <figure class="spec" tabindex="0" aria-label="흔들목마파리">
+            <svg viewBox="0 0 200 150" aria-hidden="true" class="bug">
+              <g class="rh-body">
+                <g class="wing-a" fill="rgba(206,222,246,.6)" stroke="#2A2340" stroke-width="1">
+                  <path d="M104 66C90 34 104 8 128 8C144 9 142 32 118 62Z"/>
+                  <path d="M112 68C126 42 158 30 174 40C184 48 164 64 120 70Z"/>
+                  <path d="M106 62C112 42 120 22 132 12M114 68C132 54 152 44 170 42" fill="none" stroke-opacity=".45"/>
+                </g>
+                <path d="M26 128Q100 152 174 128" fill="none" stroke="#6E3E17" stroke-width="7" stroke-linecap="round"/>
+                <path d="M28 126Q100 149 172 126" fill="none" stroke="#D29A5C" stroke-width="2" stroke-linecap="round" opacity=".8"/>
+                <g stroke="#7A4A22" stroke-width="5" stroke-linecap="round"><path d="M72 94L58 133M84 96L80 138M122 96L124 139M134 94L148 134"/></g>
+                <path d="M160 82C174 80 180 92 176 106C170 98 164 96 156 94Z" fill="#2A2340"/>
+                <path d="M62 84C62 70 82 66 104 66C128 66 150 70 152 84C154 99 130 102 106 102C82 102 62 99 62 84Z" fill="#F6F1E8" stroke="#2A2340" stroke-width="1.3"/>
+                <g fill="#8E94B0" opacity=".55"><circle cx="86" cy="80" r="4"/><circle cx="100" cy="90" r="3"/><circle cx="122" cy="78" r="4.5"/><circle cx="138" cy="90" r="3"/><circle cx="74" cy="92" r="2.5"/></g>
+                <path d="M94 67C97 58 118 58 121 67L119 78H96Z" fill="#B3243F" stroke="#2A2340" stroke-width="1.1"/>
+                <path d="M70 80C60 66 55 52 57 40C58 33 52 26 43 27C32 28 25 37 29 46C32 53 42 53 47 51C51 60 56 72 64 88Z" fill="#F6F1E8" stroke="#2A2340" stroke-width="1.3" stroke-linejoin="round"/>
+                <path d="M51 31L55 19L59 32Z" fill="#F6F1E8" stroke="#2A2340" stroke-width="1.1" stroke-linejoin="round"/>
+                <path d="M59 33C66 41 63 51 71 59C67 64 73 70 75 78" fill="none" stroke="#2A2340" stroke-width="4.2" stroke-linecap="round"/>
+                <circle cx="44" cy="35" r="2.1" fill="#2A2340"/>
+                <path d="M30 44C38 46 46 42 52 36" fill="none" stroke="#B3243F" stroke-width="1.6"/>
+              </g>
+            </svg>
+            <figcaption>
+              <h4>흔들목마파리<span class="sn">Rocking-horse-fly</span></h4>
+              <dl><dt>생김새</dt><dd>온몸이 나무. 갓 칠한 듯 반들반들하다.</dd><dt>습성</dt><dd>가지에서 가지로 몸을 흔들어 옮겨 다닌다.</dd><dt>먹이</dt><dd>수액과 톱밥</dd></dl>
+            </figcaption>
+          </figure>
+          <figure class="spec" tabindex="0" aria-label="스냅드래곤잠자리">
+            <svg viewBox="0 0 200 150" aria-hidden="true" class="bug">
+              <g class="sd-wings">
+                <g fill="#2F6B3A" stroke="#163A20" stroke-width="1.3" stroke-linejoin="round">
+                  <use href="#holly" transform="translate(94 70) rotate(-24) scale(1.2)"/>
+                  <use href="#holly" transform="translate(98 70) rotate(26) scale(1.12)"/>
+                  <use href="#holly" transform="translate(94 80) rotate(-156) scale(1.2)"/>
+                  <use href="#holly" transform="translate(98 80) rotate(154) scale(1.12)"/>
+                </g>
+                <g stroke="#9CC58A" stroke-width="1" opacity=".75" fill="none"><path d="M94 70L73 24M98 70L122 26M94 80L72 128M98 80L123 126"/></g>
+              </g>
+              <path d="M104 68C126 64 162 68 184 75C162 82 126 86 104 82Z" fill="#5B2E1E" stroke="#2A120B" stroke-width="1.2"/>
+              <g fill="none" stroke="#2A120B" stroke-width="1" opacity=".6"><path d="M120 67Q122 75 120 84M136 68Q138 75 136 83M152 70Q154 75 152 81M167 72Q168 75 167 78"/></g>
+              <g fill="#1E0C07"><circle cx="113" cy="73" r="1.6"/><circle cx="128" cy="78" r="1.5"/><circle cx="144" cy="72" r="1.4"/><circle cx="159" cy="77" r="1.2"/></g>
+              <circle cx="93" cy="75" r="15.5" fill="#6A3624" stroke="#2A120B" stroke-width="1.3"/>
+              <path d="M79 70C82 59 104 59 107 70C103 67 100 74 96 69C92 74 87 67 79 70Z" fill="#F4E6C2" stroke="#8A6A40" stroke-width=".8"/>
+              <g fill="#1E0C07"><circle cx="88" cy="80" r="1.8"/><circle cx="97" cy="84" r="1.6"/><circle cx="101" cy="77" r="1.5"/><circle cx="85" cy="74" r="1.2"/></g>
+              <g fill="#C8203C"><circle cx="90" cy="62" r="2.6"/><circle cx="95" cy="60" r="2.6"/><circle cx="93" cy="65" r="2.4"/></g>
+              <ellipse cx="70" cy="75" rx="8.5" ry="7.5" fill="#2A120B"/>
+              <path d="M65 72Q70 70 75 73M64 77Q70 79 76 76" fill="none" stroke="#5B2E1E" stroke-width="1"/>
+              <path class="sd-flame" d="M70 70C62 66 63 55 70 44C72 53 79 57 77 65C76 69 74 70 70 70Z" fill="url(#gFlameB)"/>
+            </svg>
+            <figcaption>
+              <h4>스냅드래곤잠자리<span class="sn">Snap-dragon-fly</span></h4>
+              <dl><dt>생김새</dt><dd>몸통은 플럼 푸딩, 날개는 호랑가시나무 잎, 머리는 브랜디에 불붙은 건포도.</dd><dt>둥지</dt><dd>크리스마스 선물 상자</dd><dt>먹이</dt><dd>밀죽과 민스파이</dd></dl>
+            </figcaption>
+          </figure>
+          <figure class="spec" tabindex="0" aria-label="버터빵나비">
+            <svg viewBox="0 0 200 150" aria-hidden="true" class="bug">
+              <g class="bb-l">
+                <g transform="translate(96 66) rotate(-62)"><use href="#slice" fill="#F3DCA8" stroke="#8A5424" stroke-width="4" stroke-linejoin="round"/><path d="M-14-6V-30C-14-40-2-44 0-36C4-44 14-40 14-30V-6Z" fill="#FFE27A" opacity=".75"/><path d="M-6-30q6-6 10 0" fill="none" stroke="#FFF6C8" stroke-width="2" stroke-linecap="round"/></g>
+                <g transform="translate(97 82) rotate(-122) scale(.74)"><use href="#slice" fill="#F3DCA8" stroke="#8A5424" stroke-width="4.5" stroke-linejoin="round"/><path d="M-14-6V-30C-14-40-2-44 0-36C4-44 14-40 14-30V-6Z" fill="#FFE27A" opacity=".7"/></g>
+              </g>
+              <g class="bb-r">
+                <g transform="translate(104 66) rotate(62)"><use href="#slice" fill="#F3DCA8" stroke="#8A5424" stroke-width="4" stroke-linejoin="round"/><path d="M-14-6V-30C-14-40-2-44 0-36C4-44 14-40 14-30V-6Z" fill="#FFE27A" opacity=".75"/><path d="M-4-28q6-6 10 0" fill="none" stroke="#FFF6C8" stroke-width="2" stroke-linecap="round"/></g>
+                <g transform="translate(103 82) rotate(122) scale(.74)"><use href="#slice" fill="#F3DCA8" stroke="#8A5424" stroke-width="4.5" stroke-linejoin="round"/><path d="M-14-6V-30C-14-40-2-44 0-36C4-44 14-40 14-30V-6Z" fill="#FFE27A" opacity=".7"/></g>
+              </g>
+              <rect x="94.5" y="50" width="11" height="54" rx="5.5" fill="#A8662E" stroke="#5E3413" stroke-width="1.3"/>
+              <path d="M97 58h6M97 66h6M97 74h6M97 82h6M97 90h6" stroke="#6E3E17" stroke-width="1" opacity=".6"/>
+              <path d="M91 42L100 37L109 42L100 47Z" fill="#FFFFFF" stroke="#2A2340" stroke-width="1"/>
+              <path d="M91 42L100 47V56L91 51Z" fill="#E4E2EE" stroke="#2A2340" stroke-width="1"/>
+              <path d="M100 47L109 42V51L100 56Z" fill="#CFCCDD" stroke="#2A2340" stroke-width="1"/>
+              <path d="M97 38C92 26 84 21 78 24C74 26 76 31 80 30M103 38C108 26 116 21 122 24C126 26 124 31 120 30" fill="none" stroke="#2A2340" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            <figcaption>
+              <h4>버터빵나비<span class="sn">Bread-and-Butterfly</span></h4>
+              <dl><dt>생김새</dt><dd>날개는 버터 바른 얇은 빵, 몸통은 빵 껍질, 머리는 각설탕.</dd><dt>먹이</dt><dd>크림을 탄 연한 홍차</dd></dl>
+            </figcaption>
+          </figure>
+        </div>
+        <p class="plate-note">앨리스는 생각했다. 벌레들이 그토록 촛불로 날아드는 건, 스냅드래곤잠자리가 되고 싶어서가 아닐까?</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- 이름 없는 숲 · 트위들 형제 (4열) -->
+  <section class="chapter" id="r4" data-station="r4">
+    <article class="pane right reveal" id="wood">
+      <div class="eyebrow"><span class="mv"><svg aria-hidden="true"><use href="#i-pawn"/></svg><b>2.</b> … to 4th <i>(Tweedledum and Tweedledee)</i></span></div>
+      <p class="chap">제3장 · 이름 없는 숲 <span class="en">the wood where things have no names</span></p>
+      <h2>이름 없는 <span class="nm">숲</span></h2>
+      <p>네 번째 칸으로 가려면 아무것도 이름이 없는 숲을 지나야 했다. “어쨌든 이렇게 더울 때 이 — 이 뭐더라? — 이 밑에 들어오니 참 좋다.” 앨리스는 <span class="nm">나무</span> 줄기에 손을 얹었지만, 그것을 부를 말이 떠오르지 않았다. 자기 이름이 <span class="nm">앨리스<span class="l" aria-hidden="true">L…</span></span>라는 것조차.</p>
+      <blockquote class="q"><span class="ko">“엘(L)… 엘로 시작하는 건 분명해!”</span><span class="en">“L, I know it begins with L!”</span></blockquote>
+      <p>그때 <span class="nm">새끼 사슴</span> 한 마리가 다가왔다. 둘은 서로에게 기대어 숲을 함께 걸었다. 그리고 숲을 벗어나 탁 트인 들판에 닿은 순간—</p>
+      <div class="fawn">
+        <blockquote class="q"><span class="ko">“나는 새끼 사슴이야! 그런데 세상에, 너는 사람 아이잖아!”</span><span class="en">“I’m a Fawn! and, dear me! you’re a human child!”</span></blockquote>
+        <p>사슴은 놀란 눈으로 쏜살같이 달아났다. “그래도 이제 내 이름은 알아. 앨리스 — 앨리스 — 다시는 잊지 않을 거야.”</p>
+      </div>
+    </article>
+
+    <article class="pane reveal" id="tweedles">
+      <p class="chap">제4장 · 트위들덤과 트위들디 <span class="en">Tweedledum and Tweedledee</span></p>
+      <h2>트위들덤과 트위들디</h2>
+      <p>옷깃에 한 사람은 ‘DUM’, 다른 사람은 ‘DEE’라고 수를 놓은 뚱뚱한 두 형제가, 거울에 비친 듯 똑같은 모습으로 서로의 목에 팔을 두르고 서 있었다.</p>
+      <blockquote class="q"><span class="ko">“거꾸로 말하자면, 만약 그랬다면 그랬을 수도 있겠지. 그랬더라면 그랬겠지. 하지만 그렇지 않으니까, 아닌 거야. 그게 논리지.”</span><span class="en">“Contrariwise, if it was so, it might be; and if it were so, it would be; but as it isn’t, it ain’t. That’s logic.”</span><cite>트위들디</cite></blockquote>
+      <p>근처 나무 아래에서는 붉은 왕이 코를 골며 잠들어 있었다.</p>
+      <ul class="dialog">
+        <li><b>트위들디</b><span>“지금 꿈을 꾸고 계셔. 무슨 꿈인 것 같아?”</span></li>
+        <li class="a"><b>앨리스</b><span>“그건 아무도 모르지.”</span></li>
+        <li><b>트위들디</b><span>“바로 너야! 왕이 너에 대한 꿈을 그만두면, 너는 어디 있을 것 같아?”</span></li>
+        <li class="a"><b>앨리스</b><span>“어디 있긴, 지금 여기 있겠지.”</span></li>
+        <li><b>트위들디</b><span>“천만에! 넌 아무 데도 없을 거야. 너는 그저 왕의 꿈속에 나오는 무언가일 뿐이니까!”</span></li>
+      </ul>
+      <div class="redking" id="redking">
+        <div class="rk-candle" aria-hidden="true"><i class="glow"></i><i class="dish"></i><i class="wax"></i><i class="wick"></i><i class="fl"></i><i class="smoke"></i><i class="smoke"></i><i class="smoke"></i></div>
+        <div class="rk-text">
+          <span class="rk-bang" aria-hidden="true">펑!</span>
+          <span>“저 왕이 깨어나면, 너는 — 펑! — 촛불처럼 꺼져 버릴걸!” <span class="en-i">— Tweedledum</span></span>
+          <p style="margin:.7em 0 0"><button class="btn" id="wakeKing" type="button">붉은 왕이 깨어난다면?</button></p>
+          <span class="sr-only" id="kingLive" aria-live="polite"></span>
+        </div>
+      </div>
+      <div class="verse">
+        <p class="verse-t">트위들디가 읊어 준 시 「바다코끼리와 목수」에서</p>
+        <p class="en-i" lang="en">‘The time has come,’ the Walrus said,<br>&emsp;‘To talk of many things:<br>Of shoes—and ships—and sealing-wax—<br>&emsp;Of cabbages—and kings—<br>And why the sea is boiling hot—<br>&emsp;And whether pigs have wings.’</p>
+        <p>“때가 되었네,” 바다코끼리가 말했네.<br>&emsp;“많은 것을 이야기할 때가.<br>구두와 — 배와 — 봉랍과 —<br>&emsp;양배추와 — 왕들에 대해 —<br>바다는 왜 펄펄 끓는지 —<br>&emsp;돼지에게 날개가 있는지에 대해.”</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- 제5장 · 하얀 여왕 (5열) -->
+  <section class="chapter" id="r5" data-station="r5">
+    <article class="pane right reveal">
+      <div class="eyebrow"><span class="mv"><svg aria-hidden="true"><use href="#i-pawn"/></svg><b>3.</b> Alice meets W. Q. <i>(with shawl)</i></span><span class="mv"><b>4.</b> Alice to Q.’s 5th <i>(shop, river, shop)</i></span></div>
+      <p class="chap">제5장 · 양털과 물 <span class="en">Wool and Water</span></p>
+      <h2>하얀 여왕</h2>
+      <p>바람에 날린 숄을 쫓아 하얀 여왕이 숲에서 달려 나왔다. 무엇 하나 반듯한 데가 없었고, 온몸에 핀이 꽂혀 있었다. 여왕은 거꾸로 산다. 그래서 손가락을 찔리기도 전에 비명부터 지르고, 다음다음 주에 일어날 일을 가장 잘 기억한다.</p>
+      <blockquote class="q"><span class="ko">“규칙은 이래. 내일도 잼, 어제도 잼. 하지만 오늘은 절대로 잼이 없지.”</span><span class="en">“The rule is, jam to-morrow and jam yesterday—but never jam to-day.”</span></blockquote>
+      <blockquote class="q"><span class="ko">“뒤로만 작동하는 기억이라니, 참 시시한 기억이구나.”</span><span class="en">“It’s a poor sort of memory that only works backwards.”</span></blockquote>
+      <blockquote class="q"><span class="ko">“나는 가끔 아침을 먹기 전에 불가능한 일을 여섯 가지나 믿었단다.”</span><span class="en">“Why, sometimes I’ve believed as many as six impossible things before breakfast.”</span></blockquote>
+      <div class="six">
+        <p class="six-t">이 책에서 고른, 아침 먹기 전의 불가능한 일 여섯 가지</p>
+        <ol>
+          <li>거울이 은빛 안개처럼 녹는다.</li>
+          <li>같은 자리에 있으려면 온 힘을 다해 달려야 한다.</li>
+          <li>손가락을 찔리기 전에 비명부터 지른다.</li>
+          <li>양이 뜨개바늘 열네 쌍으로 한꺼번에 뜨개질을 한다.</li>
+          <li>달걀이 담장 위에 앉아 낱말의 뜻을 정해 준다.</li>
+          <li>케이크는 먼저 나눠 주고, 자르는 건 나중이다.</li>
+        </ol>
+      </div>
+      <p>숄을 여미던 여왕은 어느새 뜨개질하는 늙은 양이 되어 있었고, 앨리스는 어둑한 작은 가게 안에 서 있었다. 가게는 온갖 신기한 물건으로 가득했다. 다만 어느 선반이든 무엇이 있는지 똑똑히 보려고 들여다보면, 바로 그 선반만은 언제나 텅 비어 있었다. 둘레의 선반들은 미어터질 만큼 꽉 차 있는데도.</p>
+      <div class="shop">
+        <div class="cabinet" id="cabinet" role="group" aria-label="양의 가게 선반"></div>
+        <p class="hint" id="shopHint">선반 하나를 뚫어지게 들여다보세요</p>
+      </div>
+      <blockquote class="q"><span class="ko">“여기선 물건들이 흘러 다니네!”</span><span class="en">“Things flow about so here!”</span></blockquote>
+      <p>인형 같기도 하고 반짇고리 같기도 한 커다랗고 반짝이는 것은, 언제나 보고 있는 선반의 바로 윗칸에 있었다. 꼭대기 칸까지 쫓아가 보아도 소용없었다. 그것은 늘 그래 왔다는 듯이 조용히 천장을 뚫고 사라졌다.</p>
+    </article>
+  </section>
+
+  <!-- 제6장 · 험프티 덤프티 (6열) -->
+  <section class="chapter" id="r6" data-station="r6">
+    <article class="pane wide reveal">
+      <div class="eyebrow"><span class="mv"><svg aria-hidden="true"><use href="#i-pawn"/></svg><b>5.</b> Alice to Q.’s 6th <i>(Humpty Dumpty)</i></span></div>
+      <p class="chap">제6장 · 험프티 덤프티 <span class="en">Humpty Dumpty</span></p>
+      <h2>험프티 덤프티</h2>
+      <p>선반 위의 달걀은 다가갈수록 점점 커지더니, 높은 담장 위에 책상다리를 하고 앉은 험프티 덤프티가 되었다. 목에 두른 것이 넥타이인지 허리띠인지 앨리스는 끝내 알 수 없었다. 그것은 ‘생일이 아닌 날’ 받은 선물이라고 했다.</p>
+      <blockquote class="q big"><span class="ko">“내가 어떤 낱말을 쓰면, 그 낱말은 딱 내가 고른 뜻이 되지. 더도 말고 덜도 말고.”</span><span class="en">“When I use a word, it means just what I choose it to mean—neither more nor less.”</span></blockquote>
+      <div class="unbirthday">
+        <button class="sumbox" id="sumbox" type="button" aria-label="험프티의 계산을 바로 돌려 보기"><span class="sum" aria-hidden="true"><i>365</i><i>1</i><span class="rule"></span><i>364</i></span></button>
+        <p>험프티는 계산을 거꾸로 들고 있었다. <span class="en-i">“You’re holding it upside down!”</span> 한 해 가운데 생일이 아닌 날 선물을 받을 수 있는 날은 삼백예순나흘, 생일 선물은 단 하루. “이게 바로 영광이지!”</p>
+      </div>
+      <p>앨리스가 「재버워키」의 첫 연을 읊자, 험프티 덤프티는 어려운 낱말을 하나씩 풀어 주었다. <strong style="font-weight:700">낱말을 눌러 보세요.</strong></p>
+      <div class="gloss">
+        <p class="stanza" lang="en" id="stanza">
+          <span>’Twas <button class="w" data-k="brillig" aria-pressed="true">brillig</button>, and the <button class="w" data-k="slithy" aria-pressed="false">slithy</button> <button class="w" data-k="toves" aria-pressed="false">toves</button></span>
+          <span>Did <button class="w" data-k="gyre" aria-pressed="false">gyre</button> and <button class="w" data-k="gimble" aria-pressed="false">gimble</button> in the <button class="w" data-k="wabe" aria-pressed="false">wabe</button>;</span>
+          <span>All <button class="w" data-k="mimsy" aria-pressed="false">mimsy</button> were the <button class="w" data-k="borogoves" aria-pressed="false">borogoves</button>,</span>
+          <span>And the <button class="w" data-k="mome" aria-pressed="false">mome raths</button> <button class="w" data-k="outgrabe" aria-pressed="false">outgrabe</button>.</span>
+        </p>
+        <div class="gl-card" id="glCard" aria-live="polite">
+          <span class="gw" lang="en">brillig</span>
+          <span class="gk">오후 네 시. 저녁거리를 굽기(broiling) 시작하는 시간.</span>
+          <span class="ge" lang="en">“four o’clock in the afternoon—the time when you begin broiling things for dinner.”</span>
+          <span class="gs">험프티 덤프티의 풀이</span>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- 제7·8장 · 하얀 기사 (7열) -->
+  <section class="chapter" id="r7" data-station="r7">
+    <article class="pane right reveal">
+      <div class="eyebrow"><span class="mv"><svg aria-hidden="true"><use href="#i-pawn"/></svg><b>6.</b> Alice to Q.’s 7th <i>(forest)</i></span><span class="mv"><b>7.</b> W. Kt. takes R. Kt.</span></div>
+      <p class="chap">제7장 · 사자와 유니콘 · 제8장 · 「이건 내 발명품이야」</p>
+      <h2>하얀 기사</h2>
+      <blockquote class="q"><span class="ko">“이제 우리가 서로를 보았으니, 네가 나를 믿어 준다면 나도 너를 믿을게. 어때, 약속하겠니?”</span><span class="en">“Well, now that we have seen each other, if you’ll believe in me, I’ll believe in you. Is that a bargain?”</span><cite>유니콘</cite></blockquote>
+      <p>왕관을 두고 싸우던 사자와 유니콘은 거울나라 케이크를 먹는 법도 일러 주었다. 먼저 돌리고, 자르는 건 나중에.</p>
+      <p>붉은 기사에게서 앨리스를 구해 준 하얀 기사는 쉴 새 없이 말에서 굴러떨어지면서도 자기 발명품을 자랑했다. 비가 들어가지 않게 거꾸로 매단 상자, 벌집, 쥐덫, 그리고 상어에게 물리지 않도록 말 발목마다 채운 고리. 숲 끝에 이르자 그는 노래를 한 곡 불러 주겠다고 했다. 문제는 노래의 이름이었다.</p>
+      <div class="names">
+        <div class="hd blank" aria-hidden="true"></div>
+        <div class="hd">…라고 <em>불린다</em> · is called</div>
+        <div class="hd">실제로는 …<em>이다</em> · really is</div>
+        <div class="rh">노래의 이름</div>
+        <div>해덕의 눈<span class="en-i">Haddocks’ Eyes</span></div>
+        <div class="real">늙고 늙은 사람<span class="en-i">The Aged Aged Man</span></div>
+        <div class="rh">노래</div>
+        <div>방법과 수단<span class="en-i">Ways and Means</span></div>
+        <div class="real">문 위에 앉아서<span class="en-i">A-sitting On A Gate</span></div>
+      </div>
+      <p>“곡조는 내 발명품이야.” 하지만 앨리스는 알고 있었다. 그건 ‘나 그대에게 모든 것을 주노니’라는 옛 노래의 곡조였다.</p>
+    </article>
+
+    <article class="pane warm farewell reveal">
+      <p class="chap">작별 <span class="en">Farewell</span></p>
+      <p class="lead">거울나라를 여행하며 본 온갖 이상한 것들 가운데, 앨리스가 언제나 가장 또렷이 기억한 것은 이 장면이었다.</p>
+      <span class="en-i" lang="en">Of all the strange things that Alice saw in her journey Through The Looking-Glass, this was the one that she always remembered most clearly.</span>
+      <p>여러 해가 지난 뒤에도 앨리스는 마치 어제 일처럼 그 모든 장면을 고스란히 되살릴 수 있었다. 기사의 온화한 푸른 눈과 다정한 미소. 그의 머리칼 사이로 번져 갑옷 위에서 눈부시게 타오르던 저녁 해. 고삐를 목에 늘어뜨린 채 발치의 풀을 뜯던 말. 그리고 뒤편의 검은 숲 그림자까지.</p>
+      <p>기사는 말을 돌려 숲으로 떠났다. 앨리스는 그가 길모퉁이를 돌 때까지 손수건을 흔들었다. 그사이 그는 네댓 번쯤 또 말에서 떨어졌다.</p>
+      <blockquote class="q"><span class="ko">“이제 마지막 시내만 건너면, 여왕이야!”</span><span class="en">“And now for the last brook, and to be a Queen!”</span></blockquote>
+    </article>
+  </section>
+
+  <!-- 제9장 · 앨리스 여왕 (8열) -->
+  <section class="cor" id="r8" aria-label="제9장 앨리스 여왕">
+    <div class="sticky">
+      <div class="cor-top">
+        <span class="cor-eb" id="corEb"><b>8.</b> Alice to Q.’s 8th <i>(coronation)</i></span>
+        <span class="cor-chap">제9장 · 앨리스 여왕 <span class="en-i">Queen Alice</span></span>
+      </div>
+      <div class="cor-lines">
+        <div class="cor-line"><span class="big">“여덟 번째 칸이다, 드디어!”</span><span class="en">“The Eighth Square at last!”</span></div>
+        <div class="cor-line"><span class="big">“그런데 내 머리 위에 있는<br>이건 뭐지?”</span><span class="en">“And what is this on my head?”</span></div>
+        <div class="cor-line"><span class="big">그것은 황금 왕관이었다.</span><span class="en">It was a golden crown.</span></div>
+        <div class="cor-line"><span class="big">“푸딩 — 앨리스. 앨리스 — 푸딩.<br>푸딩을 치워라!”</span><span class="en">“Pudding—Alice; Alice—Pudding. Remove the pudding!”</span></div>
+        <div class="cor-line"><span class="big long">촛불들이 모두 천장까지 자라났다.<br>꼭대기에서 불꽃이 터지는 골풀 숲처럼.</span><span class="en">The candles all grew up to the ceiling, looking something like a bed of rushes with fireworks at the top.</span></div>
+        <div class="cor-line"><span class="big">“더는 못 참겠어!”</span><span class="en">“I can’t stand this any longer!”</span></div>
+      </div>
+      <div class="cor-piece" aria-hidden="true">
+        <svg viewBox="-60 -140 120 145">
+          <circle id="corRing" cx="0" cy="-60" r="20" fill="none" stroke="#FFE7A3" stroke-width="1.4" opacity="0"/>
+          <g id="corPawn"><path id="corPawnPath" fill="url(#gPieceW)" stroke="#CBA35A" stroke-width=".9"/></g>
+          <g id="corQueen" opacity="0"><path id="corQueenPath" fill="url(#gPieceW)" stroke="#CBA35A" stroke-width=".9"/><path id="corCoronet" fill="url(#gGoldV)" stroke="#7A5520" stroke-width=".8" stroke-linejoin="round"/><circle cx="0" cy="-95" r="4.4" fill="url(#gGoldV)" stroke="#7A5520" stroke-width=".7"/></g>
+          <g id="corCrown" transform="translate(0 -320)">
+            <path d="M-16 0L-19-17L-10-9L-5-23L0-11L5-23L10-9L19-17L16 0Z" fill="url(#gGoldV)" stroke="#7A5520" stroke-width="1" stroke-linejoin="round"/>
+            <rect x="-16.5" y="-4" width="33" height="5" rx="1" fill="url(#gGoldV)" stroke="#7A5520" stroke-width=".7"/>
+            <circle cx="0" cy="-1.5" r="1.9" fill="#B3243F"/><circle cx="-9" cy="-1.5" r="1.3" fill="#FFF"/><circle cx="9" cy="-1.5" r="1.3" fill="#FFF"/>
+            <circle cx="-19" cy="-17" r="1.9" fill="#FFF"/><circle cx="-5" cy="-23" r="1.9" fill="#FFF"/><circle cx="5" cy="-23" r="1.9" fill="#FFF"/><circle cx="19" cy="-17" r="1.9" fill="#FFF"/>
+          </g>
+        </svg>
+      </div>
+      <div class="feast" id="feast" aria-hidden="true">
+        <div class="fcs" id="fcs"></div>
+        <div class="cloth"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 제10장 · 흔들기 -->
+  <section class="shaking" id="x" data-station="shake">
+    <div class="sticky">
+      <div class="sh-in">
+        <span class="lbl"><span class="ko">제10장 · 흔들기</span>X. Shaking</span>
+        <p class="sh-s1" id="shS1">앨리스는 그렇게 말하며 여왕을 식탁에서 집어 들고, 있는 힘을 다해 앞뒤로 흔들었다.</p>
+        <p class="sh-s2" id="shS2">붉은 여왕은 조금도 저항하지 않았다. 다만 얼굴이 아주 작아지고, 두 눈이 커다랗게, 초록빛으로 변했다. 앨리스가 계속 흔들자 여왕은 점점 <span class="t1">작아지고</span> — <span class="t2">통통해지고</span> — <span class="t3">보드라워지고</span> — <span class="t4">동그래지고</span> — 그리고 —<span class="sh-en">…she kept on growing shorter—and fatter—and softer—and rounder—and—</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 제11장 · 깨어나기 -->
+  <section class="night waking" id="xi">
+    <div>
+      <span class="lbl"><span class="ko">제11장 · 깨어나기</span>XI. Waking</span>
+      <p class="wk-s">— 그리고 그건 정말로, 결국,<br>새끼 고양이였다.<span class="wk-en">—and it really was a kitten, after all.</span></p>
+      <svg class="kitten" viewBox="0 0 240 160" aria-hidden="true">
+        <g class="body">
+          <path d="M40 124C28 92 60 62 108 60C154 58 194 76 200 106C205 128 186 142 150 143L72 143C54 143 45 136 40 124Z" fill="#141220"/>
+          <path d="M62 139C94 154 152 155 188 136C197 131 202 122 197 115" fill="none" stroke="#141220" stroke-width="13" stroke-linecap="round"/>
+          <path d="M108 62C150 60 186 74 194 100" fill="none" stroke="#2C2945" stroke-width="2" opacity=".8"/>
+          <circle cx="78" cy="76" r="31" fill="#141220"/>
+          <path d="M52 60L47 27L75 47Z" fill="#141220"/><path d="M88 46L108 24L109 59Z" fill="#141220"/>
+          <path d="M55 55L52 36L67 47Z" fill="#3A2E48"/><path d="M92 49L104 35L104 55Z" fill="#3A2E48"/>
+          <g class="eye"><ellipse cx="67" cy="78" rx="7.4" ry="5.6" fill="#8BE08E"/><ellipse cx="67" cy="78" rx="1.7" ry="4.8" fill="#07060C"/><circle cx="69" cy="76" r="1.2" fill="#fff" opacity=".8"/></g>
+          <g class="eye"><ellipse cx="92" cy="78" rx="7.4" ry="5.6" fill="#8BE08E"/><ellipse cx="92" cy="78" rx="1.7" ry="4.8" fill="#07060C"/><circle cx="94" cy="76" r="1.2" fill="#fff" opacity=".8"/></g>
+          <path d="M77 88l2.5 2.5l2.5-2.5z" fill="#C88A9A"/>
+          <g stroke="#D9D4EA" stroke-width=".8" opacity=".55" fill="none"><path d="M64 92L38 88M64 95L40 98M94 92L120 88M94 95L118 99"/></g>
+        </g>
+      </svg>
+      <span class="wk-note">제11장은 이 한 문장이 전부다.</span>
+    </div>
+  </section>
+
+  <!-- 제12장 · 누가 꿈을 꾸었을까? -->
+  <section class="night dream" id="xii">
+    <span class="lbl"><span class="ko">제12장 · 누가 꿈을 꾸었을까?</span>XII. Which Dreamed It?</span>
+    <p class="lede">붉은 여왕은 검은 새끼 고양이 키티였고, 하얀 여왕은 흰 새끼 고양이 스노드롭이었다. 어미 고양이 다이나는 — 어쩌면 험프티 덤프티였을지도. 그리고 남은 질문 하나.</p>
+    <blockquote class="q"><span class="ko">“키티, 이 꿈을 꾼 게 누구였는지 생각해 보자. … 나 아니면 붉은 왕이었을 거야. 물론 그는 내 꿈의 일부였어. 하지만 나도 그의 꿈의 일부였잖아!”</span><span class="en">“Now, Kitty, let’s consider who it was that dreamed it all. … it must have been either me or the Red King. He was part of my dream, of course—but then I was part of his dream, too!”</span></blockquote>
+    <div class="droste" aria-hidden="true"><svg id="drosteSvg" viewBox="-500 -550 1000 1100"></svg><span class="droste-q">?</span></div>
+    <p class="which">당신은 누구였다고 생각하나요?<span class="en">Which do you think it was?</span></p>
+  </section>
+
+  <!-- 끝맺는 시 -->
+  <section class="night coda" id="coda">
+    <div class="coda-in">
+      <div class="coda-h">
+        <span class="lbl"><span class="ko">끝맺는 시</span>A boat beneath a sunny sky</span>
+        <p>각 행의 첫 글자를 세로로 읽어 보세요.</p>
+      </div>
+      <div class="acro" id="acro"></div>
+      <p class="acro-name"><b>ALICE PLEASANCE LIDDELL</b><span>1862년 7월의 어느 오후, 템스강 뱃놀이에서 훗날 『이상한 나라의 앨리스』가 될 이야기를 처음 들은 세 자매 가운데 하나.<br>한국어 번역에서는 첫 글자의 수수께끼가 사라지기에, 원문을 함께 싣는다.</span></p>
+      <p class="last-line">인생이란,<br>한낱 꿈이 아니고 무엇이랴?<span class="en">Life, what is it but a dream?</span></p>
+    </div>
+  </section>
+
+  <!-- 판 뒤의 기록 -->
+  <footer class="night colophon" id="colophon">
+    <div class="colo-in">
+      <h2>체스 문제</h2>
+      <span class="sub">White Pawn (Alice) to play, and win in eleven moves.</span>
+      <table class="moves">
+        <thead><tr><th scope="col">White · 앨리스</th><th scope="col">Red</th></tr></thead>
+        <tbody>
+          <tr><td>1. Alice meets R. Q.</td><td>1. R. Q. to K. R.’s 4th</td></tr>
+          <tr><td>2. Alice through Q.’s 3d <i>(by railway)</i> to 4th <i>(Tweedledum and Tweedledee)</i></td><td>2. W. Q. to Q. B.’s 4th <i>(after shawl)</i></td></tr>
+          <tr><td>3. Alice meets W. Q. <i>(with shawl)</i></td><td>3. W. Q. to Q. B.’s 5th <i>(becomes sheep)</i></td></tr>
+          <tr><td>4. Alice to Q.’s 5th <i>(shop, river, shop)</i></td><td>4. W. Q. to K. B.’s 8th <i>(leaves egg on shelf)</i></td></tr>
+          <tr><td>5. Alice to Q.’s 6th <i>(Humpty Dumpty)</i></td><td>5. W. Q. to Q. B.’s 8th <i>(flying from R. Kt.)</i></td></tr>
+          <tr><td>6. Alice to Q.’s 7th <i>(forest)</i></td><td>6. R. Kt. to K.’s 2nd (ch.)</td></tr>
+          <tr><td>7. W. Kt. takes R. Kt.</td><td>7. W. Kt. to K. B.’s 5th</td></tr>
+          <tr><td>8. Alice to Q.’s 8th <i>(coronation)</i></td><td>8. R. Q. to K.’s sq. <i>(examination)</i></td></tr>
+          <tr><td>9. Alice becomes Queen</td><td>9. Queens castle</td></tr>
+          <tr><td>10. Alice castles <i>(feast)</i></td><td>10. W. Q. to Q. R.’s 6th <i>(soup)</i></td></tr>
+          <tr><td>11. Alice takes R. Q. &amp; wins</td><td></td></tr>
+        </tbody>
+      </table>
+      <p class="colo-foot">루이스 캐럴, 『거울나라의 앨리스』(Through the Looking-Glass, and What Alice Found There, 1871)<br>영어 인용은 Project Gutenberg판 원문을 따랐고, 한국어 번역은 이 페이지를 위해 새로 옮겼다.<br>
+        <button class="btn" id="toTop" type="button">거울 앞으로 돌아가기</button></p>
+    </div>
+  </footer>
+</main>
+
+<canvas id="snow" aria-hidden="true"></canvas>
+
+<script>
+(() => {
+'use strict';
+
+/* ───────────── 유틸 ───────────── */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+const ease = t => t * t * t * (t * (t * 6 - 15) + 10);
+const band = (x, a, b, c, d) => smooth(a, b, x) * (1 - smooth(c, d, x));
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+const mix3 = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
+const rgb = (c, a) => `rgba(${Math.round(clamp(c[0]) * 255)},${Math.round(clamp(c[1]) * 255)},${Math.round(clamp(c[2]) * 255)},${a === undefined ? 1 : a})`;
+const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const docTop = el => el.getBoundingClientRect().top + window.scrollY;
+const root = document.documentElement;
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fineHover = matchMedia('(hover: hover) and (pointer: fine)').matches;
+let vw = innerWidth, vh = innerHeight;
+const failed = new Set();
+const safe = (name, fn, ...args) => {
+  try { return fn(...args); }
+  catch (e) { if (!failed.has(name)) { failed.add(name); console.error('[거울나라] ' + name, e); } }
+};
+
+/* ───────────── 체스 말 윤곽 (단위: 높이 약 100) ───────────── */
+const PATHS = {
+  pawn: 'M-24 0C-24-5-21-8-17-9L-14-10C-11-18-8-26-9-32L-13-33C-13-36-10-38-6-38C-11-42-12-50-8-55C-4-60 4-60 8-55C12-50 11-42 6-38C10-38 13-36 13-33L9-32C8-26 11-18 14-10L17-9C21-8 24-5 24 0Z',
+  queen: 'M-28 0C-28-6-24-9-19-10L-16-12C-12-28-9-46-10-62L-15-64C-15-68-11-70-8-70L8-70C11-70 15-68 15-64L10-62C9-46 12-28 16-12L19-10C24-9 28-6 28 0Z',
+  coronet: 'M-9-70L-15-87L-7-81L-4-91L0-83L4-91L7-81L15-87L9-70Z',
+  king: 'M-28 0C-28-6-24-9-19-10L-16-12C-12-28-9-48-10-64L-15-66C-15-70-11-72-8-72C-12-76-13-82-10-86L10-86C13-82 12-76 8-72C11-72 15-70 15-66L10-64C9-48 12-28 16-12L19-10C24-9 28-6 28 0Z',
+  cross: 'M-2.5-86V-92H-8V-97H-2.5V-103H2.5V-97H8V-92H2.5V-86Z',
+  rook: 'M-24 0C-24-5-21-8-17-9L-15-12L-13-48L-17-50V-66H-10V-60H-4V-66H4V-60H10V-66H17V-50L13-48L15-12L17-9C21-8 24-5 24 0Z',
+  knight: 'M-24 0C-24-5-21-8-17-9L-15-12C-16-22-12-32-6-38C-10-38-16-36-21-33C-25-31-28-34-27-38C-25-44-18-52-10-58C-8-64-5-68-1-70L0-64C8-63 16-56 19-45C21-34 18-20 15-12L17-9C21-8 24-5 24 0Z'
+};
+
+/* ───────────── 하늘: 하루가 흐른다 ───────────── */
+const SKY_RAW = {
+  morning: { top: '#7C9FDD', hor: '#F1EEF4', sun: '#FFF0D2', el: .46,  fog: .075, ground: '#FFFFFF', night: 0 },
+  late:    { top: '#7399D8', hor: '#EDF1F1', sun: '#FFF3DC', el: .56,  fog: .075, ground: '#FBFFF8', night: 0 },
+  noon:    { top: '#6A93D8', hor: '#F3EFE9', sun: '#FFF6E4', el: .66,  fog: .07,  ground: '#FFFDF6', night: 0 },
+  water:   { top: '#8EA6CF', hor: '#E1E8F1', sun: '#F3F6FF', el: .5,   fog: .13,  ground: '#E8EDF7', night: 0 },
+  brillig: { top: '#6F8CCB', hor: '#F6DDB6', sun: '#FFD79C', el: .24,  fog: .085, ground: '#FFEEDB', night: 0 },
+  sunset:  { top: '#474B96', hor: '#F29C78', sun: '#FFB36E', el: .035, fog: .095, ground: '#F2BFA0', night: 0 },
+  dusk:    { top: '#1C1D52', hor: '#B7728F', sun: '#FFBE8A', el: -.03, fog: .11,  ground: '#9E86AE', night: .65 },
+  night:   { top: '#0D0E33', hor: '#4A3A6E', sun: '#FFCF9A', el: -.12, fog: .14,  ground: '#5E5580', night: 1 }
+};
+const SKY = {};
+for (const k in SKY_RAW) { const s = SKY_RAW[k]; SKY[k] = { top: hex(s.top), hor: hex(s.hor), sun: hex(s.sun), ground: hex(s.ground), el: s.el, fog: s.fog, night: s.night }; }
+const DARK = hex('#0B0D2A');
+
+/* 정거장: 앨리스가 서는 칸 (z = 가로줄, x = 세로줄. 퀸의 줄은 x 3–4) */
+const ST = {
+  hill:  { p: [4.0, 1.1, -1.7],  pitch: -.42, yaw: 0, tan: .56, sky: 'morning', rank: 0 },
+  r2:    { p: [3.5, .17, 1.05],  pitch: -.05, yaw: 0, tan: .5,  sky: 'morning', rank: 2 },
+  r3:    { p: [3.5, .17, 2.05],  pitch: -.05, yaw: 0, tan: .5,  sky: 'late',    rank: 3 },
+  r4:    { p: [3.5, .17, 3.05],  pitch: -.05, yaw: 0, tan: .5,  sky: 'noon',    rank: 4 },
+  r5:    { p: [3.5, .17, 4.05],  pitch: -.05, yaw: 0, tan: .5,  sky: 'water',   rank: 5 },
+  r6:    { p: [3.5, .17, 5.05],  pitch: -.05, yaw: 0, tan: .5,  sky: 'brillig', rank: 6 },
+  r7:    { p: [3.5, .17, 6.05],  pitch: -.04, yaw: 0, tan: .5,  sky: 'sunset',  rank: 7 },
+  r8:    { p: [3.5, .19, 7.1],   pitch: -.01, yaw: 0, tan: .5,  sky: 'dusk',    rank: 8 },
+  r8b:   { p: [3.5, .3, 7.3],    pitch: .34,  yaw: 0, tan: .55, sky: 'night',   rank: 8 },
+  shake: { p: [3.5, .3, 7.3],    pitch: .34,  yaw: 0, tan: .55, sky: 'night',   rank: 8 }
+};
+
+/* 판 위의 인물들 */
+const CAST = [
+  { k: 'queen',  side: 'red',   x: 3.86, z: 1.9 },
+  { k: 'rook',   side: 'white', x: 3.84, z: 3.88 },
+  { k: 'rook',   side: 'white', x: 4.1,  z: 3.92 },
+  { k: 'king',   side: 'red',   x: 2.98, z: 3.94, lying: true },
+  { k: 'queen',  side: 'white', x: 3.14, z: 4.9 },
+  { k: 'humpty',                x: 3.88, z: 5.9 },
+  { k: 'knight', side: 'white', x: 3.12, z: 6.9, flip: true }
+];
+const UNIT = 0.0027;
+const PAL = {
+  red:   [hex('#E27C8E'), hex('#B3243F'), hex('#5C1020')],
+  white: [hex('#FFFFFF'), hex('#E6E5F0'), hex('#9EA2BC')]
+};
+const GOLD = [hex('#FFF1B8'), hex('#D9B25C'), hex('#8A6424')];
+
+/* ───────────── 상태 ───────────── */
+const S = {
+  y: scrollY, ys: scrollY, t: 0, readyAt: -1,
+  heroP: 0, heroActive: null, zoom: 1, ell: [0, 0, 1, 1],
+  glass: 1, mist: .8, flash: 0, race: 0, dark: 0, shakeAmp: 0, snow: 0, queen: false, sheen: 500, tf: ''
+};
+const cam = {
+  p: [4, 1.1, -1.7], pitch: -.42, yaw: 0, roll: 0, tan: .56, tanEff: .56,
+  top: [0, 0, 0], hor: [1, 1, 1], sun: [1, 1, 1], ground: [1, 1, 1], el: .4, fog: .08, night: 0, rank: 0,
+  f: [0, 0, 1], r: [1, 0, 0], u: [0, 1, 0], sunDir: [0, 0, 1], van: [0, 0]
+};
+const L = { stations: [] };
+let GLR = null;
+
+/* ───────────── WebGL: 수은 거울과 체스판 나라 ───────────── */
+const VS = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.0,1.0);}';
+const FS_TRAIL = `precision mediump float;
+uniform sampler2D uPrev;
+uniform vec2 uTRes, uA, uB;
+uniform float uR, uAmt, uDecay;
+void main(){
+  vec2 uv = gl_FragCoord.xy / uTRes;
+  float v = max(texture2D(uPrev, uv).r - uDecay, 0.0);
+  vec2 pa = gl_FragCoord.xy - uA, ba = uB - uA;
+  float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-4), 0.0, 1.0);
+  float d = length(pa - ba * h);
+  v = max(v, uAmt * (1.0 - smoothstep(uR * 0.3, uR, d)));
+  gl_FragColor = vec4(v, v, v, 1.0);
+}`;
+const FS_MAIN = `#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+uniform vec2 uRes;
+uniform float uTime;
+uniform vec3 uRo, uFwd, uRight, uUp;
+uniform float uTan;
+uniform vec3 uSkyTop, uSkyHor, uSunCol, uSunDir, uGround, uDarkCol;
+uniform float uNight, uFog, uRace, uDark, uGlass, uMist, uFlash;
+uniform vec4 uEll;
+uniform sampler2D uTrail;
+uniform vec2 uVan;
+
+float hash(vec2 p){
+  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}
+float noise(vec2 p){
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+const mat2 M2 = mat2(1.6, 1.2, -1.2, 1.6);
+float fbm(vec2 p){ float v = 0.0, a = 0.5; for (int i = 0; i < 5; i++){ v += a * noise(p); p = M2 * p; a *= 0.5; } return v; }
+float fbm3(vec2 p){ float v = 0.0, a = 0.5; for (int i = 0; i < 3; i++){ v += a * noise(p); p = M2 * p; a *= 0.5; } return v; }
+
+vec3 skyBase(vec3 rd){
+  float h = max(rd.y, 0.0);
+  vec3 col = mix(uSkyHor, uSkyTop, pow(h, 0.5));
+  float sd = max(dot(rd, uSunDir), 0.0);
+  col += uSunCol * (0.13 * pow(sd, 6.0) + 0.3 * pow(sd, 48.0)) * (1.0 - 0.5 * uNight);
+  return col;
+}
+
+vec3 sky(vec3 rd){
+  vec3 col = skyBase(rd);
+  float sd = max(dot(rd, uSunDir), 0.0);
+  col += uSunCol * smoothstep(0.99955, 0.99985, sd) * 0.9;
+  // 먼 언덕 두 겹 — 안개 속에 잠긴 채
+  float az = atan(rd.x, rd.z);
+  float h1 = 0.016 + 0.026 * fbm3(vec2(az * 2.6, 3.1));
+  float h2 = 0.006 + 0.016 * fbm3(vec2(az * 6.3, 8.7));
+  vec3 hillC = mix(uSkyHor, uSkyTop, 0.55) * mix(vec3(0.92), uSunCol, 0.12);
+  col = mix(col, hillC, 0.26 * (1.0 - smoothstep(h1 - 0.002, h1 + 0.002, rd.y)) * smoothstep(-0.004, h1, rd.y));
+  col = mix(col, hillC * 0.9, 0.3 * (1.0 - smoothstep(h2 - 0.0015, h2 + 0.0015, rd.y)) * smoothstep(-0.004, h2 * 1.4, rd.y));
+  if (rd.y > 0.0) {
+    vec2 cp = rd.xz / (rd.y + 0.09) * 0.42 + vec2(uTime * 0.006 * (1.0 + uRace * 28.0), uTime * 0.002);
+    float c = fbm(cp);
+    float cov = smoothstep(0.5, 0.8, c) * smoothstep(0.015, 0.16, rd.y);
+    vec3 cc = mix(uSkyHor, vec3(1.0), 0.55) * mix(vec3(1.0), uSunCol, 0.4);
+    cc *= 1.0 - 0.12 * smoothstep(0.62, 0.9, c);
+    col = mix(col, cc, cov * 0.6 * (1.0 - uNight * 0.55));
+    if (uNight > 0.0) {
+      vec2 sp = rd.xz / (rd.y + 0.35) * 150.0;
+      vec2 id = floor(sp);
+      float r = hash(id);
+      float s = (1.0 - smoothstep(0.0, 0.35, length(fract(sp) - 0.5))) * step(0.992, r);
+      s *= 0.55 + 0.45 * sin(uTime * (1.5 + r * 3.0) + r * 40.0);
+      col += vec3(1.0, 0.96, 0.9) * s * uNight * smoothstep(0.04, 0.3, rd.y) * (1.0 - cov);
+    }
+  }
+  return col;
+}
+
+vec3 ground(vec3 rd, float t){
+  vec3 p = uRo + rd * t;
+  vec2 q = p.xz;
+  float ang = 2.0 * uTan / uRes.y;
+  float fx = max(t * ang, 1e-4);
+  float fz = fx / max(-rd.y, 0.02);
+  float fw = max(fx, fz);
+  float n1 = fbm3(q * 2.6);
+  vec2 cell = floor(q);
+  float par = mod(cell.x + cell.y, 2.0);
+  // 붉은 칸은 양귀비 들판, 흰 칸은 데이지 들판
+  vec3 red = mix(vec3(0.58, 0.17, 0.26), vec3(0.82, 0.39, 0.47), n1);
+  vec3 wht = mix(vec3(0.85, 0.86, 0.82), vec3(0.98, 0.97, 0.94), n1);
+  vec3 col = par < 0.5 ? red : wht;
+  float stripe = 0.5 + 0.5 * sin(q.x * 52.0 + n1 * 5.0);
+  col *= 1.0 - 0.045 * stripe * (1.0 - smoothstep(0.003, 0.012, fx));
+  float sf = 1.0 - smoothstep(0.005, 0.018, fw);
+  if (sf > 0.0) {
+    vec2 g = q * 56.0;
+    vec2 id = floor(g);
+    vec2 f = fract(g) - 0.5;
+    vec2 o = vec2(hash(id), hash(id + 17.3)) - 0.5;
+    float rad = 0.07 + 0.1 * hash(id + 3.7);
+    float d = length(f - o * 0.5);
+    float bl = (1.0 - smoothstep(rad * 0.45, rad, d)) * step(0.55, hash(id + 5.1)) * sf;
+    vec3 bc = par < 0.5 ? mix(vec3(1.0, 0.78, 0.84), vec3(1.0, 0.95, 0.9), hash(id + 9.2)) : mix(vec3(1.0, 0.88, 0.42), vec3(1.0, 1.0, 0.97), step(0.5, hash(id + 9.2)));
+    col = mix(col, bc, bl * 0.7);
+  }
+  // 멀어지면 체크 무늬가 평균색으로 녹아든다 (계단 현상 방지)
+  vec3 avgC = (vec3(0.70, 0.28, 0.36) + vec3(0.91, 0.91, 0.88)) * 0.5;
+  col = mix(col, avgC, smoothstep(0.1, 0.45, fw));
+  // 산울타리 — 시내에서 시내까지
+  float hxN = floor(q.x + 0.5);
+  float hx = abs(q.x - hxN);
+  float hw = 0.028 + (noise(vec2(q.y * 16.0, hxN * 9.1)) - 0.5) * 0.012;
+  float hedge = (1.0 - smoothstep(hw - fx, hw + fx, hx)) * min(1.0, hw * 1.6 / fx);
+  float side = (q.x - hxN) * (uSunDir.x >= 0.0 ? -1.0 : 1.0);
+  float shadow = (1.0 - smoothstep(hw, hw + 0.07 + fx, hx)) * step(0.0, side) * min(1.0, 0.07 / fx);
+  col *= 1.0 - 0.24 * shadow * (1.0 - uNight);
+  vec3 hc = mix(vec3(0.09, 0.21, 0.14), vec3(0.27, 0.45, 0.30), noise(q * vec2(24.0, 48.0)) * 0.6 + n1 * 0.4);
+  col = mix(col, hc, hedge);
+  // 시냇물 — 이쪽 끝에서 저쪽 끝까지
+  float bn = floor(q.y + 0.5);
+  float bz = abs(q.y - bn);
+  float bw = 0.042 + (noise(vec2(q.x * 3.0, bn)) - 0.5) * 0.012;
+  float cover = min(1.0, bw * 1.6 / fz);
+  float water = (1.0 - smoothstep(bw - fz, bw + fz, bz)) * cover;
+  float bank = (1.0 - smoothstep(bw + 0.004, bw + 0.024 + fz, bz)) * (1.0 - water) * cover;
+  col = mix(col, vec3(0.30, 0.45, 0.29), bank * 0.6);
+  if (water > 0.001) {
+    vec2 wq = vec2(q.x * 5.0 - uTime * 0.25, q.y * 36.0);
+    float r1 = noise(wq);
+    float r2 = noise(wq * 2.1 + vec2(uTime * 0.4, 0.0));
+    vec3 nrm = normalize(vec3((r1 - 0.5) * 0.2, 1.0, (r2 - 0.5) * 0.35));
+    vec3 rr = reflect(rd, nrm);
+    float fres = 0.04 + 0.96 * pow(1.0 - clamp(dot(-rd, nrm), 0.0, 1.0), 5.0);
+    vec3 deep = vec3(0.13, 0.30, 0.44);
+    vec3 wc = mix(deep, skyBase(rr) * vec3(0.78, 0.9, 1.02), clamp(fres * 1.1 + 0.2, 0.0, 0.85));
+    wc += uSunCol * pow(max(dot(rr, uSunDir), 0.0), 220.0) * 2.0;
+    wc += step(0.93, noise(q * vec2(60.0, 240.0) + vec2(uTime * 3.0, 0.0))) * 0.45 * (1.0 - smoothstep(0.004, 0.02, fw));
+    col = mix(col, wc, water);
+  }
+  float cs = smoothstep(0.42, 0.72, fbm3(q * 0.32 + vec2(uTime * 0.012, uTime * 0.004)));
+  col *= 1.0 - 0.16 * cs * (1.0 - uNight);
+  return col * uGround;
+}
+
+void main(){
+  vec2 frag = gl_FragCoord.xy;
+  vec2 uv = (frag - 0.5 * uRes) / (0.5 * uRes.y);
+  float alpha = 1.0, e = 0.0, wipe = 0.0;
+  vec2 off = vec2(0.0), dq = vec2(0.0);
+  if (uGlass > 0.5) {
+    dq = (frag - uEll.xy) / uEll.zw;
+    e = length(dq);
+    if (e > 1.0) { gl_FragColor = vec4(0.0); return; }
+    vec2 tuv = frag / uRes;
+    wipe = texture2D(uTrail, tuv).r;
+    vec2 px = 4.0 / uRes;
+    float gx = texture2D(uTrail, tuv + vec2(px.x, 0.0)).r - texture2D(uTrail, tuv - vec2(px.x, 0.0)).r;
+    float gy = texture2D(uTrail, tuv + vec2(0.0, px.y)).r - texture2D(uTrail, tuv - vec2(0.0, px.y)).r;
+    off = vec2(gx, gy) * 0.05 + dq * pow(e, 6.0) * 0.035;
+  }
+  vec2 suv = uv + off;
+  vec3 rd = normalize(uFwd + (suv.x * uRight + suv.y * uUp) * uTan);
+  vec3 col;
+  vec3 hzc = skyBase(normalize(vec3(rd.x, 0.0, rd.z)));
+  if (rd.y < -0.0005) {
+    float t = -uRo.y / rd.y;
+    col = ground(rd, t);
+    float fog = 1.0 - exp(-t * uFog);
+    col = mix(col, hzc, fog);
+  } else {
+    col = sky(rd);
+  }
+  col = mix(col, hzc, exp(-abs(rd.y) * 60.0) * 0.35);
+  if (uRace > 0.001) {
+    vec2 c = uv - uVan;
+    float a = atan(c.y, c.x);
+    float r = length(c);
+    float ln = smoothstep(0.62, 0.95, noise(vec2(a * 38.0, r * 1.5 - uTime * 9.0)));
+    col = mix(col, vec3(1.0, 0.99, 0.97), ln * uRace * smoothstep(0.25, 1.1, r) * 0.55);
+  }
+  float wiped = smoothstep(0.05, 0.75, wipe);
+  if (uGlass > 0.5) {
+    // 닦기 전의 저편은 빛바랜 은판 사진처럼
+    float lum = dot(col, vec3(0.3, 0.55, 0.15));
+    col = mix(col, vec3(lum) * vec3(0.86, 0.9, 1.0) * 0.9, 0.6 * (1.0 - wiped));
+  }
+  if (uMist > 0.001) {
+    vec2 mp = (frag - uEll.xy) / uEll.w * 1.4;
+    float tt = uTime * 0.035;
+    vec2 w = vec2(fbm(mp * 1.2 + vec2(tt, -tt * 0.7)), fbm(mp * 1.2 + vec2(4.7 - tt * 0.8, 1.9 + tt)));
+    float m = fbm(mp + 1.9 * w + vec2(0.0, tt * 0.4));
+    // 은빛 안개 — 저편의 빛이 안쪽에서 번져 나온다
+    float inner = exp(-dot(mp, mp) * 0.8);
+    float crest = smoothstep(0.3, 0.76, m + inner * 0.16);
+    vec3 mc = mix(vec3(0.17, 0.19, 0.32), vec3(0.94, 0.955, 1.0), crest);
+    vec3 opal = 0.5 + 0.5 * cos(6.2832 * (m * 1.7 + tt * 0.6 + vec3(0.0, 0.33, 0.67)));
+    mc = mix(mc, mc * (0.8 + 0.4 * opal), 0.26 * crest);
+    mc += vec3(0.1, 0.1, 0.15) * inner * crest;
+    mc += vec3(1.0) * pow(crest, 6.0) * 0.12;
+    mc = mix(mc, vec3(0.97, 0.975, 1.0), uFlash);
+    float dens = clamp(uMist * (0.66 + 0.55 * m), 0.0, 0.97);
+    dens *= 1.0 - 0.95 * wiped;
+    col = mix(col, mc, dens);
+  }
+  if (uGlass > 0.5) {
+    col = mix(col, col * vec3(0.84, 0.88, 0.98), 0.45 * (1.0 - wiped));
+    // 닦아 낸 자국의 가장자리 — 맺힌 물기
+    col += vec3(0.9, 0.93, 1.0) * clamp(length(off - dq * pow(e, 6.0) * 0.035) * 9.0, 0.0, 1.0) * 0.35;
+    float fox = smoothstep(0.56, 0.78, fbm(dq * 3.0 + 11.0)) * smoothstep(0.55, 1.0, e);
+    col = mix(col, vec3(0.30, 0.26, 0.22), fox * 0.5);
+    col *= 1.0 - 0.5 * smoothstep(0.72, 1.0, e);
+    vec2 cl = (frag - (uEll.xy + vec2(-0.92, -0.42) * uEll.zw)) / uEll.w;
+    vec2 cr = (frag - (uEll.xy + vec2(0.92, -0.42) * uEll.zw)) / uEll.w;
+    float flick = 0.85 + 0.15 * noise(vec2(uTime * 6.0, 1.0));
+    col += vec3(1.0, 0.58, 0.26) * (exp(-dot(cl, cl) * 9.0) + exp(-dot(cr, cr) * 9.0)) * 0.42 * flick;
+    float sh = dot(dq, normalize(vec2(1.0, 1.25)));
+    col += vec3(0.85, 0.9, 1.0) * (1.0 - smoothstep(0.0, 0.1, abs(sh - 0.35))) * 0.05;
+    col += vec3(0.85, 0.9, 1.0) * (1.0 - smoothstep(0.0, 0.05, abs(sh - 0.52))) * 0.03;
+    alpha = 1.0 - smoothstep(0.985, 1.0, e);
+  } else {
+    float vg = length(uv * vec2(0.62, 0.92));
+    col *= 1.0 - 0.17 * smoothstep(0.5, 1.35, vg);
+  }
+  col = mix(col, uDarkCol, uDark);
+  col += (hash(frag + fract(uTime * 7.0) * 100.0) - 0.5) / 255.0;
+  gl_FragColor = vec4(clamp(col, 0.0, 1.0) * alpha, alpha);
+}`;
+
+function createGL(canvas) {
+  let gl = null;
+  try {
+    gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false, powerPreference: 'high-performance' })
+      || canvas.getContext('experimental-webgl');
+  } catch (e) { gl = null; }
+  if (!gl) return null;
+  const compile = (type, src) => {
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(s)); return null; }
+    return s;
+  };
+  const link = fs => {
+    const v = compile(gl.VERTEX_SHADER, VS), f = compile(gl.FRAGMENT_SHADER, fs);
+    if (!v || !f) return null;
+    const p = gl.createProgram();
+    gl.attachShader(p, v); gl.attachShader(p, f); gl.bindAttribLocation(p, 0, 'p'); gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(p)); return null; }
+    return p;
+  };
+  const pMain = link(FS_MAIN), pTrail = link(FS_TRAIL);
+  if (!pMain || !pTrail) return null;
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+  gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND);
+  const locs = (p, names) => names.reduce((o, n) => { o[n] = gl.getUniformLocation(p, n); return o; }, {});
+  const U = locs(pMain, ['uRes', 'uTime', 'uRo', 'uFwd', 'uRight', 'uUp', 'uTan', 'uSkyTop', 'uSkyHor', 'uSunCol', 'uSunDir', 'uGround', 'uDarkCol', 'uNight', 'uFog', 'uRace', 'uDark', 'uGlass', 'uEll', 'uMist', 'uFlash', 'uTrail', 'uVan']);
+  const T = locs(pTrail, ['uPrev', 'uTRes', 'uA', 'uB', 'uR', 'uAmt', 'uDecay']);
+
+  let W = 0, H = 0, tw = 0, th = 0, tex = [], fbo = [], cur = 0, lost = false, decayAcc = 0, perfAcc = 0, perfN = 0;
+  let scale = Math.min(window.devicePixelRatio || 1, 1.3);
+  const MAXPX = 2.0e6;
+
+  function resize(force) {
+    let s = scale;
+    if (vw * vh * s * s > MAXPX) s = Math.sqrt(MAXPX / (vw * vh));
+    const w = Math.max(2, Math.round(vw * s)), h = Math.max(2, Math.round(vh * s));
+    if (!force && w === W && h === H) return;
+    W = w; H = h; canvas.width = w; canvas.height = h;
+    const ntw = Math.max(16, Math.round(w / 4)), nth = Math.max(16, Math.round(h / 4));
+    if (ntw === tw && nth === th) return;
+    tex.forEach(t => gl.deleteTexture(t)); fbo.forEach(f => gl.deleteFramebuffer(f));
+    tex = []; fbo = []; tw = ntw; th = nth; cur = 0;
+    for (let i = 0; i < 2; i++) {
+      const t = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, t);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, tw, th, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      const f = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, f);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+      gl.viewport(0, 0, tw, th); gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
+      tex.push(t); fbo.push(f);
+    }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  }
+
+  // 느린 기기에서는 해상도를 조금씩 낮춘다
+  function adapt(dt) {
+    perfAcc += dt; perfN++;
+    if (perfN < 50) return;
+    const avg = perfAcc / perfN; perfAcc = 0; perfN = 0;
+    if (avg > .026 && scale > .55) { scale = Math.max(.55, scale * .85); resize(true); }
+  }
+
+  function frame(dt, brush) {
+    if (lost) return;
+    if (S.t > 3) adapt(dt);
+    if (S.glass) {
+      decayAcc += dt;
+      const steps = Math.min(8, Math.floor(decayAcc * 50));
+      decayAcc -= steps / 50;
+      if (steps > 0 || brush) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo[1 - cur]);
+        gl.viewport(0, 0, tw, th);
+        gl.useProgram(pTrail);
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex[cur]);
+        gl.uniform1i(T.uPrev, 0);
+        gl.uniform2f(T.uTRes, tw, th);
+        const kx = tw / vw, ky = th / vh;
+        if (brush) {
+          gl.uniform2f(T.uA, brush.ax * kx, (vh - brush.ay) * ky);
+          gl.uniform2f(T.uB, brush.bx * kx, (vh - brush.by) * ky);
+          gl.uniform1f(T.uR, Math.max(1, brush.r * kx));
+          gl.uniform1f(T.uAmt, brush.amt);
+        } else {
+          gl.uniform2f(T.uA, -9999, -9999); gl.uniform2f(T.uB, -9999, -9999);
+          gl.uniform1f(T.uR, 1); gl.uniform1f(T.uAmt, 0);
+        }
+        gl.uniform1f(T.uDecay, steps > 0 ? steps / 255 + .0006 : 0);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        cur = 1 - cur;
+      }
+    }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, W, H);
+    gl.useProgram(pMain);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex[cur]);
+    gl.uniform1i(U.uTrail, 0);
+    const sx = W / vw, sy = H / vh;
+    gl.uniform2f(U.uRes, W, H);
+    gl.uniform1f(U.uTime, S.t);
+    gl.uniform3fv(U.uRo, cam.p); gl.uniform3fv(U.uFwd, cam.f); gl.uniform3fv(U.uRight, cam.r); gl.uniform3fv(U.uUp, cam.u);
+    gl.uniform1f(U.uTan, cam.tanEff);
+    gl.uniform3fv(U.uSkyTop, cam.top); gl.uniform3fv(U.uSkyHor, cam.hor); gl.uniform3fv(U.uSunCol, cam.sun);
+    gl.uniform3fv(U.uSunDir, cam.sunDir); gl.uniform3fv(U.uGround, cam.ground); gl.uniform3fv(U.uDarkCol, DARK);
+    gl.uniform1f(U.uNight, cam.night); gl.uniform1f(U.uFog, cam.fog); gl.uniform1f(U.uRace, S.race); gl.uniform1f(U.uDark, S.dark);
+    gl.uniform1f(U.uGlass, S.glass);
+    gl.uniform4f(U.uEll, S.ell[0] * sx, (vh - S.ell[1]) * sy, Math.max(1, S.ell[2] * sx), Math.max(1, S.ell[3] * sy));
+    gl.uniform1f(U.uMist, S.mist); gl.uniform1f(U.uFlash, S.flash);
+    gl.uniform2f(U.uVan, cam.van[0], cam.van[1]);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+
+  canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); lost = true; root.classList.add('nogl'); }, false);
+  resize(true);
+  return { resize, frame, get lost() { return lost; } };
+}
+
+/* ───────────── 카메라 ───────────── */
+function setBasis() {
+  const cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch), cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw);
+  const f = [sy * cp, sp, cy * cp], r0 = [cy, 0, -sy];
+  const u0 = [f[1] * r0[2] - f[2] * r0[1], f[2] * r0[0] - f[0] * r0[2], f[0] * r0[1] - f[1] * r0[0]];
+  const cr = Math.cos(cam.roll), sr = Math.sin(cam.roll);
+  cam.f = f;
+  cam.r = [r0[0] * cr + u0[0] * sr, r0[1] * cr + u0[1] * sr, r0[2] * cr + u0[2] * sr];
+  cam.u = [u0[0] * cr - r0[0] * sr, u0[1] * cr - r0[1] * sr, u0[2] * cr - r0[2] * sr];
+  const sd = [.28, Math.sin(cam.el), Math.cos(cam.el)], n = Math.hypot(sd[0], sd[1], sd[2]);
+  cam.sunDir = [sd[0] / n, sd[1] / n, sd[2] / n];
+  const hz = [sy, 0, cy], zc = dot(hz, f);
+  cam.van = zc > .01 ? [dot(hz, cam.r) / zc / cam.tanEff, dot(hz, cam.u) / zc / cam.tanEff] : [0, 0];
+}
+function project(x, y, z) {
+  const d = [x - cam.p[0], y - cam.p[1], z - cam.p[2]];
+  const zc = dot(d, cam.f);
+  if (zc < .05) return null;
+  const k = (vh * .5) / (cam.tanEff * zc);
+  return { x: vw * .5 + dot(d, cam.r) * k, y: vh * .5 - dot(d, cam.u) * k, k, zc, dist: Math.hypot(d[0], d[1], d[2]) };
+}
+
+/* ───────────── 측정 ───────────── */
+const rangeOf = el => el ? { top: docTop(el), h: el.offsetHeight } : null;
+function measure() {
+  vw = innerWidth; vh = innerHeight;
+  const hero = $('#hero');
+  L.heroTop = docTop(hero);
+  L.heroRange = Math.max(1, hero.offsetHeight - vh);
+  const mw = $('#mirror');
+  L.fw = mw.offsetWidth; L.fh = mw.offsetHeight;
+  L.gcx = mw.offsetLeft + L.fw * .5;
+  L.gcy = mw.offsetTop + L.fh * (720 / 1360);
+  L.grx = L.fw * (336 / 1000);
+  L.gry = L.fh * (476 / 1360);
+  L.stations = $$('[data-station]').map(el => {
+    const top = docTop(el), h = el.offsetHeight, ins = Math.min(vh * .42, h * .5);
+    return { def: ST[el.dataset.station], a: top + ins, b: top + h - ins };
+  }).filter(s => s.def).sort((p, q) => p.a - q.a);
+  L.race = rangeOf($('#race'));
+  L.cor = rangeOf($('#r8'));
+  L.shake = rangeOf($('#x'));
+  L.xi = docTop($('#xi'));
+  L.wood = rangeOf($('#wood'));
+  S.tf = '';
+  safe('mb-layout', () => MB.layout && MB.layout());
+  safe('shop-layout', () => SHOP.layout && SHOP.layout());
+}
+
+/* ───────────── 히어로: 거울 앞 ───────────── */
+const stage = $('#stage'), scene = $('#scene'), roomEl = $('#room'), flashEl = $('#flash'), flashP = $('#flash p');
+const glassText = $('#glassText'), heroFoot = $('#heroFoot'), sheenGrad = $('#gSheen');
+const P = { x: -1, y: -1, px: -1, py: -1, moved: false, seen: false, taps: [] };
+
+function updateHero() {
+  const p = clamp((S.ys - L.heroTop) / L.heroRange);
+  S.heroP = p;
+  const zp = clamp(p / .6), ez = ease(zp);
+  const s = 1 + 2.3 * Math.pow(zp, 2.1);
+  const tx = (vw * .5 - L.gcx) * ez, ty = (vh * .5 - L.gcy) * ez;
+  S.zoom = s;
+  S.ell = [L.gcx + tx, L.gcy + ty, L.grx * s, L.gry * s];
+  const active = p < .6;
+  if (active !== S.heroActive) {
+    S.heroActive = active;
+    stage.style.visibility = active ? '' : 'hidden';
+    roomEl.style.visibility = active ? '' : 'hidden';
+  }
+  S.glass = active ? 1 : 0;
+  S.mist = p < .6 ? lerp(.8, 1, smooth(.12, .55, p)) : 1 - smooth(.6, .96, p);
+  S.flash = smooth(.36, .56, p) * (1 - smooth(.62, .93, p));
+  flashEl.style.opacity = S.flash.toFixed(3);
+  flashEl.style.visibility = S.flash > .002 ? 'visible' : 'hidden';
+  const fp = band(p, .42, .52, .72, .86);
+  flashP.style.opacity = fp.toFixed(3);
+  flashP.style.transform = `translateY(${((.6 - p) * 30).toFixed(1)}px)`;
+  if (!active) return;
+  const tf = `translate(${tx.toFixed(2)}px,${ty.toFixed(2)}px) scale(${s.toFixed(4)})`;
+  if (tf !== S.tf) {
+    S.tf = tf;
+    scene.style.transformOrigin = `${L.gcx}px ${L.gcy}px`;
+    scene.style.transform = tf;
+    roomEl.style.transformOrigin = `${L.gcx + vw * .06}px ${L.gcy + vh * .06}px`;
+    roomEl.style.transform = tf;
+  }
+  glassText.style.opacity = (1 - smooth(.02, .2, p)).toFixed(3);
+  const hf = 1 - smooth(0, .07, p);
+  heroFoot.style.opacity = hf.toFixed(3);
+  heroFoot.style.visibility = hf > .01 ? '' : 'hidden';
+  // 금박 위를 미끄러지는 빛
+  const target = (P.seen && fineHover) ? clamp(P.x / vw) * 1400 - 200 : 500 + 560 * Math.sin(S.t * .12);
+  const ns = lerp(S.sheen, target, .05);
+  if (Math.abs(ns - S.sheen) > .8) {
+    S.sheen = ns;
+    sheenGrad.setAttribute('x1', (ns - 170).toFixed(1));
+    sheenGrad.setAttribute('x2', (ns + 190).toFixed(1));
+  }
+}
+
+function heroBrush() {
+  if (!S.glass || S.heroP > .45) { P.px = -1; P.moved = false; P.taps.length = 0; return null; }
+  const r = L.grx * S.zoom * .27;
+  if (P.taps.length) { const t = P.taps.shift(); return { ax: t[0], ay: t[1], bx: t[0] + .5, by: t[1], r: r * 1.25, amt: 1 }; }
+  if (P.moved) {
+    P.moved = false;
+    const b = { ax: P.px < 0 ? P.x : P.px, ay: P.px < 0 ? P.y : P.py, bx: P.x, by: P.y, r, amt: 1 };
+    P.px = P.x; P.py = P.y;
+    return b;
+  }
+  // 처음 몇 초, 보이지 않는 손이 유리를 한 번 닦는다
+  if (!P.seen && !reduced && S.readyAt >= 0) {
+    const k = (S.t - S.readyAt - 1.8) / 2.8;
+    if (k > 0 && k < 1) {
+      const pt = e => [S.ell[0] + S.ell[2] * lerp(-.56, .56, e), S.ell[1] + S.ell[3] * (-.18 + .46 * e + .09 * Math.sin(e * Math.PI * 2))];
+      const a = pt(ease(clamp(k - .05))), b = pt(ease(k));
+      return { ax: a[0], ay: a[1], bx: b[0], by: b[1], r: r * .95, amt: 1 };
+    }
+  }
+  return null;
+}
+
+function goThrough() {
+  window.scrollTo({ top: L.heroTop + L.heroRange + 4, behavior: reduced ? 'auto' : 'smooth' });
+}
+
+/* ───────────── 여정: 정거장 사이를 걷는다 ───────────── */
+function updateJourney() {
+  const st = L.stations;
+  if (!st.length) return;
+  const c = S.ys + vh * .5;
+  let A = st[0], B = st[0], e = 0;
+  if (c > st[0].a) {
+    let found = false;
+    for (let i = 0; i < st.length; i++) {
+      if (c < st[i].a) { A = st[i - 1]; B = st[i]; e = ease(clamp((c - A.b) / Math.max(1, B.a - A.b))); found = true; break; }
+      if (c <= st[i].b) { A = B = st[i]; found = true; break; }
+    }
+    if (!found) A = B = st[st.length - 1];
+  }
+  const a = A.def, b = B.def, sa = SKY[a.sky], sb = SKY[b.sky];
+  cam.p = mix3(a.p, b.p, e);
+  if (a === ST.hill && b === ST.hill) cam.p[2] -= .9 * (1 - S.heroP);
+  if (a !== b && a.rank >= 2 && b.rank === a.rank + 1 && !reduced) cam.p[1] += .045 * Math.sin(Math.PI * e);
+  cam.pitch = lerp(a.pitch, b.pitch, e);
+  cam.yaw = lerp(a.yaw, b.yaw, e);
+  cam.tan = lerp(a.tan, b.tan, e);
+  cam.top = mix3(sa.top, sb.top, e); cam.hor = mix3(sa.hor, sb.hor, e); cam.sun = mix3(sa.sun, sb.sun, e); cam.ground = mix3(sa.ground, sb.ground, e);
+  cam.el = lerp(sa.el, sb.el, e); cam.fog = lerp(sa.fog, sb.fog, e); cam.night = lerp(sa.night, sb.night, e);
+  cam.rank = lerp(a.rank, b.rank, e);
+  cam.roll = 0;
+  cam.tanEff = cam.tan * Math.max(1, Math.sqrt(.95 / (vw / vh)));
+  if (S.race > 0) {
+    cam.p[1] += Math.sin(S.t * 13) * .006 * S.race;
+    cam.roll += Math.sin(S.t * 6.5) * .012 * S.race;
+    cam.tanEff *= 1 + .1 * S.race;
+  }
+  if (S.shakeAmp > 0) {
+    const k = S.shakeAmp;
+    cam.roll += (Math.sin(S.t * 31) * .05 + Math.sin(S.t * 17.3) * .03) * k;
+    cam.pitch += Math.sin(S.t * 23) * .03 * k;
+  }
+  setBasis();
+}
+
+/* ───────────── 효과 캔버스: 불씨, 말, 꽃잎, 불꽃, 눈 ───────────── */
+const FX = (() => {
+  const cv = $('#fx'), ctx = cv.getContext('2d');
+  const scv = $('#snow'), sctx = scv.getContext('2d');
+  let dpr = 1, dirty = true, sdirty = true;
+  const R = Math.random;
+  const paths = {};
+  for (const k in PATHS) paths[k] = new Path2D(PATHS[k]);
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = scv.width = Math.round(vw * dpr);
+    cv.height = scv.height = Math.round(vh * dpr);
+    dirty = sdirty = true;
+  }
+
+  const spawnEmber = init => ({ x: vw * (.18 + .64 * R()), y: init ? vh * (.45 + .55 * R()) : vh + 8, vx: (R() - .5) * 16, vy: -(22 + R() * 44), life: init ? R() * 4 : 0, ttl: 4 + R() * 6, s: .7 + R() * 1.7, ph: R() * 6.28 });
+  const embers = Array.from({ length: 34 }, () => spawnEmber(true));
+  const petals = Array.from({ length: 90 }, () => ({ a: R() * 6.283, r: R() * 1.4, v: .5 + R() * 1.2, c: R() }));
+  const sparks = [];
+  const flakes = Array.from({ length: 150 }, () => ({ x: R(), y: R(), r: .6 + R() * 2.2, v: .03 + R() * .06, sw: 10 + R() * 26, ph: R() * 6.28 }));
+
+  function burst(x, y, n, palette, speed) {
+    for (let i = 0; i < n; i++) {
+      const a = R() * 6.283, v = (speed || 140) * (.35 + R() * .75);
+      sparks.push({ x, y, px: x, py: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, ttl: .9 + R() * .9, c: palette[(R() * palette.length) | 0], s: .8 + R() * 1.5 });
+    }
+    if (sparks.length > 900) sparks.splice(0, sparks.length - 900);
+  }
+
+  function drawEmbers(dt, alpha) {
+    for (const e of embers) {
+      e.life += dt;
+      e.x += (e.vx + Math.sin(S.t * .9 + e.ph) * 10) * dt;
+      e.y += e.vy * dt;
+      if (e.life > e.ttl || e.y < vh * .2) Object.assign(e, spawnEmber(false));
+      const a = Math.sin(Math.PI * clamp(e.life / e.ttl)) * (.55 + .45 * Math.sin(S.t * 9 + e.ph)) * alpha;
+      if (a <= .01) continue;
+      ctx.fillStyle = `rgba(255,150,70,${(a * .22).toFixed(3)})`;
+      ctx.beginPath(); ctx.arc(e.x, e.y, e.s * 3.2, 0, 6.283); ctx.fill();
+      ctx.fillStyle = `rgba(255,214,150,${(a * .9).toFixed(3)})`;
+      ctx.beginPath(); ctx.arc(e.x, e.y, e.s * .8, 0, 6.283); ctx.fill();
+    }
+  }
+
+  function drawHumpty(fog, fc) {
+    const m = h => rgb(mix3(hex(h), fc, fog));
+    ctx.fillStyle = m('#BCA78C'); ctx.strokeStyle = m('#6F5C48'); ctx.lineWidth = 1.2;
+    ctx.fillRect(-32, -34, 64, 34); ctx.strokeRect(-32, -34, 64, 34);
+    ctx.beginPath();
+    for (let row = 0; row < 3; row++) {
+      const y = -34 + row * 11.3;
+      ctx.moveTo(-32, y); ctx.lineTo(32, y);
+      for (let x = -32 + (row % 2 ? 8 : 0); x < 32; x += 16) { ctx.moveTo(x, y); ctx.lineTo(x, y + 11.3); }
+    }
+    ctx.stroke();
+    ctx.strokeStyle = m('#3A3050'); ctx.lineWidth = 3; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(-6, -38); ctx.lineTo(-9, -24); ctx.moveTo(6, -38); ctx.lineTo(9, -24); ctx.stroke();
+    ctx.fillStyle = m('#2A2340');
+    ctx.beginPath(); ctx.ellipse(-10, -23, 4.5, 2.4, 0, 0, 6.283); ctx.ellipse(10, -23, 4.5, 2.4, 0, 0, 6.283); ctx.fill();
+    const g = ctx.createRadialGradient(-6, -64, 2, 0, -55, 24);
+    g.addColorStop(0, m('#FFFDF6')); g.addColorStop(1, m('#D5C6A8'));
+    ctx.fillStyle = g; ctx.strokeStyle = m('#6F5C48'); ctx.lineWidth = 1.1;
+    ctx.beginPath(); ctx.ellipse(0, -55, 16, 21, 0, 0, 6.283); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = m('#B3243F'); ctx.fillRect(-15.6, -52, 31.2, 4.5);
+    ctx.fillStyle = m('#2A2340');
+    ctx.beginPath(); ctx.arc(-5.5, -61, 1.5, 0, 6.283); ctx.arc(5.5, -61, 1.5, 0, 6.283); ctx.fill();
+    ctx.strokeStyle = m('#2A2340'); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(0, -58, 6, .25, Math.PI - .25); ctx.stroke();
+  }
+
+  function drawPiece(it, alpha) {
+    const { c, sx, sy, sc, fog } = it;
+    const a = alpha * it.near;
+    if (a < .01) return;
+    const fc = cam.hor;
+    ctx.save();
+    ctx.globalAlpha = a;
+    const flat = clamp(cam.p[1] / Math.max(.2, it.zc) * 1.3, .1, .55);
+    const sw = (c.lying ? 56 : c.k === 'humpty' ? 36 : 30) * sc;
+    ctx.fillStyle = `rgba(28,22,60,${(.28 * (1 - fog)).toFixed(3)})`;
+    ctx.beginPath(); ctx.ellipse(sx + 6 * sc, sy, sw, sw * flat, 0, 0, 6.283); ctx.fill();
+    ctx.translate(sx, sy); ctx.rotate(-cam.roll); ctx.scale(sc, sc);
+    if (c.k === 'humpty') { drawHumpty(fog, fc); ctx.restore(); return; }
+    const pal = PAL[c.side];
+    const shade = rgb(mix3(pal[2], fc, fog)), mid = rgb(mix3(pal[1], fc, fog)), hi = rgb(mix3(pal[0], fc, fog * .9));
+    const g = ctx.createLinearGradient(-30, 0, 30, 0);
+    if (cam.sunDir[0] >= 0) { g.addColorStop(0, shade); g.addColorStop(.5, mid); g.addColorStop(.8, hi); g.addColorStop(1, mid); }
+    else { g.addColorStop(0, mid); g.addColorStop(.2, hi); g.addColorStop(.5, mid); g.addColorStop(1, shade); }
+    ctx.fillStyle = g;
+    ctx.strokeStyle = `rgba(20,14,40,${(.35 * (1 - fog)).toFixed(3)})`;
+    ctx.lineWidth = 1 / sc;
+    if (c.lying) { ctx.translate(-51, -28); ctx.rotate(Math.PI / 2); }
+    if (c.flip) ctx.scale(-1, 1);
+    ctx.fill(paths[c.k]); ctx.stroke(paths[c.k]);
+    if (c.k === 'queen') {
+      const gg = ctx.createLinearGradient(0, -95, 0, -70);
+      gg.addColorStop(0, rgb(mix3(GOLD[0], fc, fog))); gg.addColorStop(1, rgb(mix3(GOLD[2], fc, fog)));
+      ctx.fillStyle = gg;
+      ctx.fill(paths.coronet); ctx.stroke(paths.coronet);
+      ctx.beginPath(); ctx.arc(0, -95, 4.4, 0, 6.283); ctx.fill(); ctx.stroke();
+    } else if (c.k === 'king') {
+      ctx.fill(paths.cross); ctx.stroke(paths.cross);
+    } else if (c.k === 'knight') {
+      ctx.fillStyle = rgb(mix3(hex('#2A2340'), fc, fog));
+      ctx.beginPath(); ctx.arc(-11, -54, 2.2, 0, 6.283); ctx.fill();
+      ctx.strokeStyle = rgb(mix3(hex('#8E92AE'), fc, fog)); ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(2, -62); ctx.quadraticCurveTo(12, -52, 13, -36); ctx.stroke();
+    }
+    ctx.restore();
+    if (c.lying && sc > .25) {
+      ctx.save();
+      ctx.globalAlpha = a * (1 - fog) * .8;
+      ctx.fillStyle = '#3B3060';
+      ctx.font = `${Math.round(clamp(22 * sc, 9, 40))}px "IM Fell English", Georgia, serif`;
+      for (let i = 0; i < 3; i++) {
+        const ph = (S.t * .35 + i / 3) % 1;
+        ctx.globalAlpha = a * (1 - fog) * .8 * Math.sin(Math.PI * ph);
+        ctx.fillText('z', sx + (20 + i * 9 + ph * 10) * sc, sy - (58 + ph * 40) * sc);
+      }
+      ctx.restore();
+    }
+  }
+
+  function drawPieces(alpha) {
+    const list = [];
+    for (const c of CAST) {
+      const pr = project(c.x, 0, c.z);
+      if (!pr) continue;
+      const sc = pr.k * UNIT;
+      if (pr.x < -140 * sc || pr.x > vw + 140 * sc || pr.y < -20 || pr.y > vh + 160 * sc) continue;
+      list.push({ c, zc: pr.zc, sx: pr.x, sy: pr.y, sc, fog: 1 - Math.exp(-pr.dist * cam.fog), near: smooth(.42, .8, pr.zc) });
+    }
+    list.sort((p, q) => q.zc - p.zc);
+    for (const it of list) drawPiece(it, alpha);
+  }
+
+  function drawPetals(dt) {
+    const cx = vw * .5 + cam.van[0] * vh * .5, cy = vh * .5 - cam.van[1] * vh * .5;
+    ctx.lineCap = 'round';
+    for (const p of petals) {
+      p.r += dt * p.v * (.25 + p.r * 2.4) * (.3 + S.race);
+      if (p.r > 1.7) { p.r = .02 + R() * .1; p.a = R() * 6.283; }
+      const ca = Math.cos(p.a), sa = Math.sin(p.a) * .78, rr = p.r * vh * .9, r0 = rr * .9;
+      const a = S.race * smooth(.06, .35, p.r) * .85;
+      if (a < .01) continue;
+      ctx.strokeStyle = p.c < .5 ? `rgba(247,190,204,${a.toFixed(3)})` : `rgba(255,255,255,${a.toFixed(3)})`;
+      ctx.lineWidth = 1 + p.r * 2.4;
+      ctx.beginPath(); ctx.moveTo(cx + ca * r0, cy + sa * r0); ctx.lineTo(cx + ca * rr, cy + sa * rr); ctx.stroke();
+    }
+  }
+
+  function drawSparks(dt) {
+    ctx.lineCap = 'round';
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const s = sparks[i];
+      s.life += dt;
+      if (s.life > s.ttl) { sparks.splice(i, 1); continue; }
+      s.px = s.x; s.py = s.y;
+      s.vy += 70 * dt; s.vx *= 1 - .9 * dt; s.vy *= 1 - .9 * dt;
+      s.x += s.vx * dt; s.y += s.vy * dt;
+      const a = Math.pow(1 - s.life / s.ttl, 1.4);
+      ctx.strokeStyle = `rgba(${s.c},${a.toFixed(3)})`;
+      ctx.lineWidth = s.s;
+      ctx.beginPath(); ctx.moveTo(s.px, s.py); ctx.lineTo(s.x + (s.x - s.px) * .6, s.y + (s.y - s.py) * .6); ctx.stroke();
+    }
+  }
+
+  function drawSnow(dt) {
+    sctx.setTransform(1, 0, 0, 1, 0, 0);
+    sctx.clearRect(0, 0, scv.width, scv.height);
+    sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const off = S.y * .12;
+    for (const f of flakes) {
+      f.y += f.v * dt * (.6 + f.r * .25);
+      if (f.y > 1.05) { f.y -= 1.1; f.x = R(); }
+      const x = f.x * vw + Math.sin(S.t * .5 + f.ph) * f.sw;
+      let y = (f.y * (vh + 40) - off * (.5 + f.r / 3)) % (vh + 40);
+      if (y < 0) y += vh + 40;
+      y -= 20;
+      sctx.fillStyle = `rgba(255,255,255,${(S.snow * (.22 + f.r * .2)).toFixed(3)})`;
+      sctx.beginPath(); sctx.arc(x, y, f.r, 0, 6.283); sctx.fill();
+    }
+  }
+
+  function snowFrame(dt) {
+    if (S.snow > .01) { sdirty = true; drawSnow(reduced ? dt * .3 : dt); return; }
+    if (sdirty) { sctx.setTransform(1, 0, 0, 1, 0, 0); sctx.clearRect(0, 0, scv.width, scv.height); sdirty = false; }
+  }
+
+  function frame(dt) {
+    snowFrame(dt);
+    const heroA = S.heroP < .62 ? 1 - smooth(.22, .55, S.heroP) : 0;
+    const pieceA = (GLR && !GLR.lost) ? smooth(.6, .82, S.heroP) * (1 - S.dark) : 0;
+    const need = heroA > .01 || pieceA > .01 || S.race > .01 || sparks.length > 0;
+    if (!need) {
+      if (dirty) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); dirty = false; }
+      return;
+    }
+    dirty = true;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (pieceA > .01) drawPieces(pieceA);
+    if (S.race > .01) drawPetals(dt);
+    ctx.globalCompositeOperation = 'lighter';
+    if (heroA > .01 && !reduced) drawEmbers(dt, heroA);
+    if (sparks.length) drawSparks(dt);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+  return { resize, frame, burst };
+})();
+
+/* ───────────── 제1장: 거울 책 ───────────── */
+const MB = {};
+function initMirrorBook() {
+  const stack = $('#mbStack'), glass = $('#mbGlass'), rev = $('#poemRev'), tru = $('#poemTrue'), book = $('#mbook'), btn = $('#mbAll');
+  rev.innerHTML = tru.innerHTML;
+  let W = 0, gw = 0, gx = 0, touched = false, dragging = false, dx = 0;
+  const set = x => {
+    gx = clamp(x, 0, Math.max(0, W - gw));
+    stack.style.setProperty('--gx', gx.toFixed(1) + 'px');
+    glass.setAttribute('aria-valuenow', String(Math.round(W > gw ? gx / (W - gw) * 100 : 0)));
+  };
+  MB.layout = () => {
+    const ratio = W > gw ? gx / (W - gw) : 0;
+    W = stack.clientWidth;
+    gw = W < 560 ? Math.max(130, W * .62) : clamp(W * .42, 180, 380);
+    stack.style.setProperty('--gw', gw.toFixed(1) + 'px');
+    set(ratio * (W - gw));
+  };
+  MB.layout();
+  const localX = e => e.clientX - stack.getBoundingClientRect().left;
+  stack.addEventListener('pointerdown', e => {
+    if (book.classList.contains('all')) return;
+    const onGlass = e.target === glass;
+    if (!onGlass && e.pointerType !== 'mouse') return;
+    touched = true; dragging = true;
+    const px = localX(e);
+    if (onGlass) dx = px - gx; else { dx = gw / 2; set(px - dx); }
+    try { stack.setPointerCapture(e.pointerId); } catch (err) { /* 무시 */ }
+  });
+  stack.addEventListener('pointermove', e => { if (dragging) set(localX(e) - dx); });
+  const end = () => { dragging = false; };
+  stack.addEventListener('pointerup', end);
+  stack.addEventListener('pointercancel', end);
+  glass.addEventListener('keydown', e => {
+    const step = Math.max(8, (W - gw) * .06);
+    const map = { ArrowLeft: gx - step, ArrowRight: gx + step, Home: 0, End: W - gw, PageUp: gx - step * 3, PageDown: gx + step * 3 };
+    if (e.key in map) { e.preventDefault(); touched = true; set(map[e.key]); }
+  });
+  btn.addEventListener('click', () => {
+    const on = book.classList.toggle('all');
+    btn.setAttribute('aria-pressed', String(on));
+    btn.textContent = on ? '다시 거울 책으로' : '책 전체를 거울에 비추기';
+  });
+  // 처음 보일 때 손거울이 스스로 한 번 지나간다
+  const io = new IntersectionObserver(ents => {
+    for (const en of ents) {
+      if (!en.isIntersecting || touched) continue;
+      io.disconnect();
+      const to = (W - gw) * .5;
+      if (reduced) { set(to); return; }
+      const t0 = performance.now(), dur = 2600;
+      const step = now => {
+        if (touched) return;
+        const k = clamp((now - t0) / dur);
+        const e2 = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+        set(lerp(0, to, e2));
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+  }, { threshold: .45 });
+  io.observe(stack);
+}
+
+/* ───────────── 붉은 여왕의 달리기 ───────────── */
+const raceLines = $$('.race-line');
+const RACE_WIN = [[0, .06, .22, .3], [.26, .34, .46, .54], [.5, .58, .7, .78], [.74, .82, 1.5, 1.6]];
+function updateRace() {
+  const r = L.race;
+  if (!r) return;
+  const inView = S.y + vh > r.top && S.y < r.top + r.h;
+  const rp = clamp((S.y - r.top) / Math.max(1, r.h - vh));
+  S.race = (inView && !reduced) ? band(rp, .03, .12, .44, .56) : 0;
+  if (!inView) return;
+  raceLines.forEach((el, i) => {
+    const w = RACE_WIN[i], o = band(rp, w[0], w[1], w[2], w[3]);
+    let jx = 0;
+    if (i === 0 && S.race > 0) jx = Math.sin(S.t * 40) * 1.6 * S.race;
+    el.style.opacity = o.toFixed(3);
+    el.style.transform = `translate(calc(-50% + ${jx.toFixed(2)}px),${((1 - o) * 16).toFixed(1)}px)`;
+  });
+}
+
+/* ───────────── 이름 없는 숲 ───────────── */
+const woodEl = $('#wood');
+let woodState = '';
+function updateWood() {
+  if (!woodEl || !L.wood) return;
+  const prog = (vh * .62 - (L.wood.top - S.y)) / Math.max(1, L.wood.h);
+  const st = prog >= .7 ? 'found' : prog > .08 ? 'nameless' : '';
+  if (st === woodState) return;
+  woodState = st;
+  woodEl.classList.toggle('nameless', st === 'nameless');
+  woodEl.classList.toggle('found', st === 'found');
+}
+
+/* ───────────── 붉은 왕의 촛불 ───────────── */
+function initKing() {
+  const box = $('#redking'), btn = $('#wakeKing'), live = $('#kingLive');
+  let t = 0;
+  btn.addEventListener('click', () => {
+    if (box.classList.contains('out')) return;
+    box.classList.add('out');
+    live.textContent = '펑! 촛불이 꺼졌다.';
+    clearTimeout(t);
+    t = setTimeout(() => { box.classList.remove('out'); live.textContent = '다행히 붉은 왕은 깨지 않았다. 촛불이 다시 켜졌다.'; }, 2600);
+  });
+}
+
+/* ───────────── 양의 가게 ───────────── */
+const SHOP = {};
+function initShop() {
+  const cab = $('#cabinet');
+  const ICONS = ['cup', 'egg', 'spool', 'key', 'candle', 'bottle', 'watch', 'book', 'yarn', 'glass', 'jam', 'thimble', 'pot', 'pawn', 'bell', 'scissors'];
+  const cols = 4, rows = 3;
+  const icon = (id, extra) => `<svg class="${extra ? 'x' : ''}" viewBox="0 0 40 40" aria-hidden="true"><use href="#o-${id}"/></svg>`;
+  let html = '';
+  for (let i = 0; i < rows * cols; i++) {
+    const a = ICONS[(i * 5) % 16], b = ICONS[(i * 7 + 3) % 16], x1 = ICONS[(i * 3 + 11) % 16], x2 = ICONS[(i * 11 + 6) % 16];
+    html += `<div class="shelf" tabindex="0" role="button" aria-label="${Math.floor(i / cols) + 1}번째 줄 ${i % cols + 1}번째 선반 들여다보기">${icon(a)}${icon(x1, 1)}${icon(b)}${icon(x2, 1)}</div>`;
+  }
+  html += '<div class="bright" id="bright" aria-hidden="true"><svg class="b1" viewBox="0 0 40 40"><use href="#o-doll"/></svg><svg class="b2" viewBox="0 0 40 40"><use href="#o-box"/></svg></div>';
+  cab.innerHTML = html;
+  const shelves = $$('.shelf', cab), bright = $('#bright');
+  let at = 6, hideT = 0;
+  const posOf = i => {
+    const s = shelves[i];
+    return [s.offsetLeft + s.offsetWidth / 2 - bright.offsetWidth / 2, s.offsetTop + s.offsetHeight - bright.offsetHeight - 9];
+  };
+  const place = (i, instant) => {
+    const [x, y] = posOf(i);
+    if (instant) bright.style.transition = 'none';
+    bright.style.transform = `translate(${x}px,${y}px)`;
+    if (instant) { void bright.offsetWidth; bright.style.transition = ''; }
+    at = i;
+  };
+  const look = i => {
+    clearTimeout(hideT);
+    cab.classList.add('looking');
+    shelves.forEach((s, j) => s.classList.toggle('watched', j === i));
+    const above = i - cols;
+    if (above >= 0) { bright.classList.remove('gone'); place(above); }
+    else {
+      const [x] = posOf(i);
+      bright.classList.add('gone');
+      bright.style.transform = `translate(${x}px,-70px)`;
+    }
+  };
+  const unlook = () => {
+    cab.classList.remove('looking');
+    shelves.forEach(s => s.classList.remove('watched'));
+    clearTimeout(hideT);
+    hideT = setTimeout(() => {
+      if (!bright.classList.contains('gone')) return;
+      place(cols + Math.floor(Math.random() * (shelves.length - cols)), true);
+      bright.classList.remove('gone');
+    }, 1100);
+  };
+  shelves.forEach((s, i) => {
+    s.addEventListener('pointerenter', () => look(i));
+    s.addEventListener('focus', () => look(i));
+    s.addEventListener('click', () => look(i));
+    s.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); look(i); } });
+  });
+  cab.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') unlook(); });
+  cab.addEventListener('focusout', e => { if (!cab.contains(e.relatedTarget)) unlook(); });
+  document.addEventListener('pointerdown', e => { if (!cab.contains(e.target) && cab.classList.contains('looking')) unlook(); });
+  SHOP.layout = () => { if (!bright.classList.contains('gone')) place(at, true); };
+  place(at, true);
+}
+
+/* ───────────── 험프티의 풀이 ───────────── */
+const GLOSS = {
+  brillig: ['오후 네 시. 저녁거리를 굽기(broiling) 시작하는 시간.', '“four o’clock in the afternoon—the time when you begin broiling things for dinner.”'],
+  slithy: ['‘나긋하고(lithe) 미끈미끈한(slimy)’. 여행 가방(portmanteau)처럼, 두 가지 뜻이 한 낱말 속에 꾸려져 있다.', '“‘lithe and slimy.’ … You see it’s like a portmanteau—there are two meanings packed up into one word.”'],
+  toves: ['오소리 같기도 하고, 도마뱀 같기도 하고, 코르크 따개 같기도 한 것. 해시계 밑에 둥지를 틀고, 치즈를 먹고 산다.', '“something like badgers—they’re something like lizards—and they’re something like corkscrews.”'],
+  gyre: ['자이로스코프처럼 빙글빙글 도는 것.', '“To ‘gyre’ is to go round and round like a gyroscope.”'],
+  gimble: ['송곳(gimlet)처럼 구멍을 뚫는 것.', '“To ‘gimble’ is to make holes like a gimlet.”'],
+  wabe: ['해시계를 둘러싼 풀밭. 앞으로도 한참(a long way before), 뒤로도 한참(a long way behind) 뻗어 있어서 그렇게 부른다. “양옆으로도 한참이고요.” 앨리스가 덧붙였다.', '“It’s called ‘wabe,’ you know, because it goes a long way before it, and a long way behind it—” “And a long way beyond it on each side,” Alice added.'],
+  mimsy: ['‘얄팍하고(flimsy) 비참한(miserable)’. 여행 가방 낱말이 또 하나.', '“‘flimsy and miserable’ (there’s another portmanteau for you).”'],
+  borogoves: ['깃털이 사방으로 삐죽삐죽 솟은, 여위고 초라한 새. 살아 있는 대걸레 같다.', '“a thin shabby-looking bird with its feathers sticking out all round—something like a live mop.”'],
+  mome: ['rath는 초록색 돼지의 일종. mome은 확실치 않지만, 아마 ‘집에서 먼(from home)’의 준말 — 길을 잃었다는 뜻.', '“a ‘rath’ is a sort of green pig: but ‘mome’ I’m not certain about. I think it’s short for ‘from home’—meaning that they’d lost their way, you know.”'],
+  outgrabe: ['고함과 휘파람 사이의 무엇. 가운데에 재채기 같은 것이 한 번 끼어 있다.', '“something between bellowing and whistling, with a kind of sneeze in the middle.”']
+};
+function initGloss() {
+  const card = $('#glCard'), gw = $('.gw', card), gk = $('.gk', card), ge = $('.ge', card);
+  const words = $$('#stanza .w');
+  words.forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.k;
+    if (!GLOSS[k]) return;
+    gw.textContent = b.textContent;
+    gk.textContent = GLOSS[k][0];
+    ge.textContent = GLOSS[k][1];
+    card.classList.remove('swap'); void card.offsetWidth; card.classList.add('swap');
+    words.forEach(w => w.setAttribute('aria-pressed', String(w === b)));
+  }));
+  const sum = $('#sumbox');
+  sum.addEventListener('click', () => sum.classList.toggle('fixed'));
+}
+
+/* ───────────── 제9장: 대관식과 만찬 ───────────── */
+const COR = { burst: false, phase: -1, fc: [] };
+const COR_WIN = [[0, .03, .12, .16], [.14, .18, .28, .32], [.3, .35, .46, .5], [.5, .54, .62, .66], [.66, .7, .84, .88], [.87, .91, 1.5, 1.6]];
+const COR_EB = [
+  '<b>8.</b> Alice to Q.’s 8th <i>(coronation)</i>',
+  '<b>9.</b> Alice becomes Queen',
+  '<b>10.</b> Alice castles <i>(feast)</i>',
+  '<b>11.</b> Alice takes R. Q. &amp; wins'
+];
+function initCor() {
+  const cor = $('#r8');
+  ['r8', 'r8b'].forEach((k, i) => {
+    const m = document.createElement('div');
+    m.dataset.station = k;
+    m.setAttribute('aria-hidden', 'true');
+    m.style.cssText = `position:absolute;left:0;width:1px;top:${i ? 55 : 0}%;height:45%;pointer-events:none`;
+    cor.appendChild(m);
+  });
+  $('#corPawnPath').setAttribute('d', PATHS.pawn);
+  $('#corQueenPath').setAttribute('d', PATHS.queen);
+  $('#corCoronet').setAttribute('d', PATHS.coronet);
+  // 골풀 숲처럼 양쪽에서 글을 감싸도록, 가운데는 비워 둔다
+  const xs = [4, 9.5, 15, 20.5, 26, 74, 79.5, 85, 90.5, 96];
+  const hs = [62, 88, 70, 96, 58, 64, 92, 74, 86, 60];
+  const fcs = $('#fcs');
+  fcs.innerHTML = hs.map((h, i) => `<div class="fc" style="height:${h}px;left:${xs[i]}%"><i class="wax"></i><i class="fl"><b></b></i></div>`).join('');
+  COR.fc = $$('.fc', fcs).map((el, i) => ({ el, wax: $('.wax', el), fl: $('.fl', el), h: hs[i], x: xs[i], v: .78 + ((i * 37) % 10) / 45 }));
+  COR.lines = $$('.cor-line');
+  COR.eb = $('#corEb');
+  COR.piece = $('.cor-piece');
+  COR.pawn = $('#corPawn'); COR.queen = $('#corQueen'); COR.crown = $('#corCrown'); COR.ring = $('#corRing');
+  COR.feast = $('#feast');
+}
+function updateCor(dt) {
+  const r = L.cor;
+  if (!r || !COR.lines) return;
+  const inView = S.y + vh > r.top && S.y < r.top + r.h;
+  const pr = clamp((S.y - r.top) / Math.max(1, r.h - vh));
+  S.queen = S.y > r.top + (r.h - vh) * .37;
+  if (!inView) return;
+  COR.lines.forEach((el, i) => {
+    const w = COR_WIN[i], o = band(pr, w[0], w[1], w[2], w[3]);
+    el.style.opacity = o.toFixed(3);
+    el.style.transform = `translate(-50%,${((1 - o) * 14).toFixed(1)}px)`;
+  });
+  const ph = pr < .33 ? 0 : pr < .5 ? 1 : pr < .86 ? 2 : 3;
+  if (ph !== COR.phase) { COR.phase = ph; COR.eb.innerHTML = COR_EB[ph]; }
+  // 왕관이 내려와 폰의 머리에 앉는다
+  const cd = ease(clamp((pr - .13) / .19));
+  const cu = smooth(.36, .45, pr);
+  const cy = lerp(lerp(-250, -57, cd), -78, cu);
+  COR.crown.setAttribute('transform', `translate(0 ${cy.toFixed(2)})`);
+  COR.crown.style.opacity = (smooth(.12, .19, pr) * (1 - cu)).toFixed(3);
+  COR.pawn.style.opacity = (smooth(0, .05, pr) * (1 - smooth(.35, .39, pr))).toFixed(3);
+  const qo = smooth(.36, .41, pr) * (1 - smooth(.6, .68, pr));
+  COR.queen.style.opacity = qo.toFixed(3);
+  COR.queen.setAttribute('transform', `scale(${lerp(.9, 1, smooth(.36, .46, pr)).toFixed(4)})`);
+  const rr = clamp((pr - .36) / .1);
+  COR.ring.setAttribute('r', (20 + 70 * rr).toFixed(1));
+  COR.ring.style.opacity = (pr > .36 && pr < .46 ? (1 - rr) : 0).toFixed(3);
+  if (pr > .37 && pr < .5 && !COR.burst) {
+    COR.burst = true;
+    const b = COR.piece.getBoundingClientRect();
+    FX.burst(b.left + b.width / 2, b.top + b.height * (80 / 145), reduced ? 0 : 90, ['255,231,163', '255,255,255', '243,223,162', '255,190,200'], 190);
+  }
+  if (pr < .3) COR.burst = false;
+  // 만찬: 촛불이 천장까지 자란다
+  const fo = smooth(.6, .66, pr);
+  COR.feast.style.opacity = fo.toFixed(3);
+  const g = ease(clamp((pr - .66) / .2));
+  const shake = pr > .86 && !reduced ? (pr - .86) * 30 : 0;
+  // 촛대 줄의 바닥: 고정된 무대(100vh)의 91% 지점
+  const bottom = vh * .91;
+  const stickTop = clamp(r.top + r.h - vh - S.y, -vh, 0);
+  COR.fc.forEach((c, i) => {
+    const maxK = Math.max(0, (bottom - vh * .06) / c.h - 1) * c.v;
+    const k = 1 + maxK * g;
+    const jx = shake ? Math.sin(S.t * 37 + i * 2) * shake : 0;
+    c.wax.style.transform = `translateX(${jx.toFixed(2)}px) scaleY(${k.toFixed(4)})`;
+    c.fl.style.transform = `translate(${jx.toFixed(2)}px,${(-(k - 1) * c.h).toFixed(1)}px)`;
+    if (fo > .5 && g > .45 && !reduced && Math.random() < dt * 1.3) {
+      const fx = vw * c.x / 100 + jx, fy = stickTop + bottom - c.h * k - 18;
+      FX.burst(fx, fy, 26, ['255,215,140', '255,170,190', '200,220,255', '255,255,255'], 150);
+    }
+  });
+}
+
+/* ───────────── 제10장: 흔들기 ───────────── */
+const SH = { chars: [], acc: 0 };
+function initShake() {
+  const s1 = $('#shS1');
+  const text = s1.textContent;
+  const copy = document.createElement('p');
+  copy.className = 'sr-only';
+  copy.textContent = text;
+  s1.parentNode.insertBefore(copy, s1);
+  s1.setAttribute('aria-hidden', 'true');
+  s1.innerHTML = text.split(' ').map(w => `<span style="white-space:nowrap">${[...w].map(ch => `<span class="c">${ch}</span>`).join('')}</span>`).join(' ');
+  SH.chars = $$('.c', s1);
+  SH.s2 = $('#shS2');
+}
+function updateShake(dt) {
+  const r = L.shake;
+  if (!r) return;
+  const inView = S.y + vh > r.top && S.y < r.top + r.h;
+  const sp = clamp((S.y - r.top) / Math.max(1, r.h - vh));
+  S.shakeAmp = inView && !reduced ? smooth(.02, .4, sp) * (1 - .75 * smooth(.62, .95, sp)) : 0;
+  S.dark = S.y >= r.top + r.h - vh * .5 ? 1 : inView ? smooth(.2, .88, sp) : 0;
+  if (!inView) return;
+  SH.s2.style.opacity = smooth(.4, .58, sp).toFixed(3);
+  SH.acc += dt;
+  if (SH.acc < 1 / 30) return;
+  SH.acc = 0;
+  const a = S.shakeAmp;
+  for (const c of SH.chars) {
+    if (a < .01) { if (c.style.transform) c.style.transform = ''; continue; }
+    const R = Math.random;
+    c.style.transform = `translate(${((R() - .5) * 9 * a).toFixed(1)}px,${((R() - .5) * 7 * a).toFixed(1)}px) rotate(${((R() - .5) * 14 * a).toFixed(1)}deg)`;
+  }
+}
+
+/* ───────────── 제12장: 마주 선 두 거울 ───────────── */
+function buildDroste() {
+  const svg = $('#drosteSvg');
+  const k = .8, N = 15;
+  let defs = '', body = '';
+  for (let i = N - 1; i >= 0; i--) {
+    const s = Math.pow(k, i), rx = 440 * s, ry = 520 * s, tr = rx - 44 * s, tq = ry - 44 * s;
+    defs += `<path id="dp${i}" d="M${(-tr).toFixed(2)} 0A${tr.toFixed(2)} ${tq.toFixed(2)} 0 0 1 ${tr.toFixed(2)} 0"/>`;
+    body += `<g>
+      <ellipse rx="${rx.toFixed(2)}" ry="${ry.toFixed(2)}" fill="none" stroke="#2A1D08" stroke-width="${(24 * s).toFixed(2)}"/>
+      <ellipse rx="${rx.toFixed(2)}" ry="${ry.toFixed(2)}" fill="none" stroke="url(#gGold)" stroke-width="${(16 * s).toFixed(2)}"/>
+      <ellipse rx="${(rx - 2 * s).toFixed(2)}" ry="${(ry - 2 * s).toFixed(2)}" fill="none" stroke="#FFF3CC" stroke-width="${(2.6 * s).toFixed(2)}" opacity=".5"/>
+      <ellipse rx="${(rx - 19 * s).toFixed(2)}" ry="${(ry - 19 * s).toFixed(2)}" fill="none" stroke="#EBD9A4" stroke-width="${(6 * s).toFixed(2)}" stroke-dasharray="0 ${(14 * s).toFixed(2)}" stroke-linecap="round" opacity=".85"/>
+      <text font-size="${(27 * s).toFixed(2)}" fill="${i % 2 ? '#F4AFBD' : '#EEEAFB'}" font-family="Diphylleia, 'Nanum Myeongjo', serif" letter-spacing="${(3 * s).toFixed(2)}"><textPath href="#dp${i}" startOffset="50%" text-anchor="middle">${i % 2 ? '붉은 왕의 꿈속의 앨리스' : '앨리스의 꿈속의 붉은 왕'}</textPath></text>
+    </g>`;
+  }
+  svg.innerHTML = `<defs>${defs}</defs>${body}`;
+}
+
+/* ───────────── 끝맺는 시 ───────────── */
+const ACRO = [
+  ['A boat beneath a sunny sky,', '햇살 가득한 하늘 아래 작은 배 한 척,'],
+  ['Lingering onward dreamily', '꿈결인 듯 느릿느릿 나아가던'],
+  ['In an evening of July—', '칠월의 어느 저녁—'],
+  ['Children three that nestle near,', '곁에 바짝 다가앉은 세 아이,'],
+  ['Eager eye and willing ear,', '반짝이는 눈과 기울인 귀,'],
+  ['Pleased a simple tale to hear—', '소박한 이야기에 즐거워하던—'],
+  ['Long has paled that sunny sky:', '그 눈부시던 하늘은 빛바랜 지 오래,'],
+  ['Echoes fade and memories die.', '메아리는 잦아들고 기억은 스러진다.'],
+  ['Autumn frosts have slain July.', '가을 서리가 칠월을 거두어 갔다.'],
+  ['Still she haunts me, phantomwise,', '그래도 그 아이는 유령처럼 내 곁을 맴돈다.'],
+  ['Alice moving under skies', '앨리스가 거닌다, 깨어 있는 눈으로는'],
+  ['Never seen by waking eyes.', '결코 볼 수 없는 하늘 아래를.'],
+  ['Children yet, the tale to hear,', '아이들은 여전히, 이야기를 들으려'],
+  ['Eager eye and willing ear,', '반짝이는 눈과 기울인 귀로'],
+  ['Lovingly shall nestle near.', '다정히 곁에 다가앉으리라.'],
+  ['In a Wonderland they lie,', '이상한 나라에 그들은 누워'],
+  ['Dreaming as the days go by,', '날들이 흘러가는 동안 꿈꾸고'],
+  ['Dreaming as the summers die:', '여름이 저무는 동안 꿈꾼다.'],
+  ['Ever drifting down the stream—', '언제까지나 물결 따라 흘러가며—'],
+  ['Lingering in the golden gleam—', '금빛 반짝임 속에 머물며—'],
+  ['Life, what is it but a dream?', '인생이란, 한낱 꿈이 아니고 무엇이랴?']
+];
+function buildAcro() {
+  const el = $('#acro');
+  let html = '';
+  for (let s = 0; s < 7; s++) {
+    const lines = ACRO.slice(s * 3, s * 3 + 3);
+    const en = lines.map((l, j) => { const n = s * 3 + j; return `<span><span class="cap" style="--i:${n}">${l[0][0]}</span>${l[0].slice(1)}</span>`; }).join('');
+    const ko = lines.map(l => `<span>${l[1]}</span>`).join('');
+    html += `<div class="st"><p class="en" lang="en">${en}</p><p class="ko">${ko}</p></div>`;
+  }
+  el.innerHTML = html;
+  const coda = $('#coda');
+  const io = new IntersectionObserver(ents => {
+    for (const en of ents) if (en.isIntersecting) { el.classList.add('lit'); coda.classList.add('lit'); io.disconnect(); }
+  }, { threshold: .25 });
+  io.observe(el);
+}
+
+/* ───────────── 액자 장식 (잎, 조가비, 장미 무늬) ───────────── */
+function buildFrame() {
+  const cx = 500, cy = 720, ax = 398, ay = 538;
+  const N = 1440, pts = [];
+  let len = 0, px = cx + ax, py = cy;
+  for (let i = 0; i <= N; i++) {
+    const th = i / N * Math.PI * 2, x = cx + ax * Math.cos(th), y = cy + ay * Math.sin(th);
+    if (i) len += Math.hypot(x - px, y - py);
+    pts.push([th, len]); px = x; py = y;
+  }
+  const norm = a => { a %= Math.PI * 2; if (a > Math.PI) a -= Math.PI * 2; if (a < -Math.PI) a += Math.PI * 2; return a; };
+  const count = 60;
+  let html = '';
+  let j = 0;
+  for (let k = 0; k < count; k++) {
+    const s = (k + .5) / count * len;
+    while (j < pts.length - 1 && pts[j][1] < s) j++;
+    const th = pts[j][0];
+    if (Math.abs(norm(th - 1.5 * Math.PI)) < .62 || Math.abs(norm(th - .5 * Math.PI)) < .3) continue;
+    const x = cx + ax * Math.cos(th), y = cy + ay * Math.sin(th);
+    const rot = Math.atan2(Math.sin(th) / ay, Math.cos(th) / ax) * 180 / Math.PI;
+    html += `<use href="#leaf" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(1)}) scale(${k % 2 ? .72 : 1})"/>`;
+  }
+  $('#leaves').innerHTML = html;
+  // 아래쪽 조가비
+  const sx = 500, sy = 1238, Rr = 72, RC = 86, n = 11, a0 = 22 * Math.PI / 180, a1 = 158 * Math.PI / 180;
+  const ends = [];
+  for (let i = 0; i < n; i++) { const a = a0 + (a1 - a0) * i / (n - 1); ends.push([sx + Rr * Math.cos(a), sy + Rr * Math.sin(a), a]); }
+  let d = `M${sx} ${sy}L${ends[0][0].toFixed(1)} ${ends[0][1].toFixed(1)}`;
+  for (let i = 1; i < n; i++) {
+    const am = (ends[i - 1][2] + ends[i][2]) / 2;
+    d += `Q${(sx + RC * Math.cos(am)).toFixed(1)} ${(sy + RC * Math.sin(am)).toFixed(1)} ${ends[i][0].toFixed(1)} ${ends[i][1].toFixed(1)}`;
+  }
+  d += 'Z';
+  let ribs = '';
+  for (let i = 1; i < n - 1; i++) { const a = ends[i][2]; ribs += `M${(sx + 16 * Math.cos(a)).toFixed(1)} ${(sy + 16 * Math.sin(a)).toFixed(1)}L${(sx + (Rr - 5) * Math.cos(a)).toFixed(1)} ${(sy + (Rr - 5) * Math.sin(a)).toFixed(1)}`; }
+  $('#shell').innerHTML = `<path d="${d}" fill="url(#gGold)" stroke="#3A270B" stroke-width="3" stroke-linejoin="round"/><path d="${ribs}" fill="none" stroke="#5A3F12" stroke-width="2.2" opacity=".75"/><circle cx="${sx}" cy="${sy}" r="17" fill="url(#gGoldDk)" stroke="#3A270B" stroke-width="2.5"/><circle cx="${sx}" cy="${sy}" r="7.5" fill="url(#gPearl)"/>`;
+  // 좌우 장미 무늬
+  let ros = '';
+  [[124, 720], [876, 720]].forEach(([x, y]) => {
+    let pet = '';
+    for (let i = 0; i < 8; i++) pet += `<ellipse cx="0" cy="-13" rx="6.5" ry="11" transform="rotate(${i * 45})" fill="url(#gGold)" stroke="#3A270B" stroke-width="1.6"/>`;
+    ros += `<g transform="translate(${x} ${y})">${pet}<circle r="9" fill="url(#gGoldDk)" stroke="#3A270B" stroke-width="2"/><circle r="4.5" fill="#B3243F"/></g>`;
+  });
+  $('#rosettes').innerHTML = ros;
+}
+
+/* ───────────── 레일, 드러남, 이동 ───────────── */
+const rail = $('#rail');
+let railState = '';
+function updateRail() {
+  const show = S.heroP >= 1 && cam.rank >= 1.5 && S.dark < .5;
+  const st = show ? 'on' : '';
+  if (st !== railState) { railState = st; rail.classList.toggle('on', show); }
+  if (!show) return;
+  rail.style.setProperty('--rk', clamp(cam.rank, 1, 8).toFixed(3));
+  rail.classList.toggle('queen', S.queen);
+  rail.classList.toggle('dark', cam.night > .35);
+}
+
+function initReveal() {
+  const els = $$('.reveal');
+  if (!('IntersectionObserver' in window)) { els.forEach(el => el.classList.add('in')); return; }
+  const io = new IntersectionObserver(ents => {
+    for (const en of ents) if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+  }, { rootMargin: '0px 0px -10% 0px', threshold: .06 });
+  els.forEach(el => io.observe(el));
+}
+
+function initNav() {
+  $('#goThrough').addEventListener('click', goThrough);
+  $('#mirror').addEventListener('click', () => { if (fineHover) goThrough(); });
+  $('#mirror').addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') P.taps.push([e.clientX, e.clientY]); });
+  if (!fineHover) $('#wipeHint').textContent = '유리를 톡톡 건드려 김을 닦아 보세요';
+  $('#toTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }));
+  $$('#rail a').forEach(a => a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (!t) return;
+    e.preventDefault();
+    window.scrollTo({ top: docTop(t) + (t.id === 'r8' ? 2 : vh * .1), behavior: reduced ? 'auto' : 'smooth' });
+  }));
+  addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
+    P.x = e.clientX; P.y = e.clientY; P.moved = true; P.seen = true;
+  }, { passive: true });
+}
+
+/* ───────────── 루프 ───────────── */
+let last = performance.now(), glHidden = false;
+function loop(now) {
+  const dt = Math.min(.05, Math.max(.001, (now - last) / 1000));
+  last = now;
+  S.t += dt;
+  S.y = window.scrollY;
+  const k = 1 - Math.exp(-dt * (reduced ? 40 : 7.5));
+  S.ys += (S.y - S.ys) * k;
+  if (Math.abs(S.y - S.ys) < .25) S.ys = S.y;
+
+  safe('hero', updateHero);
+  safe('race', updateRace);
+  safe('shake', updateShake, dt);
+  safe('journey', updateJourney);
+  safe('wood', updateWood);
+  safe('cor', updateCor, dt);
+  safe('rail', updateRail);
+  S.snow = clamp((S.y + vh - L.xi) / (vh * .8));
+
+  if (GLR && !GLR.lost) {
+    const off = S.dark >= .999 && L.shake && S.y > L.shake.top + L.shake.h;
+    if (off !== glHidden) { glHidden = off; $('#gl').style.visibility = off ? 'hidden' : ''; }
+    if (!off) safe('gl', GLR.frame, dt, heroBrush());
+  }
+  safe('fx', FX.frame, dt);
+  requestAnimationFrame(loop);
+}
+
+/* ───────────── 시작 ───────────── */
+function resizeAll() {
+  vw = innerWidth; vh = innerHeight;
+  if (GLR) GLR.resize();
+  FX.resize();
+  measure();
+}
+
+safe('lang', () => $$('.en,.en-i,.sn,.hf-en,.gt-en1,.gt-en2,.gt-by,.wk-en,.sh-en,.eyebrow .mv,.cor-eb,.colophon .sub,.moves tbody').forEach(el => { if (!el.hasAttribute('lang')) el.setAttribute('lang', 'en'); }));
+safe('frame', buildFrame);
+safe('mbook', initMirrorBook);
+safe('king', initKing);
+safe('shop', initShop);
+safe('gloss', initGloss);
+safe('cor-init', initCor);
+safe('shake-init', initShake);
+safe('droste', buildDroste);
+safe('acro', buildAcro);
+safe('reveal', initReveal);
+safe('nav', initNav);
+GLR = safe('gl-init', createGL, $('#gl')) || null;
+if (!GLR) root.classList.add('nogl');
+resizeAll();
+S.y = S.ys = window.scrollY;
+safe('hero', updateHero);
+safe('journey', updateJourney);
+requestAnimationFrame(loop);
+
+const go = () => {
+  if (S.readyAt >= 0) return;
+  S.readyAt = S.t;
+  root.classList.add('loaded', 'ready');
+  measure();
+};
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => setTimeout(go, 80));
+setTimeout(go, 2600);
+
+let rzT = 0;
+addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(resizeAll, 140); });
+if ('ResizeObserver' in window) {
+  let roT = 0;
+  new ResizeObserver(() => { clearTimeout(roT); roT = setTimeout(measure, 160); }).observe($('#book'));
+}
+})();
+</script>
+</body>
+</html>
