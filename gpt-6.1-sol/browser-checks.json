@@ -1,0 +1,75 @@
+{
+  "checked_at_utc": "2026-09-30T05:29:58.096527+00:00",
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "xhigh",
+  "codex_thread_id": "01a0f0b1-ca81-7633-95e1-2cbe5779f9e5",
+  "codex_home": "C:\\Users\\sun\\AppData\\Roaming\\orca\\codex-runtime-home\\home",
+  "browser": "Playwright Chromium 149.0.7827.55",
+  "opened_via": "file://",
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1000,
+      "scroll_width": 1440,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "scroll_width": 390,
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "scroll_width": 320,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "scroll_width": 768,
+      "overflow": false
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "scroll_width": 1024,
+      "overflow": false
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "scroll_width": 1920,
+      "overflow": false
+    }
+  ],
+  "console_errors": [],
+  "external_requests": 0,
+  "embedded_fonts_loaded": true,
+  "embedded_art_dimensions": [
+    1122,
+    1402
+  ],
+  "interactions": {
+    "mouse": "passed: moonlight toggle, all three scene tabs, entry/top/navigation links, mirror pointer movement/reset",
+    "keyboard": "passed: Enter/Space activation; tab arrows and wrapping; Home/End; single selected tab and roving tabindex; visible focus; entry/top/skip links",
+    "touch": "passed at 390x844: moonlight toggle, entry link and scene tabs",
+    "reduced_motion": "passed: stars and rotating seal stop; mirror transform none; smooth scrolling disabled"
+  },
+  "visual_review": "Reviewed desktop 1440, mobile 390, narrow mobile 320, tablet 768, moonlight mode and chess scene screenshots; no clipped text or controls.",
+  "screenshots_directory": "C:\\Users\\sun\\AppData\\Local\\Temp\\alice-gpt-6-1-checks",
+  "assets": {
+    "generation_tool": "built-in image_gen",
+    "generation_prompt": "Use case: illustration-story. Asset type: exquisite central artwork for an immersive single-file website about Lewis Carroll's Through the Looking-Glass. Generate a breathtaking tall portrait composition, aspect ratio 4:5, very high resolution. Scene: a tiny Alice in an elegant powder-blue Victorian dress and white apron seen from behind at the bottom center, walking along a gleaming black-and-white chessboard path that curves across still silver water toward a fantastical ivory palace suspended between towering flowering gardens. Huge sculptural deep crimson, soft pink and lavender roses grow along the left and right sides, curling surreal stems, dew droplets catching light. Two large graceful porcelain white chess knights emerge among the flowers. Silver-blue cascades, floating distant islands, a pale crescent moon and delicate stars in a luminous misty lilac sky. The palace and garden are reflected in the mirror-like water. Composition has extraordinary depth, beautiful atmospheric perspective, detailed flowers in foreground, tiny Alice in lower third clearly visible. Color palette luminous periwinkle, lavender, pearl silver, dusty rose, champagne and deep burgundy; cinematic soft pearlescent light; sophisticated magical dream rather than cartoon. Style: a richly rendered surreal fine-art illustration with tactile oil-paint detail, opulent botanical detail, some realistic miniature material qualities, incredible beauty and polish. No text, no typography, no borders, no UI, no watermark. Full bleed painting.",
+    "packaging": "Original PNG and three display font faces embedded as data URIs in looking-glass.html"
+  },
+  "artifact_bytes": 4445546,
+  "artifact_lines": 445,
+  "rollout_log": "C:\\Users\\sun\\AppData\\Roaming\\orca\\codex-runtime-home\\home\\sessions\\2026\\09\\30\\rollout-2026-09-30T14-02-58-01a0f0b1-ca81-7633-95e1-2cbe5779f9e5.jsonl",
+  "recorded_turn_context": {
+    "model": "gpt-6.1-sol",
+    "effort": "xhigh",
+    "turn_id": "01a0f0b1-cb0e-7122-8343-4ea36d5f2198"
+  }
+}

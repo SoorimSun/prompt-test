@@ -1,0 +1,30 @@
+{
+  "scope": "one completed Alice HTML task; excludes subsequent report creation",
+  "turn_id": "01a0f0b1-cb0e-7122-8343-4ea36d5f2198",
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "xhigh",
+  "started_at_kst": "2026-09-30T14:02:58.948+09:00",
+  "completed_at_kst": "2026-09-30T14:32:19.475+09:00",
+  "duration_ms": 1760633,
+  "time_to_first_token_ms": 31546,
+  "tokens": {
+    "total": 1519489,
+    "input": 1487865,
+    "cached_input": 1408384,
+    "uncached_input": 79481,
+    "output": 31624,
+    "reasoning_output_subset": 9071,
+    "cached_share_of_input_percent": 94.66
+  },
+  "artifact": {
+    "name": "looking-glass.html",
+    "bytes": 4445546,
+    "lines": 445,
+    "sha256": "1b3ae55e55e5510d09b7a7e1a63f13afb1467bba8985f62c27516ba3ba1402c2"
+  },
+  "sources": {
+    "rollout_log": "rollout-2026-09-30T14-02-58-01a0f0b1-ca81-7633-95e1-2cbe5779f9e5.jsonl",
+    "usage_record_line": 210,
+    "task_complete_line": 212
+  }
+}

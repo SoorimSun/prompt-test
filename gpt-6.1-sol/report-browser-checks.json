@@ -1,0 +1,38 @@
+{
+  "scope": "Report browser verification and optional parent visual review; outside measured page task",
+  "report_viewports": [
+    {
+      "width": 1440,
+      "height": 1000,
+      "overflow_px": 0,
+      "errors": [],
+      "metrics_match_json": true,
+      "offline": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "overflow_px": 0,
+      "errors": [],
+      "metrics_match_json": true,
+      "offline": true
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "overflow_px": 0,
+      "errors": [],
+      "metrics_match_json": true,
+      "offline": true
+    }
+  ],
+  "page_visual_review": [],
+  "report_metric_arithmetic": "passed",
+  "artifact_hash_matches_metrics": true,
+  "api_cost_arithmetic": "passed",
+  "browser": "Chromium 149.0.7827.55",
+  "report_navigation": {
+    "mouse": "passed",
+    "keyboard_Tab_Enter": "passed"
+  }
+}

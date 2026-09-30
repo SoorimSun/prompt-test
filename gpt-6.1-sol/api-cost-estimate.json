@@ -1,0 +1,79 @@
+{
+  "scope": "API-equivalent model token cost estimate for the completed Alice page task; not a billed amount",
+  "currency": "USD",
+  "model": "gpt-6.1-sol",
+  "turn_id": "01a0f0b1-cb0e-7122-8343-4ea36d5f2198",
+  "pricing_checked_at_kst": "2026-09-30T14:49:15+09:00",
+  "basis": "OpenAI Standard short-context text token rates; Fast shown as a separate 2x scenario",
+  "service_tier_recorded": null,
+  "tokens": {
+    "uncached_input_excluding_cache_writes": 79481,
+    "cached_input": 1408384,
+    "cache_write_input": 0,
+    "output": 31624
+  },
+  "rates_usd_per_million_tokens": {
+    "uncached_input_excluding_cache_writes": "2.00",
+    "cached_input": "0.10",
+    "cache_write_input": "2.50",
+    "output": "10.00"
+  },
+  "breakdown_usd": {
+    "uncached_input_excluding_cache_writes": "0.158962",
+    "cached_input": "0.1408384",
+    "cache_write_input": "0.00",
+    "output": "0.31624"
+  },
+  "standard_total_usd": "0.6160404",
+  "fast_scenario_total_usd": "1.2320808",
+  "context": {
+    "model_calls": 23,
+    "max_single_request_input_tokens": 96204,
+    "long_context_threshold_input_tokens": 272000,
+    "long_context_requests": 0
+  },
+  "assumptions": [
+    "Use the cache-write token count reported by every model-call usage record: 0 in this run.",
+    "Cache reads and cache writes are subsets of input, priced once at their respective rates.",
+    "Reasoning tokens are part of output and are not charged a second time.",
+    "Apply current public API list prices, with no regional surcharge, tax, discount or account-specific adjustment.",
+    "No actual billing record or confirmed processing tier was available; Standard and Fast are pricing scenarios."
+  ],
+  "excluded": [
+    "Image generation model charges: usage/model billing metadata unavailable",
+    "Parent preparation and benchmark report tasks",
+    "Other tool, compute or third-party charges"
+  ],
+  "sources": {
+    "metrics": "metrics.json",
+    "rollout_log": "rollout-2026-09-30T14-02-58-01a0f0b1-ca81-7633-95e1-2cbe5779f9e5.jsonl",
+    "usage_record_lines": [
+      16,
+      25,
+      34,
+      49,
+      56,
+      63,
+      79,
+      88,
+      95,
+      99,
+      108,
+      117,
+      124,
+      134,
+      141,
+      149,
+      158,
+      169,
+      178,
+      189,
+      196,
+      203,
+      210
+    ],
+    "model_pricing": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+    "api_pricing": "https://developers.openai.com/api/docs/pricing?latest-pricing=ultrafast",
+    "cache_billing_rules": "https://developers.openai.com/api/docs/guides/prompt-caching"
+  }
+}
