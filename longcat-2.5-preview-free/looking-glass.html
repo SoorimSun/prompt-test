@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>거울나라의 앨리스 — Through the Looking-Glass</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='6' y='3' width='20' height='26' rx='10' fill='%23141838' stroke='%23d4af6a' stroke-width='2'/%3E%3Ccircle cx='16' cy='13' r='4' fill='%23e8eefc'/%3E%3Cpath d='M10 24c0-6 2.5-10 6-10s6 4 6 10' fill='%23e8eefc'/%3E%3C/svg%3E">
+<style>
+:root{
+  --ink:#0b0e22;
+  --ink-2:#141838;
+  --ink-3:#1d2247;
+  --silver:#c9d4e8;
+  --silver-2:#e8eefc;
+  --gold:#d4af6a;
+  --gold-2:#f0d9a8;
+  --rose:#c23a55;
+  --rose-2:#8f1f38;
+  --teal:#3f8f7a;
+  --mist:rgba(201,212,232,.08);
+  --serif-kr:"Noto Serif KR","Nanum Myeongjo","Apple Myungjo","Malgun Gothic",serif;
+  --display-en:"Cormorant Garamond","EB Garamond",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html,body{overflow-x:hidden}
+body{
+  background:var(--ink);
+  color:var(--silver);
+  font-family:var(--serif-kr);
+  line-height:1.9;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:rgba(212,175,106,.35);color:#fff}
+button{font-family:inherit;cursor:pointer}
+.grain{
+  position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
+.vignette{
+  position:fixed;inset:0;z-index:59;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 42%,transparent 55%,rgba(3,4,12,.55) 100%);
+}
+.progress{
+  position:fixed;top:0;left:0;right:0;height:3px;z-index:70;
+  background:linear-gradient(90deg,var(--gold),var(--gold-2));
+  transform-origin:0 50%;transform:scaleX(0);
+}
+.rank-rail{
+  position:fixed;left:22px;top:50%;transform:translateY(-50%);z-index:65;
+  display:flex;flex-direction:column;gap:18px;
+}
+.rank-rail a{
+  display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--silver);
+}
+.rank-rail .dot{
+  width:9px;height:9px;border-radius:50%;flex:none;
+  border:1px solid rgba(201,212,232,.5);background:transparent;
+  transition:all .4s ease;
+}
+.rank-rail .lbl{
+  font-size:.72rem;letter-spacing:.14em;opacity:0;transform:translateX(-6px);
+  transition:all .35s ease;white-space:nowrap;color:var(--silver);
+}
+.rank-rail a:hover .lbl,.rank-rail a.on .lbl{opacity:.9;transform:none}
+.rank-rail a.on .dot{background:var(--gold);border-color:var(--gold);box-shadow:0 0 12px rgba(212,175,106,.8)}
+.rank-rail::before{
+  content:"";position:absolute;left:4px;top:8px;bottom:8px;width:1px;
+  background:linear-gradient(180deg,transparent,rgba(201,212,232,.25),transparent);
+}
+main{position:relative;z-index:2}
+.scene{
+  position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:12vh 8vw;overflow:hidden;
+}
+.scene .inner{
+  position:relative;z-index:3;max-width:760px;width:100%;
+  opacity:0;transform:translateY(46px);
+  transition:opacity 1s ease,transform 1s cubic-bezier(.22,.8,.3,1);
+}
+.scene.active .inner{opacity:1;transform:none}
+.kicker{
+  font-family:var(--display-en);font-size:.8rem;letter-spacing:.42em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1.4rem;
+}
+h2.title{
+  font-size:clamp(2rem,5.4vw,3.6rem);font-weight:600;line-height:1.3;color:var(--silver-2);
+  margin-bottom:1.6rem;letter-spacing:.02em;
+}
+.body-text{font-size:clamp(1rem,1.6vw,1.12rem);color:var(--silver);max-width:44em}
+.body-text em{font-style:normal;color:var(--gold-2)}
+.hint{
+  margin-top:2.2rem;font-size:.85rem;color:rgba(201,212,232,.55);letter-spacing:.06em;
+}
+.btn{
+  display:inline-block;margin-top:2rem;padding:.85rem 2.1rem;
+  background:transparent;color:var(--gold-2);
+  border:1px solid rgba(212,175,106,.55);border-radius:999px;
+  font-size:.95rem;letter-spacing:.12em;
+  transition:all .35s ease;
+}
+.btn:hover,.btn:focus-visible{
+  background:rgba(212,175,106,.14);border-color:var(--gold);
+  box-shadow:0 0 24px rgba(212,175,106,.25);outline:none;
+}
+.scene-mirror{
+  min-height:100vh;flex-direction:column;text-align:center;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 0%,#232a55 0%,transparent 60%),
+    radial-gradient(ellipse 70% 50% at 50% 110%,#1a1440 0%,transparent 55%),
+    var(--ink);
+}
+.stars{position:absolute;inset:0;z-index:1;pointer-events:none}
+.stars i{
+  position:absolute;width:2px;height:2px;border-radius:50%;background:var(--silver-2);
+  animation:twinkle 4s ease-in-out infinite;
+}
+@keyframes twinkle{0%,100%{opacity:.15}50%{opacity:.9}}
+.mirror-wrap{position:relative;z-index:3;margin:2.2rem 0 2.6rem}
+.mirror{
+  position:relative;width:min(340px,72vw);height:min(460px,58vh);margin:0 auto;
+  border-radius:170px 170px 26px 26px;
+  padding:14px;
+  background:
+    linear-gradient(135deg,#8a6a2f 0%,#e8cf9a 18%,#6e5426 38%,#f0d9a8 55%,#7a5c2a 75%,#e8cf9a 100%);
+  box-shadow:
+    0 0 0 1px rgba(240,217,168,.35),
+    0 30px 80px -20px rgba(0,0,0,.8),
+    0 0 90px -18px rgba(212,175,106,.35);
+  cursor:pointer;
+}
+.mirror::before,.mirror::after{
+  content:"";position:absolute;width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#f0d9a8,#8a6a2f 70%);
+  top:-14px;
+}
+.mirror::before{left:24px}
+.mirror::after{right:24px}
+.mirror-world{
+  position:relative;width:100%;height:100%;overflow:hidden;
+  border-radius:156px 156px 16px 16px;
+  background:
+    radial-gradient(ellipse 120% 70% at 50% 118%,rgba(120,180,255,.28) 0%,transparent 55%),
+    linear-gradient(180deg,#0a0d24 0%,#1b2150 58%,#2c3470 100%);
+  transition:transform .25s ease-out;
+}
+.mirror-world .mw-grid{
+  position:absolute;left:-30%;right:-30%;bottom:-4%;height:62%;
+  background:
+    repeating-linear-gradient(90deg,rgba(201,212,232,.22) 0 2px,transparent 2px 64px),
+    repeating-linear-gradient(0deg,rgba(201,212,232,.22) 0 2px,transparent 2px 64px);
+  transform:perspective(340px) rotateX(61deg);transform-origin:bottom;
+}
+.mirror-world .mw-river{
+  position:absolute;left:0;right:0;bottom:26%;height:26px;
+  background:linear-gradient(90deg,transparent,rgba(140,190,255,.5),transparent);
+  filter:blur(3px);
+}
+.mirror-world .mw-piece{
+  position:absolute;bottom:30%;width:34px;opacity:.9;
+  animation:floaty 7s ease-in-out infinite;
+}
+.mirror-world .mw-piece.p1{left:22%;animation-delay:-2s}
+.mirror-world .mw-piece.p2{left:48%;width:44px;animation-delay:-4.5s}
+.mirror-world .mw-piece.p3{left:72%;width:28px;animation-delay:-1s}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.mirror-world .mw-moon{
+  position:absolute;top:12%;left:50%;width:52px;height:52px;margin-left:-26px;border-radius:50%;
+  background:radial-gradient(circle at 38% 34%,#fdf6e0,#d9c489 62%,#a8894a);
+  box-shadow:0 0 44px 8px rgba(240,217,168,.35);
+}
+.mirror-world .shimmer{
+  position:absolute;inset:0;
+  background:linear-gradient(115deg,transparent 30%,rgba(232,238,252,.14) 46%,rgba(232,238,252,.05) 52%,transparent 66%);
+  background-size:280% 100%;
+  animation:shimmer 6.5s ease-in-out infinite;
+}
+@keyframes shimmer{0%{background-position:120% 0}55%,100%{background-position:-40% 0}}
+.mirror-caption{
+  position:absolute;left:50%;bottom:9%;transform:translateX(-50%);
+  font-size:.72rem;letter-spacing:.3em;color:rgba(232,238,252,.6);white-space:nowrap;
+}
+.hero-kicker{
+  font-family:var(--display-en);font-size:.82rem;letter-spacing:.5em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1.6rem;
+}
+.hero-title{
+  font-size:clamp(2.6rem,7.5vw,5rem);font-weight:600;line-height:1.25;color:var(--silver-2);
+  letter-spacing:.04em;
+  background:linear-gradient(180deg,#fdf6e0 20%,var(--gold) 75%,#9a7a3c);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  transform:scaleX(-1);opacity:0;
+  transition:transform 1.4s cubic-bezier(.22,.8,.3,1),opacity 1s ease;
+}
+body.loaded .hero-title{transform:scaleX(1);opacity:1}
+.hero-sub{
+  margin-top:1.4rem;font-family:var(--display-en);font-size:clamp(.95rem,2vw,1.15rem);
+  letter-spacing:.24em;color:rgba(201,212,232,.75);
+}
+.scroll-hint{
+  position:absolute;bottom:4.5vh;left:50%;transform:translateX(-50%);z-index:3;
+  font-size:.78rem;letter-spacing:.28em;color:rgba(201,212,232,.55);text-align:center;
+}
+.scroll-hint .chev{
+  display:block;margin:.6rem auto 0;width:10px;height:10px;
+  border-right:1px solid var(--gold);border-bottom:1px solid var(--gold);
+  transform:rotate(45deg);animation:chev 1.8s ease-in-out infinite;
+}
+@keyframes chev{0%,100%{transform:rotate(45deg) translate(0,0);opacity:.4}50%{transform:rotate(45deg) translate(4px,4px);opacity:1}}
+.candle{
+  position:absolute;bottom:0;width:340px;height:340px;pointer-events:none;z-index:1;
+  background:radial-gradient(ellipse 50% 42% at 50% 100%,rgba(240,190,110,.16) 0%,transparent 70%);
+  animation:flick 3.2s ease-in-out infinite;
+}
+.candle.l{left:-60px}
+.candle.r{right:-60px;animation-delay:-1.6s}
+@keyframes flick{0%,100%{opacity:.75;transform:scaleY(1)}30%{opacity:1;transform:scaleY(1.04)}60%{opacity:.65;transform:scaleY(.97)}}
+.scene-land{background:linear-gradient(180deg,var(--ink) 0%,#10163a 50%,#0b0e22 100%)}
+.land-floor{
+  position:absolute;left:-25%;right:-25%;bottom:-12%;height:78%;pointer-events:none;
+  background:
+    repeating-linear-gradient(90deg,rgba(201,212,232,.13) 0 2px,transparent 2px 110px),
+    repeating-linear-gradient(0deg,rgba(201,212,232,.13) 0 2px,transparent 2px 110px);
+  transform:perspective(640px) rotateX(63deg);transform-origin:bottom;
+}
+.scene.active .land-floor{animation:floorMove 5s linear infinite}
+@keyframes floorMove{from{background-position:0 0,0 0}to{background-position:0 0,0 110px}}
+.land-river{
+  position:absolute;left:0;right:0;top:44%;height:70px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(120,180,255,.32) 30%,rgba(120,180,255,.42) 50%,rgba(120,180,255,.32) 70%,transparent);
+  filter:blur(3px);
+}
+.land-hills{position:absolute;left:0;top:34%;width:100%;height:120px;pointer-events:none;opacity:.8}
+.land-alice{position:absolute;bottom:16%;left:50%;width:64px;transform:translateX(-50%);z-index:2;pointer-events:none}
+.land-square{
+  position:absolute;bottom:12%;left:50%;width:150px;height:64px;transform:translateX(-50%);
+  border:1px solid rgba(212,175,106,.5);background:rgba(212,175,106,.07);z-index:1;pointer-events:none;
+}
+.scene-queen{background:linear-gradient(180deg,#160a18 0%,#2a0f1e 55%,#12060f 100%)}
+.race-stripes{
+  position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(115deg,rgba(194,58,85,.16) 0 46px,transparent 46px 92px);
+}
+.scene.active .race-stripes{animation:stripeMove 2.6s linear infinite}
+.scene.active .race-stripes.sprint{animation-duration:.55s}
+@keyframes stripeMove{from{background-position:0 0}to{background-position:-130px 0}}
+.race-stage{position:relative;z-index:3;display:flex;align-items:flex-end;justify-content:center;gap:12vw;margin-top:3rem}
+.runner{width:84px;animation:run .7s ease-in-out infinite}
+.runner.queen{width:110px;animation-duration:.55s}
+@keyframes run{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
+.race-counter{
+  margin-top:2.4rem;text-align:center;font-family:var(--display-en);
+  font-size:clamp(1.4rem,3.4vw,2.2rem);letter-spacing:.14em;color:var(--gold-2);
+}
+.race-wink{
+  margin-top:1rem;text-align:center;font-size:.95rem;color:rgba(201,212,232,.75);
+  opacity:0;transition:opacity .8s ease;
+}
+.race-wink.show{opacity:1}
+.scene-tweedle{background:linear-gradient(180deg,#0a1420 0%,#12283a 55%,#0a1420 100%)}
+.tweedle-stage{position:relative;z-index:3;display:flex;align-items:flex-end;justify-content:center;gap:9vw;margin:2.6rem 0}
+.tweedle{width:120px;cursor:pointer;transition:transform .3s ease}
+.tweedle:hover{transform:translateY(-8px)}
+.tweedle-bubble{
+  position:relative;z-index:3;max-width:520px;margin:0 auto;min-height:5.2em;
+  background:rgba(232,238,252,.07);border:1px solid rgba(201,212,232,.22);
+  border-radius:18px;padding:1.1rem 1.6rem;text-align:center;font-size:1.05rem;color:var(--silver-2);
+}
+.tweedle-bubble::after{
+  content:"";position:absolute;left:50%;bottom:-9px;width:16px;height:16px;transform:translateX(-50%) rotate(45deg);
+  background:rgba(232,238,252,.07);border-right:1px solid rgba(201,212,232,.22);border-bottom:1px solid rgba(201,212,232,.22);
+}
+.tweedle-hint{text-align:center;margin-top:1.4rem;font-size:.82rem;color:rgba(201,212,232,.5);letter-spacing:.1em}
+.scene-humpty{background:linear-gradient(180deg,#17110c 0%,#2b1d12 55%,#120c08 100%)}
+.wall{
+  position:absolute;left:0;right:0;bottom:0;height:34%;pointer-events:none;
+  background:
+    repeating-linear-gradient(0deg,rgba(0,0,0,.35) 0 3px,transparent 3px 44px),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.3) 0 3px,transparent 3px 96px),
+    linear-gradient(180deg,#4a3220 0%,#2b1d12 100%);
+  border-top:2px solid rgba(240,217,168,.25);
+}
+.humpty-stage{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;margin-top:1rem}
+.humpty{width:150px;margin-bottom:-6px;z-index:2}
+.humpty-speech{
+  position:relative;z-index:3;max-width:560px;margin:2.2rem auto 0;text-align:center;
+  font-size:1.08rem;color:var(--silver-2);
+}
+.word{
+  display:inline-block;padding:.05em .35em;margin:0 .1em;cursor:pointer;
+  border-bottom:1px dashed rgba(212,175,106,.7);color:var(--gold-2);
+  transition:background .3s ease;
+}
+.word:hover{background:rgba(212,175,106,.15)}
+.word .m{display:inline-block;transition:opacity .25s ease}
+.word.flip .m{opacity:0}
+.scene-jabber{background:linear-gradient(180deg,#08130f 0%,#0f2c22 55%,#08130f 100%)}
+.jabber-beast{position:absolute;right:4vw;top:12vh;width:min(420px,60vw);opacity:.16;pointer-events:none}
+.poem{
+  position:relative;z-index:3;max-width:600px;margin:0 auto;text-align:center;
+}
+.poem h3{
+  font-family:var(--display-en);font-weight:500;font-size:1rem;letter-spacing:.4em;
+  color:var(--gold);margin-bottom:2.2rem;text-transform:uppercase;
+}
+.poem p{
+  font-size:clamp(1.05rem,2.4vw,1.4rem);line-height:2.3;color:var(--silver-2);
+  transform:scaleX(-1);filter:blur(.4px);
+  transition:transform .9s cubic-bezier(.22,.8,.3,1),filter .9s ease,color .9s ease;
+  cursor:pointer;user-select:none;
+}
+.poem p:hover,.poem p.flip{transform:scaleX(1);filter:none;color:var(--gold-2)}
+.poem-hint{text-align:center;margin-top:2rem;font-size:.82rem;color:rgba(201,212,232,.5);letter-spacing:.12em}
+.scene-knight{background:linear-gradient(180deg,#0d1524 0%,#1d2c4a 55%,#0d1524 100%)}
+.knight-stage{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;margin-top:1rem}
+.knight{width:min(360px,70vw)}
+.notes{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.notes span{
+  position:absolute;font-size:1.5rem;color:var(--gold-2);opacity:0;
+}
+.notes span.go{animation:noteUp 2.6s ease-out forwards}
+@keyframes noteUp{
+  0%{opacity:0;transform:translateY(0) scale(.7)}
+  15%{opacity:1}
+  100%{opacity:0;transform:translateY(-190px) translateX(30px) scale(1.15) rotate(14deg)}
+}
+.scene-crown{background:linear-gradient(180deg,#141007 0%,#2b2110 55%,#100c05 100%)}
+.crown-stage{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;margin-top:1rem}
+.crown-alice{width:96px;z-index:2}
+.crown-queen{
+  width:120px;margin-bottom:-10px;z-index:2;cursor:pointer;
+  transition:transform 1.6s cubic-bezier(.22,.8,.3,1),opacity 1.6s ease;
+  animation:crownBob 3.4s ease-in-out infinite;
+}
+@keyframes crownBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.crown-queen.placed{animation:none;transform:translateY(118px) scale(.92)}
+.crown-flash{
+  position:absolute;inset:0;pointer-events:none;opacity:0;z-index:1;
+  background:radial-gradient(circle at 50% 46%,rgba(240,217,168,.5) 0%,transparent 60%);
+}
+.crown-flash.go{animation:flash 1.4s ease-out}
+@keyframes flash{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
+.particles{position:absolute;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+.particles i{
+  position:absolute;left:50%;top:44%;width:6px;height:6px;border-radius:50%;
+  background:var(--gold-2);opacity:0;
+}
+.particles i.go{animation:burst 1.8s cubic-bezier(.16,.8,.4,1) forwards}
+@keyframes burst{
+  0%{opacity:1;transform:translate(0,0) scale(1)}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.2)}
+}
+.crown-verdict{
+  margin-top:2.6rem;text-align:center;font-size:clamp(1.3rem,3vw,1.9rem);color:var(--gold-2);
+  letter-spacing:.1em;min-height:1.6em;
+}
+.scene-dream{background:linear-gradient(180deg,#0b0e22 0%,#161a3a 55%,#0b0e22 100%)}
+.dream-stage{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;text-align:center}
+.dream-mirror{
+  position:relative;width:min(220px,50vw);height:min(300px,40vh);margin:1.6rem 0 2.2rem;
+  border-radius:110px 110px 20px 20px;padding:10px;
+  background:linear-gradient(135deg,#8a6a2f,#e8cf9a 30%,#6e5426 60%,#f0d9a8 100%);
+  box-shadow:0 0 0 1px rgba(240,217,168,.3),0 24px 60px -18px rgba(0,0,0,.8);
+}
+.dream-mirror .dm-world{
+  width:100%;height:100%;border-radius:100px 100px 12px 12px;overflow:hidden;position:relative;
+  background:linear-gradient(180deg,#0a0d24,#1b2150);
+}
+.dream-mirror .dm-world::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 40% at 50% 100%,rgba(120,180,255,.3),transparent 60%);
+}
+.dm-kitten{position:absolute;bottom:8%;width:30px}
+.dm-kitten.k1{left:26%}
+.dm-kitten.k2{left:58%}
+.dream-q{
+  font-size:clamp(1.4rem,3.6vw,2.2rem);color:var(--silver-2);line-height:1.7;margin-bottom:1.6rem;
+}
+.dream-choices{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+.dream-answer{
+  margin-top:1.8rem;max-width:36em;min-height:4.5em;font-size:1.05rem;color:var(--gold-2);
+  opacity:0;transform:translateY(10px);transition:all .8s ease;
+}
+.dream-answer.show{opacity:1;transform:none}
+.dream-src{margin-top:2.4rem;font-size:.85rem;color:rgba(201,212,232,.5);letter-spacing:.14em}
+footer{
+  position:relative;z-index:2;text-align:center;padding:6rem 6vw 7rem;
+  font-size:.8rem;letter-spacing:.18em;color:rgba(201,212,232,.45);
+  border-top:1px solid rgba(201,212,232,.08);
+}
+footer .btn{margin-top:1.6rem}
+@media (max-width:760px){
+  .rank-rail{display:none}
+  .scene{padding:14vh 7vw}
+  .race-stage{gap:8vw}
+  .tweedle-stage{gap:6vw}
+  .candle{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s !important;animation-iteration-count:1 !important;transition-duration:.15s !important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+<div class="progress" id="progress"></div>
+
+<nav class="rank-rail" id="rankRail" aria-label="장면 이동">
+  <a href="#scene-mirror" data-i="0"><span class="dot"></span><span class="lbl">거울</span></a>
+  <a href="#scene-land" data-i="1"><span class="dot"></span><span class="lbl">체스판 나라</span></a>
+  <a href="#scene-queen" data-i="2"><span class="dot"></span><span class="lbl">붉은 여왕</span></a>
+  <a href="#scene-tweedle" data-i="3"><span class="dot"></span><span class="lbl">트위들 형제</span></a>
+  <a href="#scene-humpty" data-i="4"><span class="dot"></span><span class="lbl">험프티</span></a>
+  <a href="#scene-jabber" data-i="5"><span class="dot"></span><span class="lbl">재버워키</span></a>
+  <a href="#scene-knight" data-i="6"><span class="dot"></span><span class="lbl">하얀 기사</span></a>
+  <a href="#scene-crown" data-i="7"><span class="dot"></span><span class="lbl">즉위식</span></a>
+  <a href="#scene-dream" data-i="8"><span class="dot"></span><span class="lbl">꿈</span></a>
+</nav>
+
+<main>
+  <section class="scene scene-mirror active" id="scene-mirror" aria-label="거울 앞의 방">
+    <div class="stars" id="stars"></div>
+    <div class="candle l"></div>
+    <div class="candle r"></div>
+    <div class="inner" style="display:flex;flex-direction:column;align-items:center">
+      <p class="hero-kicker">루이스 캐롤 · 단일 HTML 이야기</p>
+      <h1 class="hero-title" id="heroTitle">거울나라의 앨리스</h1>
+      <p class="hero-sub">THROUGH THE LOOKING-GLASS</p>
+      <div class="mirror-wrap">
+        <div class="mirror" id="mirror" role="button" tabindex="0" aria-label="거울 너머로 들어가기">
+          <div class="mirror-world" id="mirrorWorld">
+            <div class="mw-grid"></div>
+            <div class="mw-river"></div>
+            <div class="mw-moon"></div>
+            <svg class="mw-piece p1" viewBox="0 0 40 60" aria-hidden="true"><path d="M20 4c6 0 9 5 9 10 0 4-2 7-4 8l3 6h-16l3-6c-2-1-4-4-4-8 0-5 3-10 9-10zm-6 26h12l2 14H12l2-14z" fill="#e8eefc" opacity=".85"/></svg>
+            <svg class="mw-piece p2" viewBox="0 0 40 60" aria-hidden="true"><path d="M20 2l5 8h-10l5-8zm-8 10h16l-3 8H15l-3-8zm-5 10h26l-4 10H11l-4-10zm-3 12h32v6H4v-6z" fill="#d4af6a" opacity=".9"/></svg>
+            <svg class="mw-piece p3" viewBox="0 0 40 60" aria-hidden="true"><circle cx="20" cy="14" r="9" fill="#c9d4e8" opacity=".8"/><path d="M8 52c0-12 5-20 12-20s12 8 12 20" fill="#c9d4e8" opacity=".8"/></svg>
+            <div class="shimmer"></div>
+            <p class="mirror-caption">거울 너머 세계가 보인다</p>
+          </div>
+        </div>
+      </div>
+      <button class="btn" id="enterBtn">거울 너머로 들어가기</button>
+    </div>
+    <p class="scroll-hint">스크롤 또는 ↓ 키<span class="chev"></span></p>
+  </section>
+
+  <section class="scene scene-land" id="scene-land" aria-label="체스판 나라">
+    <div class="land-floor"></div>
+    <div class="land-river"></div>
+    <svg class="land-hills" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 120 L0 70 Q150 20 320 62 T640 55 T960 68 T1200 45 L1200 120 Z" fill="#1a2044"/>
+      <path d="M0 120 L0 92 Q200 55 420 88 T840 80 T1200 78 L1200 120 Z" fill="#141a38"/>
+    </svg>
+    <div class="land-square"></div>
+    <svg class="land-alice" viewBox="0 0 40 60" aria-hidden="true">
+      <circle cx="20" cy="14" r="9" fill="#e8eefc"/>
+      <path d="M8 56c0-13 5-22 12-22s12 9 12 22" fill="#e8eefc"/>
+      <path d="M14 34h12l2 8H12l2-8z" fill="#d4af6a"/>
+    </svg>
+    <div class="inner">
+      <p class="kicker">제 1 열</p>
+      <h2 class="title">체스판 나라</h2>
+      <p class="body-text">거울 너머 나라는 거대한 체스판처럼 생겼다. 강이 나라를 가로질러 흐르고, 여덟 개의 줄이 저편 성까지 이어진다. 앨리스는 <em>하얀 폰</em>이 되어 마지막 열을 향해 걷기 시작한다.</p>
+      <p class="hint">빛나는 강을 건너면 다음 열이 시작됩니다</p>
+    </div>
+  </section>
+
+  <section class="scene scene-queen" id="scene-queen" aria-label="붉은 여왕과 달리기">
+    <div class="race-stripes" id="raceStripes"></div>
+    <div class="inner" style="text-align:center">
+      <p class="kicker">제 2 열</p>
+      <h2 class="title">붉은 여왕의 달리기</h2>
+      <p class="body-text" style="margin:0 auto">이 나라에서는 <em>최선을 다해 달려야 제자리</em>에 있을 수 있다. 전진하려면 두 배로 달려야 하고, 돌아가고 싶다면 세 배로 달려야 한다.</p>
+      <div class="race-stage">
+        <svg class="runner queen" viewBox="0 0 60 90" aria-hidden="true">
+          <circle cx="30" cy="16" r="10" fill="#c23a55"/>
+          <path d="M14 88c0-18 7-30 16-30s16 12 16 30" fill="#c23a55"/>
+          <path d="M22 40h16l3 12H19l3-12z" fill="#8f1f38"/>
+          <path d="M20 6l10-4 10 4-4 6H24l-4-6z" fill="#d4af6a"/>
+        </svg>
+        <svg class="runner" viewBox="0 0 60 90" aria-hidden="true">
+          <circle cx="30" cy="16" r="10" fill="#e8eefc"/>
+          <path d="M14 88c0-18 7-30 16-30s16 12 16 30" fill="#e8eefc"/>
+          <path d="M22 40h16l3 12H19l3-12z" fill="#9fb4d8"/>
+        </svg>
+      </div>
+      <p class="race-counter" id="raceCounter">달린 거리 — 0.00 리</p>
+      <p class="race-wink" id="raceWink">봤죠? 아무리 빨리 달려도 제자리예요.</p>
+      <button class="btn" id="runBtn">최선을 다해 달리기</button>
+    </div>
+  </section>
+
+  <section class="scene scene-tweedle" id="scene-tweedle" aria-label="트위들덤과 트위들디">
+    <div class="inner" style="text-align:center">
+      <p class="kicker">제 3 열</p>
+      <h2 class="title">트위들덤과 트위들디</h2>
+      <p class="body-text" style="margin:0 auto">나무 아래에서 서로를 닮은 형제가 끝없는 다툼을 시작한다. 누가 먼저 화가 났는지, 아무도 기억하지 못한다.</p>
+      <div class="tweedle-stage" id="tweedleStage" role="button" tabindex="0" aria-label="다음 말 보기">
+        <svg class="tweedle" viewBox="0 0 100 120" aria-hidden="true">
+          <ellipse cx="50" cy="66" rx="38" ry="46" fill="#e8eefc"/>
+          <circle cx="38" cy="52" r="4" fill="#0b0e22"/><circle cx="62" cy="52" r="4" fill="#0b0e22"/>
+          <path d="M40 70q10 8 20 0" stroke="#0b0e22" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M22 30q28-26 56 0l-6-14H28l-6 14z" fill="#3f6fb5"/>
+        </svg>
+        <svg class="tweedle" viewBox="0 0 100 120" aria-hidden="true">
+          <ellipse cx="50" cy="66" rx="38" ry="46" fill="#e8eefc"/>
+          <circle cx="38" cy="52" r="4" fill="#0b0e22"/><circle cx="62" cy="52" r="4" fill="#0b0e22"/>
+          <path d="M40 70q10 8 20 0" stroke="#0b0e22" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M22 30q28-26 56 0l-6-14H28l-6 14z" fill="#c23a55"/>
+        </svg>
+      </div>
+      <div class="tweedle-bubble" id="tweedleBubble">트위들덤: “트위들디, 그건 네 잘못이야!”</div>
+      <p class="tweedle-hint">형제를 클릭하면 다툼이 이어집니다</p>
+    </div>
+  </section>
+
+  <section class="scene scene-humpty" id="scene-humpty" aria-label="험프티 덤프티">
+    <div class="wall"></div>
+    <div class="inner" style="text-align:center">
+      <p class="kicker">제 4 열</p>
+      <h2 class="title">험프티 덤프티의 낱말</h2>
+      <div class="humpty-stage">
+        <svg class="humpty" viewBox="0 0 120 150" aria-hidden="true">
+          <ellipse cx="60" cy="86" rx="44" ry="56" fill="#f3e3c2"/>
+          <circle cx="46" cy="72" r="5" fill="#0b0e22"/><circle cx="74" cy="72" r="5" fill="#0b0e22"/>
+          <path d="M48 92q12 10 24 0" stroke="#0b0e22" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <path d="M30 108q30 14 60 0" stroke="#c23a55" stroke-width="6" fill="none"/>
+          <path d="M16 60q-12 4-14 16M104 60q12 4 14 16" stroke="#f3e3c2" stroke-width="9" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="humpty-speech">험프티: “낱말은 내가 정한 뜻을 가진다. 점선 위의 단어를 눌러보세요.”<br>
+        <span class="word" data-meanings="내가 기쁠 때 아무 단어나|보름달이 뜨는 소리|깨지기 전의 행복">기쁨 <span class="m">— 내가 기쁠 때 아무 단어나</span></span>
+        <span class="word" data-meanings="책장 사이의 틈|아침 이슬의 무게|시집 마지막 페이지">의미 <span class="m">— 책장 사이의 틈</span></span>
+        <span class="word" data-meanings="벽 위에 앉는 법|달걀의 철학|바람에게 인사하는 법">존경 <span class="m">— 벽 위에 앉는 법</span></span>
+        <span class="word" data-meanings="깨지기 전의 길이|영원의 반쪽|달걀 껍데기 속 하루">시간 <span class="m">— 깨지기 전의 길이</span></span>
+      </p>
+      <p class="hint">단어를 누를 때마다 뜻이 바뀝니다</p>
+    </div>
+  </section>
+
+  <section class="scene scene-jabber" id="scene-jabber" aria-label="재버워키">
+    <svg class="jabber-beast" viewBox="0 0 200 160" aria-hidden="true">
+      <path d="M20 130 Q40 60 90 50 Q150 40 170 80 Q185 110 160 125 Q120 145 70 138 Q35 133 20 130 Z" fill="#3f8f7a"/>
+      <path d="M90 50 Q80 20 100 8 Q120 0 135 15 Q120 22 118 35" fill="#3f8f7a"/>
+      <path d="M150 60 Q185 45 195 60 Q185 75 155 72" fill="#3f8f7a"/>
+      <path d="M60 130 Q40 150 25 145 M120 135 Q130 152 148 148" stroke="#3f8f7a" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <circle cx="104" cy="22" r="4" fill="#e8eefc"/>
+    </svg>
+    <div class="inner">
+      <div class="poem">
+        <h3>Jabberwocky · 거울 시</h3>
+        <p data-line="1">어둑한 저녁, 미끈미끈한 토브들이</p>
+        <p data-line="2">빙글빙글 돌며 굴렀고, 미믈리 숲의</p>
+        <p data-line="3">보르고그로브들이 울부짖으며</p>
+        <p data-line="4">자브자브 새가 프루미언하게 날았다</p>
+        <p data-line="5">창을 든 보이는 비쥬나 숲으로 들어</p>
+        <p data-line="6">오래도록 재버워키를 찾아 헤맸다</p>
+        <p class="poem-hint">시 위에 마우스를 올리거나 클릭하면 읽힙니다</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene scene-knight" id="scene-knight" aria-label="하얀 기사">
+    <div class="inner" style="text-align:center">
+      <p class="kicker">제 6 열</p>
+      <h2 class="title">하얀 기사의 노래</h2>
+      <p class="body-text" style="margin:0 auto">다정한 하얀 기사는 앨리스를 여덟 번째 열까지 데려다주며, 아주 오래된 노래를 불러준다. 그의 말들은 모두 거꾸로, 노래들은 모두 느리게.</p>
+      <div class="knight-stage">
+        <div class="notes" id="notes"></div>
+        <svg class="knight" viewBox="0 0 220 150" aria-hidden="true">
+          <path d="M30 130 Q25 90 60 80 L120 70 Q170 65 185 90 L200 130 L185 130 L180 105 L150 108 L140 130 L125 130 L130 108 L70 112 L65 130 Z" fill="#dfe7f5"/>
+          <path d="M150 70 Q145 40 165 28 Q185 18 195 32 L188 40 Q178 34 172 42 Q165 52 168 68 Z" fill="#dfe7f5"/>
+          <circle cx="182" cy="34" r="3" fill="#0b0e22"/>
+          <path d="M120 70 Q115 45 130 35 Q145 26 155 38 L148 46 Q140 40 136 48 Q130 56 134 68 Z" fill="#e8eefc"/>
+          <path d="M128 30l8-10 6 10-4 6h-6l-4-6z" fill="#d4af6a"/>
+          <path d="M132 44 L150 60" stroke="#d4af6a" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <button class="btn" id="songBtn">노래 듣기</button>
+      <p class="hint">♪ 아주 오래된 노래, 아주 아주 오래된 노래 ♪</p>
+    </div>
+  </section>
+
+  <section class="scene scene-crown" id="scene-crown" aria-label="즉위식">
+    <div class="crown-flash" id="crownFlash"></div>
+    <div class="particles" id="particles"></div>
+    <div class="inner" style="text-align:center">
+      <p class="kicker">제 8 열</p>
+      <h2 class="title">여왕이 되는 앨리스</h2>
+      <p class="body-text" style="margin:0 auto">체스판의 끝, 여덟 번째 열. 폰은 금관을 쓰고 <em>여왕</em>이 된다. 만찬이 열리고, 촛불이 천장까지 자란다.</p>
+      <div class="crown-stage">
+        <svg class="crown-queen" id="crownQueen" viewBox="0 0 120 70" role="button" tabindex="0" aria-label="왕관을 씌우기">
+          <path d="M15 55 L5 18 L32 38 L60 8 L88 38 L115 18 L105 55 Z" fill="#d4af6a"/>
+          <path d="M15 55 h90 v10 h-90 z" fill="#b8934a"/>
+          <circle cx="60" cy="8" r="5" fill="#c23a55"/>
+          <circle cx="5" cy="16" r="4" fill="#3f8f7a"/>
+          <circle cx="115" cy="16" r="4" fill="#3f8f7a"/>
+          <circle cx="60" cy="60" r="4" fill="#e8eefc"/>
+        </svg>
+        <svg class="crown-alice" viewBox="0 0 40 60" aria-hidden="true">
+          <circle cx="20" cy="14" r="9" fill="#e8eefc"/>
+          <path d="M8 56c0-13 5-22 12-22s12 9 12 22" fill="#e8eefc"/>
+          <path d="M14 34h12l2 8H12l2-8z" fill="#d4af6a"/>
+        </svg>
+      </div>
+      <p class="crown-verdict" id="crownVerdict">왕관을 클릭하거나 Enter 키를 누르세요</p>
+    </div>
+  </section>
+
+  <section class="scene scene-dream" id="scene-dream" aria-label="누가 꿈을 꾸었을까">
+    <div class="inner dream-stage">
+      <p class="kicker">에필로그</p>
+      <h2 class="title">누가 꿈을 꾸었을까</h2>
+      <div class="dream-mirror">
+        <div class="dm-world">
+          <svg class="dm-kitten k1" viewBox="0 0 30 30" aria-hidden="true"><ellipse cx="15" cy="20" rx="10" ry="8" fill="#e8eefc"/><circle cx="15" cy="10" r="7" fill="#e8eefc"/><path d="M10 5l-2-4 5 2M20 5l2-4-5 2" fill="#e8eefc"/></svg>
+          <svg class="dm-kitten k2" viewBox="0 0 30 30" aria-hidden="true"><ellipse cx="15" cy="20" rx="10" ry="8" fill="#10142e"/><circle cx="15" cy="10" r="7" fill="#10142e"/><path d="M10 5l-2-4 5 2M20 5l2-4-5 2" fill="#10142e"/></svg>
+        </div>
+      </div>
+      <p class="dream-q">앨리스가 깨어나며 물었다.<br>“이 모든 것이 누구의 꿈이었을까?”</p>
+      <div class="dream-choices">
+        <button class="btn" id="dreamA">앨리스의 꿈이야</button>
+        <button class="btn" id="dreamB">너의 꿈이야</button>
+      </div>
+      <p class="dream-answer" id="dreamAnswer"></p>
+      <p class="dream-src">— 루이스 캐롤, 《거울나라의 앨리스》, 단일 HTML로 다시 엮음</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  거울나라의 앨리스 · 모든 장면은 마우스와 키보드로 움직입니다
+  <br>
+  <button class="btn" id="againBtn">처음부터 다시 보기</button>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var scenes = Array.prototype.slice.call(document.querySelectorAll(".scene"));
+  var railLinks = Array.prototype.slice.call(document.querySelectorAll("#rankRail a"));
+  var current = 0;
+
+  function goTo(i){
+    if(i < 0) i = 0;
+    if(i > scenes.length - 1) i = scenes.length - 1;
+    scenes[i].scrollIntoView({behavior: "smooth", block: "start"});
+  }
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        var i = scenes.indexOf(e.target);
+        if(i < 0) return;
+        current = i;
+        e.target.classList.add("active");
+        railLinks.forEach(function(a, j){ a.classList.toggle("on", j === i); });
+      }
+    });
+  }, {threshold: 0.45});
+  scenes.forEach(function(s){ io.observe(s); });
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "ArrowDown" || e.key === "PageDown"){
+      e.preventDefault(); goTo(current + 1);
+    }else if(e.key === "ArrowUp" || e.key === "PageUp"){
+      e.preventDefault(); goTo(current - 1);
+    }else if(e.key === "Home"){
+      e.preventDefault(); goTo(0);
+    }else if(e.key === "End"){
+      e.preventDefault(); goTo(scenes.length - 1);
+    }else if(/^[1-9]$/.test(e.key)){
+      var i = parseInt(e.key, 10) - 1;
+      if(i < scenes.length) goTo(i);
+    }
+  });
+
+  var bar = document.getElementById("progress");
+  window.addEventListener("scroll", function(){
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    var p = max > 0 ? h.scrollTop / max : 0;
+    bar.style.transform = "scaleX(" + p + ")";
+  }, {passive: true});
+
+  var stars = document.getElementById("stars");
+  for(var i = 0; i < 70; i++){
+    var s = document.createElement("i");
+    s.style.left = (Math.random() * 100) + "%";
+    s.style.top = (Math.random() * 100) + "%";
+    s.style.animationDelay = (-Math.random() * 4) + "s";
+    s.style.opacity = (0.2 + Math.random() * 0.6).toFixed(2);
+    stars.appendChild(s);
+  }
+
+  var mirrorScene = document.getElementById("scene-mirror");
+  var mirrorWorld = document.getElementById("mirrorWorld");
+  mirrorScene.addEventListener("mousemove", function(e){
+    var r = mirrorScene.getBoundingClientRect();
+    var x = (e.clientX - r.left) / r.width - 0.5;
+    var y = (e.clientY - r.top) / r.height - 0.5;
+    mirrorWorld.style.transform = "translate(" + (x * -20) + "px," + (y * -14) + "px)";
+  });
+  mirrorScene.addEventListener("mouseleave", function(){
+    mirrorWorld.style.transform = "translate(0,0)";
+  });
+
+  function enterMirror(){
+    goTo(1);
+  }
+  document.getElementById("enterBtn").addEventListener("click", enterMirror);
+  document.getElementById("mirror").addEventListener("click", enterMirror);
+  document.getElementById("mirror").addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); enterMirror(); }
+  });
+
+  setTimeout(function(){ document.body.classList.add("loaded"); }, 350);
+
+  var raceStripes = document.getElementById("raceStripes");
+  var raceWink = document.getElementById("raceWink");
+  var runBtn = document.getElementById("runBtn");
+  var racing = false;
+  runBtn.addEventListener("click", function(){
+    if(racing) return;
+    racing = true;
+    raceStripes.classList.add("sprint");
+    raceWink.classList.remove("show");
+    setTimeout(function(){
+      raceStripes.classList.remove("sprint");
+      raceWink.classList.add("show");
+      racing = false;
+    }, 3000);
+  });
+
+  var tweedleLines = [
+    "트위들덤: “트위들디, 그건 네 잘못이야!”",
+    "트위들디: “아니야, 네가 먼저 화났잖아!”",
+    "트위들덤: “나? 난 원래부터 이 표정이야.”",
+    "트위들디: “그럼 나도 원래부터 이 표정이야.”",
+    "트위들덤: “…그래, 넌 여전히 트위들디야.”"
+  ];
+  var tweedleIdx = 0;
+  var bubble = document.getElementById("tweedleBubble");
+  var stage = document.getElementById("tweedleStage");
+  function nextTweedle(){
+    tweedleIdx = (tweedleIdx + 1) % tweedleLines.length;
+    bubble.style.opacity = "0";
+    setTimeout(function(){
+      bubble.textContent = tweedleLines[tweedleIdx];
+      bubble.style.opacity = "1";
+    }, 200);
+  }
+  stage.addEventListener("click", nextTweedle);
+  stage.addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); nextTweedle(); }
+  });
+  bubble.style.transition = "opacity .2s ease";
+
+  Array.prototype.forEach.call(document.querySelectorAll(".word"), function(w){
+    var meanings = w.getAttribute("data-meanings").split("|");
+    var idx = 0;
+    w.addEventListener("click", function(){
+      idx = (idx + 1) % meanings.length;
+      var m = w.querySelector(".m");
+      w.classList.add("flip");
+      setTimeout(function(){
+        m.textContent = "— " + meanings[idx];
+        w.classList.remove("flip");
+      }, 250);
+    });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".poem p[data-line]"), function(p){
+    p.addEventListener("click", function(){ p.classList.toggle("flip"); });
+    p.addEventListener("mouseenter", function(){ p.classList.add("flip"); });
+  });
+
+  var notesBox = document.getElementById("notes");
+  var noteChars = ["♪", "♫", "♩", "♬"];
+  document.getElementById("songBtn").addEventListener("click", function(){
+    for(var i = 0; i < 9; i++){
+      (function(i){
+        var n = document.createElement("span");
+        n.textContent = noteChars[i % noteChars.length];
+        n.style.left = (30 + Math.random() * 40) + "%";
+        n.style.top = (55 + Math.random() * 20) + "%";
+        n.style.animationDelay = (i * 0.22) + "s";
+        notesBox.appendChild(n);
+        requestAnimationFrame(function(){ n.classList.add("go"); });
+        setTimeout(function(){ n.remove(); }, 4200);
+      })(i);
+    }
+  });
+
+  var crown = document.getElementById("crownQueen");
+  var flash = document.getElementById("crownFlash");
+  var verdict = document.getElementById("crownVerdict");
+  var particles = document.getElementById("particles");
+  var crowned = false;
+  function placeCrown(){
+    if(crowned) return;
+    crowned = true;
+    crown.classList.add("placed");
+    flash.classList.add("go");
+    verdict.textContent = "앨리스 여왕 만세!";
+    for(var i = 0; i < 42; i++){
+      (function(i){
+        var p = document.createElement("i");
+        var ang = Math.random() * Math.PI * 2;
+        var dist = 90 + Math.random() * 240;
+        p.style.setProperty("--dx", (Math.cos(ang) * dist).toFixed(0) + "px");
+        p.style.setProperty("--dy", (Math.sin(ang) * dist - 60).toFixed(0) + "px");
+        p.style.animationDelay = (Math.random() * 0.35) + "s";
+        if(i % 5 === 0) p.style.background = "#c23a55";
+        else if(i % 7 === 0) p.style.background = "#3f8f7a";
+        particles.appendChild(p);
+        requestAnimationFrame(function(){ p.classList.add("go"); });
+        setTimeout(function(){ p.remove(); }, 2600);
+      })(i);
+    }
+  }
+  crown.addEventListener("click", placeCrown);
+  crown.addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); placeCrown(); }
+  });
+
+  var answer = document.getElementById("dreamAnswer");
+  document.getElementById("dreamA").addEventListener("click", function(){
+    answer.textContent = "그 나라가 사라져도, 거울은 여전히 거기 있을 거야.";
+    answer.classList.add("show");
+  });
+  document.getElementById("dreamB").addEventListener("click", function(){
+    answer.textContent = "그럼 지금 읽는 이 순간도, 누군가의 거울 속 풍경이야.";
+    answer.classList.add("show");
+  });
+
+  document.getElementById("againBtn").addEventListener("click", function(){
+    goTo(0);
+  });
+})();
+</script>
+</body>
+</html>

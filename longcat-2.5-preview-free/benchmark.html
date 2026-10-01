@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>벤치 결과 — longcat-2.5-preview-free 앨리스 페이지</title>
+<style>
+:root{
+  --ink:#0b0e22;
+  --ink-2:#141838;
+  --silver:#c9d4e8;
+  --silver-2:#e8eefc;
+  --gold:#d4af6a;
+  --gold-2:#f0d9a8;
+  --mist:rgba(201,212,232,.08);
+  --serif-kr:"Noto Serif KR","Nanum Myeongjo","Apple Myungjo","Malgun Gothic",serif;
+  --display-en:"Cormorant Garamond","EB Garamond",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%,#1a2044 0%,transparent 60%),
+    var(--ink);
+  color:var(--silver);
+  font-family:var(--serif-kr);
+  line-height:1.85;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:820px;margin:0 auto;padding:0 6vw}
+header{
+  min-height:92vh;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;padding:14vh 0;
+}
+.kicker{
+  font-family:var(--display-en);font-size:.78rem;letter-spacing:.42em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1.6rem;
+}
+h1{
+  font-size:clamp(1.9rem,5vw,3rem);font-weight:600;color:var(--silver-2);
+  line-height:1.35;margin-bottom:1.2rem;
+}
+.sub{font-family:var(--display-en);letter-spacing:.2em;color:rgba(201,212,232,.7);font-size:.95rem}
+.meta{
+  margin-top:2.6rem;display:flex;gap:2.2rem;flex-wrap:wrap;justify-content:center;
+  font-size:.85rem;color:rgba(201,212,232,.65);
+}
+.meta b{display:block;color:var(--gold-2);font-weight:600;font-size:.95rem;letter-spacing:.06em}
+.page-link{
+  display:inline-block;margin-top:3rem;padding:.9rem 2.4rem;text-decoration:none;
+  color:var(--gold-2);border:1px solid rgba(212,175,106,.55);border-radius:999px;
+  font-size:.95rem;letter-spacing:.14em;transition:all .35s ease;
+}
+.page-link:hover{background:rgba(212,175,106,.14);box-shadow:0 0 24px rgba(212,175,106,.25)}
+section{padding:5.5rem 0;border-top:1px solid rgba(201,212,232,.09)}
+h2{
+  font-size:clamp(1.3rem,3vw,1.7rem);color:var(--silver-2);font-weight:600;
+  margin-bottom:1.8rem;letter-spacing:.02em;
+}
+h2 .en{
+  display:block;font-family:var(--display-en);font-weight:400;font-size:.72rem;
+  letter-spacing:.34em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;
+}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem}
+.card{
+  background:var(--mist);border:1px solid rgba(201,212,232,.12);border-radius:14px;
+  padding:1.3rem 1.4rem;
+}
+.card .k{font-size:.76rem;letter-spacing:.18em;color:rgba(201,212,232,.55);margin-bottom:.6rem}
+.card .v{font-size:1.5rem;color:var(--silver-2);font-weight:600;letter-spacing:.02em}
+.card .v small{font-size:.85rem;color:rgba(201,212,232,.6);font-weight:400}
+.card.hero{
+  grid-column:1/-1;background:rgba(212,175,106,.08);border-color:rgba(212,175,106,.35);
+}
+.card.hero .v{font-size:clamp(2rem,5vw,2.8rem);color:var(--gold-2)}
+.bar{
+  margin-top:2rem;height:34px;border-radius:999px;overflow:hidden;display:flex;
+  border:1px solid rgba(201,212,232,.15);
+}
+.bar div{height:100%;display:flex;align-items:center;justify-content:center;font-size:.72rem;letter-spacing:.08em;min-width:0;overflow:hidden;white-space:nowrap}
+.bar .b-cached{background:linear-gradient(90deg,#8a6a2f,#d4af6a);color:#1a1408}
+.bar .b-uncached{background:#3f6fb5;color:#eaf2ff}
+.bar .b-out{background:#3f8f7a;color:#eafff8}
+.bar .b-reason{background:#6b4f8f;color:#f4eaff}
+.legend{display:flex;gap:1.6rem;flex-wrap:wrap;margin-top:1.1rem;font-size:.8rem;color:rgba(201,212,232,.65)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:.5em;vertical-align:-1px}
+table{width:100%;border-collapse:collapse;font-size:.92rem;table-layout:fixed}
+th,td{padding:.75rem .9rem;text-align:left;border-bottom:1px solid rgba(201,212,232,.09);word-break:break-word;overflow-wrap:anywhere}
+th{color:var(--gold);font-weight:600;font-size:.78rem;letter-spacing:.16em}
+td{color:var(--silver)}
+td.num{font-variant-numeric:tabular-nums;color:var(--silver-2);word-break:break-all}
+.note{
+  margin-top:1.6rem;font-size:.85rem;color:rgba(201,212,232,.55);
+  background:var(--mist);border-left:2px solid var(--gold);padding:.9rem 1.2rem;border-radius:0 10px 10px 0;
+}
+.checks{list-style:none}
+.checks li{
+  padding:.85rem 0 .85rem 2rem;position:relative;border-bottom:1px dashed rgba(201,212,232,.1);
+  font-size:.95rem;
+}
+.checks li::before{
+  content:"";position:absolute;left:.2rem;top:1.15rem;width:9px;height:9px;border-radius:50%;
+  background:var(--gold);box-shadow:0 0 10px rgba(212,175,106,.7);
+}
+.checks li b{color:var(--silver-2);font-weight:600}
+.unmeasured li::before{background:#5a6284;box-shadow:none}
+footer{
+  text-align:center;padding:4rem 6vw 5rem;font-size:.78rem;letter-spacing:.16em;
+  color:rgba(201,212,232,.4);border-top:1px solid rgba(201,212,232,.09);
+}
+@media (max-width:600px){
+  .meta{gap:1.4rem}
+  .card .v{font-size:1.25rem}
+}
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <p class="kicker">Alice Page Benchmark · prompt-test</p>
+  <h1>longcat-2.5-preview-free<br>거울나라의 앨리스 벤치 결과</h1>
+  <p class="sub">THROUGH THE LOOKING-GLASS · ONE PROMPT · ONE MODEL</p>
+  <div class="meta">
+    <div><b>2026-10-01</b>실행 날짜 (KST)</div>
+    <div><b>opencode / high</b>제공자 · 추론 강도</div>
+    <div><b>0:17:14</b>페이지 태스크 소요 시간</div>
+    <div><b>11,111,665</b>누적 처리 토큰</div>
+  </div>
+  <a class="page-link" href="looking-glass.html">완성된 페이지 열기 — looking-glass.html</a>
+</header>
+
+<div class="wrap">
+
+<section>
+  <h2><span class="en">Core Metrics</span>핵심 수치</h2>
+  <div class="cards">
+    <div class="card hero"><div class="k">총 토큰 (입력 + 출력)</div><div class="v">11,111,665</div></div>
+    <div class="card"><div class="k">소요 시간</div><div class="v">0:17:14 <small>1,034,912 ms</small></div></div>
+    <div class="card"><div class="k">입력 토큰</div><div class="v">11,086,731</div></div>
+    <div class="card"><div class="k">캐시된 입력</div><div class="v">11,039,232 <small>99.57%</small></div></div>
+    <div class="card"><div class="k">캐시 안 된 입력</div><div class="v">47,499 <small>0.43%</small></div></div>
+    <div class="card"><div class="k">출력 토큰</div><div class="v">24,934</div></div>
+    <div class="card"><div class="k">가시 출력</div><div class="v">20,244</div></div>
+    <div class="card"><div class="k">추론 출력 (부분집합)</div><div class="v">4,690</div></div>
+    <div class="card"><div class="k">결과물 크기</div><div class="v">41,432 <small>바이트 · 846 줄</small></div></div>
+  </div>
+  <div class="bar" role="img" aria-label="토큰 구성: 캐시 입력 99.35%, 가시 출력 0.18%, 추론 0.04%, 캐시 안 된 입력 0.43%">
+    <div class="b-cached" style="width:99.35%">캐시 입력 99.35%</div>
+    <div class="b-uncached" style="width:0.43%"></div>
+    <div class="b-out" style="width:0.18%"></div>
+    <div class="b-reason" style="width:0.04%"></div>
+  </div>
+  <div class="legend">
+    <span><i style="background:#d4af6a"></i>캐시된 입력 11,039,232 (입력의 99.57%)</span>
+    <span><i style="background:#3f6fb5"></i>캐시 안 된 입력 47,499</span>
+    <span><i style="background:#3f8f7a"></i>가시 출력 20,244</span>
+    <span><i style="background:#6b4f8f"></i>추론 출력 4,690</span>
+  </div>
+  <p class="note">모든 토큰은 페이지 태스크 하나에 대한 <b>누적 처리 토큰</b>입니다. 매 턴마다 다시 읽은 컨텍스트도 중복으로 더해지기 때문에 페이지 본문 크기보다 훨씬 큽니다. 고유 텍스트 크기도 아니고 청구서도 아닙니다. 캐시된 입력은 입력의 부분집합이며, 추론 출력은 출력의 부분집합입니다.</p>
+</section>
+
+<section>
+  <h2><span class="en">Token Ledger</span>토큰 원장</h2>
+  <table>
+    <tr><th>항목</th><th>토큰</th><th>비중</th><th>의미</th></tr>
+    <tr><td>입력 전체</td><td class="num">11,086,731</td><td>99.78%</td><td>모델이 읽은 전체 (캐시분 + 신분)</td></tr>
+    <tr><td>├ 캐시된 입력</td><td class="num">11,039,232</td><td>99.35%</td><td>프롬프트 캐시에서 처리된 양</td></tr>
+    <tr><td>└ 캐시 안 된 입력</td><td class="num">47,499</td><td>0.43%</td><td>실제로 새로 읽은 텍스트</td></tr>
+    <tr><td>출력 전체</td><td class="num">24,934</td><td>0.22%</td><td>가시 출력 + 추론</td></tr>
+    <tr><td>├ 가시 출력</td><td class="num">20,244</td><td>0.18%</td><td>어시스턴트 텍스트와 도구 호출</td></tr>
+    <tr><td>└ 추론 출력</td><td class="num">4,690</td><td>0.04%</td><td>출력의 부분집합 (별도 스트림)</td></tr>
+    <tr><td><b>합계</b></td><td class="num"><b>11,111,665</b></td><td>100%</td><td>입력 + 출력</td></tr>
+  </table>
+  <p class="note">검산: 11,086,731 + 24,934 = 11,111,665 ✓ · 캐시 비율: 11,039,232 ÷ 11,086,731 = 99.57% ✓</p>
+</section>
+
+<section>
+  <h2><span class="en">Measurement Scope</span>측정 범위와 방법</h2>
+  <p style="margin-bottom:1.4rem">이 리포트는 <b>완료된 페이지 태스크 하나</b>만 측정합니다. 페이지 제작이 끝난 뒤 시작된 이 리포트 작성에 소모된 토큰은 위 숫자에 포함되지 않습니다.</p>
+  <table>
+    <tr><th>항목</th><th>값</th></tr>
+    <tr><td>실행 모델</td><td class="num">longcat-2.5-preview-free (opencode, 추론 강도 high)</td></tr>
+    <tr><td>세션</td><td class="num">ses_f09aea0b6ffeg3Bpx73thX4CmW</td></tr>
+    <tr><td>측정 구간</td><td class="num">메시지 인덱스 33–104 (어시스턴트 턴 72개)</td></tr>
+    <tr><td>시작 시각</td><td class="num">2026-10-01 16:28:42.576 KST</td></tr>
+    <tr><td>완료 시각</td><td class="num">2026-10-01 16:45:57.488 KST</td></tr>
+    <tr><td>포함</td><td class="num">looking-glass.html 작성, 결함 수정, 브라우저 검증</td></tr>
+    <tr><td>제외</td><td class="num">스킬 로드·폴더 생성 등 준비 단계, 측정과 리포트 작성</td></tr>
+  </table>
+  <p class="note">이 모델은 opencode에서 실행되어 Codex rollout-*.jsonl 로그를 남기지 않습니다. 최근 7일간의 Codex 로그 71개를 검색한 결과 longcat 기록 0건을 확인했습니다. 따라서 스킬의 Codex extract_metrics.py 대신 opencode 세션 스토어(opencode.db message 테이블)의 턴별 사용량을 집계했습니다. 집계 전 모든 등식(total = input + output, cached ≤ input, reasoning ≤ output)을 확인했습니다.</p>
+</section>
+
+<section>
+  <h2><span class="en">Browser Checks</span>브라우저 검증</h2>
+  <ul class="checks">
+    <li><b>데스크톱 1440×900</b> — 가로 넘침 없음 (scrollWidth = clientWidth), 콘솔 오류 0건</li>
+    <li><b>모바일 390×844</b> — 가로 넘침 없음, 콘솔 오류 0건</li>
+    <li><b>좁은 화면 320×568</b> — 가로 넘침 없음, 콘솔 오류 0건</li>
+    <li><b>거울 클릭</b> — 실제 마우스 클릭으로 장면 1 이동, 레일 표시 전환 확인</li>
+    <li><b>키보드 내비게이션</b> — ↓/↑ 키와 PageDown/PageUp, Home/End, 숫자 키 1–9 장면 이동</li>
+    <li><b>마우스 패럴랙스</b> — 거울 세계가 커서에 따라 미세하게 이동</li>
+    <li><b>붉은 여왕 달리기</b> — 3초 질주 후 거리 계속 0.00 리, 위크 메시지 표시</li>
+    <li><b>트위들 형제</b> — 클릭마다 다툼 대사 순환</li>
+    <li><b>험프티 낱말</b> — 4개 단어 클릭 시 뜻이 순환</li>
+    <li><b>재버워키</b> — 거울 글씨 시가 클릭/호버로 뒤집혀 읽힘</li>
+    <li><b>하얀 기사 노래</b> — 음표 9개 상승 애니메이션</li>
+    <li><b>즉위식</b> — 실제 마우스 클릭으로 왕관 강림, 파티클 42개, 플래시, 문구 변경</li>
+    <li><b>에필로그 선택</b> — 두 개의 선택지 모두 서로 다른 결말 문구 표시</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="en">Unmeasured</span>측정하지 않은 것</h2>
+  <ul class="checks unmeasured">
+    <li><b>첫 토큰까지 시간</b> — 이 스토어에 기록되지 않아 측정 불가</li>
+    <li><b>가격</b> — 토큰 수에서 추론하지 않음</li>
+    <li><b>에너지</b> — 토큰 수에서 추론하지 않음</li>
+    <li><b>페이지 로딩 속도</b> — 태스크 소요 시간에서 추론하지 않음</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="en">Sources</span>기록의 출처</h2>
+  <table>
+    <tr><th>항목</th><th>출처</th></tr>
+    <tr><td>시간·토큰</td><td class="num">opencode.db — message 테이블, 세션 ses_f09aea0b6ffeg3Bpx73thX4CmW, 메시지 33–104</td></tr>
+    <tr><td>모델·강도</td><td class="num">message 테이블 modelID/providerID/variant 필드</td></tr>
+    <tr><td>결과물 메타데이터</td><td class="num">looking-glass.html — 41,432 바이트 · 846 줄 · SHA-256 1223cbaaee80e0d2b836138ef7b75ba6af0f9d42c8cc1fb12a44fcb1f00f24cb</td></tr>
+    <tr><td>브라우저 검증</td><td class="num">Chromium 1440×900 · 390×844 · 320×568, 콘솔 및 스크롤 오버플로 직접 측정</td></tr>
+  </table>
+  <p class="note">원본 요청: “longcat-2.5-preview-free 폴더에 ‘거울나라의 앨리스’를 주제로 상상할 수 있는 가장 아름다운 HTML 파일을 만들어 보세요. 보는 사람들이 ‘와!!!’라는 감탄사밖에 나오지 않을 만한 파일이어야 합니다. 시각적으로 인상적이고 아름다우며 눈을 즐겁게 하는 파일이어야 합니다. 꼼꼼하게 작업하되 창의성을 발휘하세요. 실수는 절대 금물입니다.” — 프롬프트 편차 없음</p>
+</section>
+
+</div>
+
+<footer>
+  거울나라의 앨리스 벤치 · longcat-2.5-preview-free · 2026-10-01
+</footer>
+
+</body>
+</html>

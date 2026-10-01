@@ -1,0 +1,52 @@
+{
+  "source": "opencode session store (opencode.db message table) - NOT the skill's Codex extract_metrics.py",
+  "schema_note": "opencode records reasoning as a stream disjoint from output and counts cache.read separately from input. Fields are remapped to the skill's Codex-style schema so total == input + output and reasoning_output <= output both hold: input_tokens = store input + cache.read; output_tokens = store output + reasoning.",
+  "model": {
+    "id": "longcat-2.5-preview-free",
+    "providerID": "opencode",
+    "variant": "high"
+  },
+  "session_id": "ses_f09aea0b6ffeg3Bpx73thX4CmW",
+  "scope": "one completed Alice HTML page task: authoring, defect-fixing and browser verification of longcat-2.5-preview-free/looking-glass.html. Excludes all benchmark setup before the page task and all measurement/report work after it.",
+  "page_task": {
+    "window_message_indexes": [
+      33,
+      104
+    ],
+    "assistant_messages": 72,
+    "raw_fresh_input": 47499,
+    "raw_cached_input": 11039232,
+    "raw_output": 20244,
+    "raw_reasoning_disjoint": 4690,
+    "raw_store_total": 11111665,
+    "input_tokens": 11086731,
+    "cached_input_tokens": 11039232,
+    "uncached_input_tokens": 47499,
+    "output_tokens": 24934,
+    "visible_output_tokens": 20244,
+    "reasoning_output_subset": 4690,
+    "total_tokens": 11111665,
+    "cache_write_tokens": 0,
+    "cached_share_of_input_percent": 99.57,
+    "uncached_share_of_input_percent": 0.43,
+    "cached_share_of_total_percent": 99.35,
+    "output_share_of_total_percent": 0.22,
+    "started_at_kst": "2026-10-01T16:28:42.576+09:00",
+    "completed_at_kst": "2026-10-01T16:45:57.488+09:00",
+    "wall_clock_ms": 1034912,
+    "wall_clock_hms": "0:17:14"
+  },
+  "time_to_first_token_ms": null,
+  "time_to_first_token_note": "not recorded by the opencode session store; unmeasured",
+  "artifact": {
+    "name": "looking-glass.html",
+    "bytes": 41432,
+    "lines": 846,
+    "sha256": "1223cbaaee80e0d2b836138ef7b75ba6af0f9d42c8cc1fb12a44fcb1f00f24cb"
+  },
+  "codex_extractor": {
+    "attempted": true,
+    "succeeded": false,
+    "reason": "no Codex rollout log records this model; the page task ran in opencode, which writes no Codex rollout-*.jsonl. Codex fields therefore come from the opencode session store instead."
+  }
+}
