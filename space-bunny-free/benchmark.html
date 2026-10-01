@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>벤치마크 · space-bunny-free · 앨리스 페이지</title>
+<style>
+:root{
+  --ink:#07030f;
+  --violet:#7a4dff;--rose:#ff5ea8;--gold:#ffd27a;--emerald:#43e6b4;--ice:#66d9ff;
+  --cream:#f7ecff;--muted:#b6a8d8;--dim:#8d80ad;
+  --hair:rgba(255,255,255,.14);--hair-soft:rgba(255,255,255,.07);
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,"Liberation Mono","D2Coding","Malgun Gothic",monospace;
+  --ui:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Malgun Gothic","맑은 고딕",sans-serif;
+  --body:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Malgun Batang","맑은 고딕",serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{overflow-x:clip;-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--ink);color:var(--cream);
+  font-family:var(--body);font-size:clamp(1rem,.95rem + .2vw,1.08rem);line-height:1.78;
+  word-break:keep-all;overflow-wrap:anywhere;
+}
+a{color:var(--ice)}
+h1,h2,h3{font-family:var(--body);font-weight:600;line-height:1.24;margin:0;letter-spacing:-.01em}
+p{margin:0 0 .9em}
+code,kbd{font-family:var(--mono);font-size:.86em}
+code{background:rgba(255,255,255,.09);padding:.08em .34em;border-radius:5px;overflow-wrap:anywhere}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:5px}
+.wrap{width:min(1120px,100% - clamp(1.1rem,4vw,3.2rem));margin-inline:auto}
+
+.hero{position:relative;overflow:clip;padding:clamp(2.6rem,8vh,5rem) 0 clamp(1.8rem,4vh,2.6rem);border-bottom:1px solid var(--hair-soft)}
+.hero::before{
+  content:"";position:absolute;inset:-40% -10% auto;height:150%;z-index:0;pointer-events:none;
+  background:radial-gradient(38% 42% at 20% 16%,rgba(122,77,255,.5),transparent 62%),
+             radial-gradient(34% 36% at 82% 26%,rgba(255,94,168,.32),transparent 64%),
+             radial-gradient(40% 40% at 66% 88%,rgba(67,230,180,.18),transparent 66%);
+  filter:blur(10px);
+}
+.hero .wrap{position:relative;z-index:1}
+.tag{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--ui);font-size:.66rem;font-weight:700;
+  letter-spacing:.2em;color:var(--gold);margin:0 0 .9rem}
+.tag::before{content:"";width:34px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+h1{font-size:clamp(1.8rem,1.2rem + 2.4vw,3.2rem);margin:0 0 .6rem;letter-spacing:-.02em}
+h1 small{display:block;font-family:var(--ui);font-size:.72rem;font-weight:600;letter-spacing:.16em;
+  color:var(--muted);margin-bottom:.7rem}
+.lede{color:var(--muted);max-width:66ch;margin:0}
+.cta{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.4rem}
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.1rem;border-radius:99px;
+  border:1px solid var(--hair);background:rgba(255,255,255,.06);color:var(--cream);text-decoration:none;
+  font-family:var(--ui);font-size:.83rem;font-weight:650;cursor:pointer;
+  transition:transform .2s,background .2s,border-color .2s;
+}
+.btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3)}
+.btn--key{background:linear-gradient(120deg,var(--violet),var(--rose) 60%,#ff8a5b);border-color:transparent;
+  color:#1b0526;font-weight:750;box-shadow:0 12px 30px -14px rgba(255,94,168,.85)}
+
+section{padding:clamp(2.4rem,6vh,4rem) 0;border-bottom:1px solid var(--hair-soft)}
+h2{font-size:clamp(1.3rem,1.1rem + 1vw,1.85rem);margin:0 0 .4rem}
+h3{font-family:var(--ui);font-weight:700;color:var(--gold);margin:0 0 .7rem;font-size:.85rem;letter-spacing:.02em}
+.sub{color:var(--dim);font-family:var(--ui);font-size:.85rem;margin:0 0 1.4rem;max-width:78ch;line-height:1.7}
+
+.note{border-left:3px solid var(--gold);background:rgba(255,210,122,.07);padding:.9rem 1.1rem;
+  border-radius:0 12px 12px 0;margin:0 0 1.4rem;font-size:.95rem;color:#f3e6c8}
+.note b{color:var(--gold)}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,178px),1fr));gap:.8rem;margin-bottom:1.5rem}
+.kpi{border:1px solid var(--hair);border-radius:16px;padding:.95rem 1rem;background:linear-gradient(165deg,rgba(255,255,255,.06),rgba(255,255,255,.015))}
+.kpi dt{font-family:var(--ui);font-size:.68rem;font-weight:700;letter-spacing:.02em;color:var(--dim);margin:0 0 .35rem}
+.kpi dd{margin:0;font-family:var(--mono);font-size:clamp(1.15rem,1rem + .7vw,1.6rem);font-weight:700;letter-spacing:-.02em;color:var(--cream);line-height:1.2;overflow-wrap:anywhere}
+.kpi dd small{font-family:var(--ui);font-size:.66rem;font-weight:600;color:var(--muted);letter-spacing:0;display:block;margin-top:.25rem;line-height:1.5}
+.kpi--cache dd{color:var(--emerald)}
+.kpi--rose dd{color:var(--rose)}
+.kpi--gold dd{color:var(--gold)}
+
+.bar{height:30px;border-radius:9px;overflow:hidden;display:flex;border:1px solid var(--hair);background:#0d0620;margin:.2rem 0 .7rem}
+.bar i{display:block;height:100%}
+.bar .c1{background:linear-gradient(90deg,#2f9e7c,#43e6b4)}
+.bar .c2{background:linear-gradient(90deg,#c07a2a,#ffd27a)}
+.bar .c3{background:linear-gradient(90deg,#5aa8e0,#66d9ff)}
+.bar .c4{background:linear-gradient(90deg,#b8467f,#ff5ea8)}
+.legend{display:flex;flex-wrap:wrap;gap:.5rem 1.1rem;font-family:var(--ui);font-size:.8rem;color:var(--muted);list-style:none;padding:0;margin:0}
+.legend li{display:flex;align-items:center;gap:.45rem}
+.legend i{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
+.legend b{color:var(--cream);font-family:var(--mono);font-size:.82rem}
+
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+caption{text-align:left;font-family:var(--ui);font-size:.82rem;color:var(--dim);padding-bottom:.6rem}
+th,td{padding:.62rem .7rem;border-bottom:1px solid var(--hair-soft);text-align:left;vertical-align:top}
+thead th{font-family:var(--ui);font-size:.7rem;font-weight:700;letter-spacing:.02em;color:var(--dim);white-space:nowrap}
+tbody th{font-weight:600;color:var(--cream);font-family:var(--ui);font-size:.85rem;white-space:nowrap}
+td.num{font-family:var(--mono);text-align:right;white-space:nowrap}
+td{color:var(--muted)}
+td strong{color:var(--cream);font-weight:600}
+tr.total td,tr.total th{border-top:1px solid var(--hair);border-bottom:none;color:var(--cream);font-weight:700}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+ul.checks{list-style:none;padding:0;margin:0;display:grid;gap:.5rem}
+ul.checks li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.7rem;align-items:start;
+  border:1px solid var(--hair-soft);border-radius:12px;padding:.75rem .9rem;background:rgba(255,255,255,.03)}
+ul.checks .ok{color:var(--emerald);font-weight:700;font-family:var(--ui);font-size:.78rem;line-height:1.9;letter-spacing:.02em}
+ul.checks .out{color:var(--dim)}
+ul.checks .fix{color:var(--gold)}
+ul.checks .t{font-size:.93rem;color:var(--cream);line-height:1.7}
+ul.checks .d{display:block;font-family:var(--mono);font-size:.76rem;color:var(--muted);margin-top:.25rem;line-height:1.6}
+
+.src{font-family:var(--mono);font-size:.78rem;color:var(--muted);background:#0d0620;
+  border:1px solid var(--hair-soft);border-radius:12px;padding:.9rem 1rem;overflow-x:auto;margin:0}
+.src div{margin:0 0 .35rem;white-space:pre-wrap;line-height:1.7}
+.src div:last-child{margin:0}
+footer{padding:clamp(2.2rem,5vh,3.4rem) 0;font-family:var(--ui);font-size:.8rem;color:var(--dim);line-height:1.8}
+footer a{color:var(--ice)}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+
+@media (max-width:620px){
+  .kpi dd{font-size:1.15rem}
+  th,td{padding:.5rem .45rem}
+  .bar{height:24px}
+  .wide-hide{display:none}
+  tbody th{white-space:normal;font-size:.8rem;overflow-wrap:break-word}
+  td.num{font-size:.84rem}
+  thead th{font-size:.68rem}
+  .scroll table{min-width:0}
+  td.wrapnum{white-space:normal;overflow-wrap:anywhere}
+}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.06s!important}}
+@media print{.btn{display:none}body{background:#fff;color:#111}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="tag">앨리스 페이지 벤치마크</p>
+    <h1><small>측정 대상 모델</small>opencode / space-bunny-free</h1>
+    <p class="lede">
+      &ldquo;거울나라의 앨리스&rdquo;를 주제로 이 모델이 단 한 번 만든 자체 완결 HTML 페이지를, 그다음 측정했습니다.
+      이 리포트는 <strong>별도의 태스크</strong>입니다. 이미 끝난 페이지 태스크의 사용량 기록만 읽기 때문에,
+      리포트 작성에 쓴 토큰은 아래 숫자에 포함되지 않습니다.
+    </p>
+    <div class="cta">
+      <a class="btn btn--key" href="looking-glass.html">페이지 열기 &mdash; looking-glass.html</a>
+      <a class="btn" href="metrics.json">원본 metrics.json</a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>핵심 수치</h2>
+    <p class="sub">
+      아래 모든 토큰은 <strong>페이지 태스크 하나만</strong>에 대한 누적 <em>처리</em> 토큰입니다.
+      매 턴마다 다시 읽은 컨텍스트도 중복으로 더해지기 때문에, 페이지 본문 크기보다 훨씬 큽니다.
+      고유 텍스트 크기도 아니고 청구서도 아닙니다.
+    </p>
+
+    <div class="kpis">
+      <dl class="kpi kpi--gold">
+        <dt>경과 시간</dt>
+        <dd id="k-duration">0:54:49</dd>
+        <small id="k-duration-sub">10:36:37 &rarr; 11:31:26 KST</small>
+      </dl>
+      <dl class="kpi">
+        <dt>첫 토큰까지</dt>
+        <dd>측정 불가</dd>
+        <small>이 스토어에 기록되지 않음</small>
+      </dl>
+      <dl class="kpi kpi--rose">
+        <dt>총 토큰</dt>
+        <dd id="k-total">0</dd>
+        <small>input + output</small>
+      </dl>
+      <dl class="kpi kpi--cache">
+        <dt>input 중 캐시 비율</dt>
+        <dd id="k-cacheshare">0%</dd>
+        <small id="k-cacheshare-sub">cached / input 합계</small>
+      </dl>
+      <dl class="kpi">
+        <dt>결과물 크기</dt>
+        <dd id="k-bytes">0</dd>
+        <small id="k-lines">0 줄 &middot; 단일 파일</small>
+      </dl>
+    </div>
+
+    <div class="bar" role="img" aria-labelledby="bar-desc">
+      <i class="c1" id="seg1"></i><i class="c2" id="seg2"></i><i class="c3" id="seg3"></i><i class="c4" id="seg4"></i>
+    </div>
+    <p class="sr" id="bar-desc">누적 막대: 캐시된 input, 캐시되지 않은 input, 가시 output, reasoning output.</p>
+    <ul class="legend">
+      <li><i style="background:#43e6b4"></i>캐시된 input <b id="lg-cached">0</b></li>
+      <li><i style="background:#ffd27a"></i>캐시 안 된 input <b id="lg-uncached">0</b></li>
+      <li><i style="background:#66d9ff"></i>가시 output <b id="lg-output">0</b></li>
+      <li><i style="background:#ff5ea8"></i>reasoning output <b id="lg-reasoning">0</b></li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>측정 범위와 <em>측정하지 않은</em> 것</h2>
+    <p class="sub">숫자는 페이지 태스크 하나만 대상으로 합니다. 아래는 밝히지 않은 항목입니다.</p>
+
+    <div class="note">
+      <p style="margin-bottom:0"><b>추론하지 않은 것:</b> 가격, 에너지, 페이지 로딩 속도.
+      토큰 수와 태스크 소요 시간으로는 이 중 무엇도 나올 수 없고, 어느 것도 측정하지 않았습니다.
+      <b>첫 토큰까지 시간</b>은 기록이 없어 측정 불가입니다.</p>
+    </div>
+
+    <h3 style="margin-top:1.9rem">측정 구간에 포함된 것</h3>
+    <p class="sub" style="margin-bottom:.7rem">
+      세션 <code id="s-session">—</code>, 어시스턴트 메시지 인덱스 <b id="s-idx">—</b>
+      (모델 턴 <b id="s-turns">—</b>회). 양 끝은 스토어에 남아 있는 텍스트로 표시했습니다.
+      첫 포함 턴은 <em>&ldquo;Page task starts now.&rdquo;</em>가 적힌 턴이고,
+      첫 제외 턴은 <em>&ldquo;Page task done. Now the measurement step.&rdquo;</em>가 적힌 턴입니다.
+    </p>
+    <ul class="checks">
+      <li><span class="ok">포함</span><span class="t"><code>looking-glass.html</code> 작성, 그리고 손으로 인코딩한 한글 이스케이프가 쓰레기로 디코딩된 뒤의 전면 재작성.<span class="d">디코딩 결과를 다시 읽어 확인함</span></span></li>
+      <li><span class="ok">포함</span><span class="t">추측이 아니라 렌더링된 페이지를 보고 발견한 결함 수정.<span class="d">키 SVG 스트로크 미표시 &middot; 카드 아트가 제목을 덮음 &middot; .hero__grid 의 width:100% 이 .wrap 의 max-width 를 이김 &middot; 체스판이 한 수 후 잠김</span></span></li>
+      <li><span class="ok">포함</span><span class="t">뷰포트 5종에서 브라우저 검증, 그리고 모든 인터랙션을 마우스와 키보드로 직접 구동.<span class="d">아래 &lsquo;브라우저 검증&rsquo; 참조</span></span></li>
+      <li><span class="ok out">제외</span><span class="t">스킬 로드, 폴더 이름 확인 질문, <code>prepare_run.py</code>, 세션 조회.<span class="d">메시지 인덱스 0&ndash;14 &mdash; 준비 단계이며 페이지 태스크가 아님</span></span></li>
+      <li><span class="ok out">제외</span><span class="t">모든 측정 작업과 이 리포트 작성.<span class="d">메시지 인덱스 122 이후 &mdash; 설계상 측정 구간 바깥</span></span></li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>토큰 산정</h2>
+    <p class="sub">
+      이 출처의 스키마가 스킬이 전정한 형태와 달라서 원본 필드를 다시 매핑했습니다.
+      아래 등식은 숫자를 하나라도 쓰기 <em>전에</em> 어시스턴트 레코드 138개 전부에 대해 확인했습니다.
+      <code>total = input + cache.read + output + reasoning</code>이며,
+      <code>reasoning</code>은 <code>output</code>과 <em>서로 겹치지 않는</em> 별도 스트림입니다
+      (레코드 30개에서 reasoning 이 output 보다 큽니다).
+      재매핑 후에는 스킬의 형태로, <code>cached_input</code>은 <code>input</code> 안에,
+      <code>reasoning_output</code>은 <code>output</code> 안에 들어갑니다.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <caption>모든 값은 <a href="metrics.json">metrics.json</a> &rarr; <code>page_task</code> 에서 재현할 수 있습니다.</caption>
+        <thead>
+          <tr><th scope="col">필드</th><th scope="col" style="text-align:right">토큰</th><th scope="col" style="text-align:right">비중</th><th scope="col" class="wide-hide">의미</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">total</th><td class="num" id="t-total">—</td><td class="num">100.00%</td><td class="wide-hide">input + output. 누적 처리 토큰이며 컨텍스트는 매 턴 다시 계산됩니다.</td></tr>
+          <tr><th scope="row">input</th><td class="num" id="t-input">—</td><td class="num" id="t-input-pct">—</td><td class="wide-hide">모델이 읽은 전체. 캐시분과 신선분을 모두 포함합니다.</td></tr>
+          <tr><th scope="row">&nbsp;&nbsp;cached_<wbr>input</th><td class="num" id="t-cached">—</td><td class="num" id="t-cached-pct">—</td><td class="wide-hide">input 의 부분집합으로 프롬프트 캐시에서 처리된 양. 반복된 컨텍스트가 여기에 쌓입니다.</td></tr>
+          <tr><th scope="row">&nbsp;&nbsp;uncached_<wbr>input</th><td class="num" id="t-uncached">—</td><td class="num" id="t-uncached-pct">—</td><td class="wide-hide">input &minus; cached_input. 진짜로 새로 읽은 텍스트는 이것뿐입니다.</td></tr>
+          <tr><th scope="row">output</th><td class="num" id="t-output">—</td><td class="num" id="t-output-pct">—</td><td class="wide-hide">가시 출력과 reasoning 을 합친 값.</td></tr>
+          <tr><th scope="row">&nbsp;&nbsp;visible_<wbr>output</th><td class="num" id="t-visible">—</td><td class="num" id="t-visible-pct">—</td><td class="wide-hide">어시스턴트 텍스트와 도구 호출 인자.</td></tr>
+          <tr><th scope="row">&nbsp;&nbsp;reasoning_<wbr>output</th><td class="num" id="t-reasoning">—</td><td class="num" id="t-reasoning-pct">—</td><td class="wide-hide">output 의 부분집합. 출처 스토어에서는 별도 스트림입니다.</td></tr>
+          <tr><th scope="row">cache_write</th><td class="num" id="t-write">—</td><td class="num">기록 없음</td><td class="wide-hide">프롬프트 캐시 기록량. 이번 실행은 0 입니다.</td></tr>
+          <tr class="total"><th scope="row">검산: in + out</th><td class="num wrapnum" id="t-check">—</td><td class="num">&nbsp;</td><td class="wide-hide">total 과 같아야 합니다. 확인했습니다.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note" style="margin-top:1.4rem">
+      <p style="margin-bottom:0"><b>총합이 아니라 캐시 비율을 보세요.</b>
+      <span id="k-cache-sentence">—</span>
+      절대 총합은 계속 커지는 컨텍스트를 반복해서 읽은 탓에 지배됩니다.
+      진짜로 새 자료를 얼마나 끌어들였는지를 말하는 건 캐시되지 않은 input 입니다.</p>
+    </div>
+
+    <h3 style="margin-top:1.9rem">구간 경계에 따른 차이</h3>
+    <p class="sub">마지막에 포함된 세 턴은 브라우저를 닫고 임시 스크린샷을 지운 것뿐입니다. 이 셋을 빼도 눈에 띄는 차이가 없는데, 그냥 말하는 대신 숫자로 보입니다.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th scope="col">구간</th><th scope="col" style="text-align:right">턴</th><th scope="col" style="text-align:right">총합</th><th scope="col" style="text-align:right">캐시 비율</th><th scope="col" style="text-align:right">경과</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">msgs 15&ndash;121 <em>(보고값)</em></th><td class="num" id="b1-turns">—</td><td class="num" id="b1-total">—</td><td class="num" id="b1-cache">—</td><td class="num" id="b1-dur">—</td></tr>
+          <tr><th scope="row">msgs 15&ndash;118 <em>(정리 제외)</em></th><td class="num" id="b2-turns">—</td><td class="num" id="b2-total">—</td><td class="num" id="b2-cache">—</td><td class="num" id="b2-dur">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>실행 조건</h2>
+    <div class="scroll">
+      <table>
+        <tbody>
+          <tr><th scope="row">모델</th><td><strong id="r-model">—</strong> &middot; 제공자 <code id="r-provider">—</code></td></tr>
+          <tr><th scope="row">추론 강도</th><td><strong id="r-effort">—</strong> <span style="font-family:var(--ui);font-size:.84rem">(스토어 필드 <code>variant</code>)</span></td></tr>
+          <tr><th scope="row">일시 (KST)</th><td><span id="r-date">—</span></td></tr>
+          <tr><th scope="row">사용 가능 도구</th><td>파일 쓰기/편집, 셸, Playwright 브라우저(탐색, 스냅샷, 클릭, 입력, hover, 드래그, 업로드, 스크린샷, 콘솔, 네트워크, evaluate). 모델은 Bash를 사용할 수 있었습니다.</td></tr>
+          <tr><th scope="row">프롬프트</th><td><code>references/benchmark-prompt.md</code>의 표준 한국어 지시문이며, 폴더 이름만 치환했습니다. <span id="r-prompt">—</span></td></tr>
+          <tr><th scope="row">프롬프트 변경점</th><td><strong id="r-dev">—</strong></td></tr>
+          <tr><th scope="row">디자인 참고</th><td>없음. 다른 모델이 만든 페이지는 열거나 참고하지 않았습니다.</td></tr>
+          <tr><th scope="row">시작 저장소 상태</th><td><code>3ef3174</code> 기준 깨끗한 트리. 페이지 태스크 직전에 <code>prepare_run.py</code>가 빈 폴더 <code>space-bunny-free/</code>를 만들었습니다.</td></tr>
+          <tr><th scope="row">폴더 이름</th><td><code>space-bunny-free</code>. 글자 그대로 <code>opencode/space-bunny-free</code>가 아닙니다. <code>prepare_run.py</code>는 경로 안전한 단일 세그먼트만 허용하고, 이 저장소의 기존 폴더도 모두 모델 이름만 씁니다.</td></tr>
+          <tr><th scope="row">외부 요청</th><td><strong id="r-net">—</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>실제로 수행한 브라우저 검증</h2>
+    <p class="sub">Playwright로 Chromium에서 렌더링해 눈으로 확인했습니다. 아래 각 항목은 계획이 아니라 실행한 결과입니다.</p>
+    <ul class="checks">
+      <li><span class="ok">통과</span><span class="t"><b>1440, 1280, 834, 390, 360</b> CSS px 모두에서 가로 오버플로 없음.<span class="d">다섯 폭 전부에서 scrollWidth &minus; clientWidth = 0</span></span></li>
+      <li><span class="ok">통과</span><span class="t">다섯 폭 모두에서 콘솔 에러 0건, 처리되지 않은 페이지 에러 0건.<span class="d">로컬 서빙 중 발생한 서버 측 /favicon.ico 404 는 제외했습니다. 페이지에서 나오는 요청이 아닙니다</span></span></li>
+      <li><span class="ok">통과</span><span class="t">스크롤 등장 요소 14개가 모두 나타남. 보이지 않은 채로 남는 요소 없음.<span class="d">각 폭에서 전체 스크롤 후 reveal.in = 14 / 14</span></span></li>
+      <li><span class="ok">통과</span><span class="t">완전 자체 완결. 네트워크 요청은 HTML 문서 자신뿐.<span class="d">웹폰트 없음, CDN 없음, fetch 없음, 절대 URL 없음</span></span></li>
+      <li><span class="ok">통과</span><span class="t">돋보기 렌즈: 마우스를 움직이면 켜지고 실제 2.5&times; 배율로 포인터를 따라감.<span class="d">hud: lens &middot; off &rarr; on, --lx/--ly 가 포인터를 추적</span></span></li>
+      <li><span class="ok">통과</span><span class="t">돋보기를 키보드로도 조작: Enter 로 토글 및 스테이지 포커스, 방향키 18px 이동, Home 으로 440 중앙 복귀, Escape 로 끄기.<span class="d">440 &rarr; 476 &rarr; 440, 이동마다 live region 으로 안내</span></span></li>
+      <li><span class="ok">통과</span><span class="t">체스판을 마우스와 키보드로: b1 &rarr; b3 &rarr; c2 &rarr; a1 후 반복, 초기화하면 b1 로 복귀.<span class="d">각 수가 #movelog 에 기록되고 live region 으로 안내됨</span></span></li>
+      <li><span class="ok">통과</span><span class="t">약병을 클릭과 D / E 단축키로: 크기 100% &rarr; 35% &rarr; 220% &rarr; 100%, 라벨과 로그가 함께 갱신.<span class="d">매 동작 뒤 figure --s 와 #scaleLabel 을 되읽어 확인</span></span></li>
+      <li><span class="ok">통과</span><span class="t">공개 카드가 hover 와 키보드 포커스 <em>둘 다</em>에 반응.<span class="d">:hover 와 :focus-visible 양쪽에서 .imp__x opacity 1</span></span></li>
+      <li><span class="ok">통과</span><span class="t">터치 경로: 360 px 뷰포트에서도 돋보기가 켜짐.<span class="d">hud: lens &middot; on</span></span></li>
+      <li><span class="ok">통과</span><span class="t"><code>prefers-reduced-motion: reduce</code> 를 존중하며 인터랙션도 그대로 동작.<span class="d">캔버스 숨김, 등장 요소 표시, Space 로도 나이트 이동</span></span></li>
+      <li><span class="ok">통과</span><span class="t">JavaScript 를 꺼도 내용이 렌더링됨.<span class="d">reveal opacity 1, 제목이 Alice / Through / the Glass 로 읽힘</span></span></li>
+    </ul>
+
+    <h3 style="margin-top:1.9rem">보고서만으로는 못 잡고, 보고서로 잡은 결함</h3>
+    <p class="sub">이 여섯 건 모두 &ldquo;소스에서는 멀쩡해 보인다&rdquo;는 말이 통하지 않아서 기록합니다.</p>
+    <ul class="checks">
+      <li><span class="ok fix">수정</span><span class="t">두 개의 열쇠 그림이 고리와 이빨은 그렸는데 <b>몸통이 없었습니다</b>. 스트로크 그라디언트가 기본 <code>objectBoundingBox</code> 단위를 썼는데, 세로선은 너비가 0인 박스라 그려지지 않습니다.<span class="d">gradientUnits="userSpaceOnUse" 로 해결</span></span></li>
+      <li><span class="ok fix">수정</span><span class="t">캐릭터 카드 그림이 카드 제목을 덮었습니다. <code>viewBox</code>만 가진 SVG에 <code>height:100%</code> 를 걸어도 크기가 제한되지 않았습니다.<span class="d">104px 박스 안에 109&ndash;197px로 넘치던 svg &rarr; 정확히 108px, 제목과 10px 간격</span></span></li>
+      <li><span class="ok fix">수정</span><span class="t">히어로 그리드가 페이지 거터를 무시했습니다. <code>.hero__grid{width:100%}</code> 가 같은 명시도로 <code>.wrap</code> 보다 뒤에 선언되어 1240px 상한과 auto 마진을 이겼습니다.<span class="d">내용 왼쪽 끝 0 &rarr; 92px</span></span></li>
+      <li><span class="ok fix">수정</span><span class="t">체스판이 한 수 이후 잠겼습니다. <code>busy</code> 가 마지막 수에서만 해제됐습니다.<span class="d">지금은 클릭과 Space 를 반복해도 b1&rarr;b3&rarr;c2&rarr;a1 로 진행</span></span></li>
+      <li><span class="ok fix">수정</span><span class="t">손으로 인코딩한 한글 <code>\uXXXX</code> 이스케이프가 무의미한 문자열로 디코딩됨(&ldquo;대경&rdquo;, &ldquo;용반 쁬기&rdquo;). 파일을 리터럴 UTF-8 텍스트로 다시 작성했습니다.<span class="d">이스케이프를 디코딩해 되읽고 발견함</span></span></li>
+      <li><span class="ok fix">수정</span><span class="t">한글 줄바꿈이 어절 중간에서 잘렸습니다. <code>word-break:keep-all</code> 을 추가했습니다.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>결과물</h2>
+    <div class="scroll">
+      <table>
+        <tbody>
+          <tr><th scope="row">파일</th><td><strong><a href="looking-glass.html">looking-glass.html</a></strong> &middot; 바로 열 수 있는 단일 파일</td></tr>
+          <tr><th scope="row">바이트</th><td class="num" id="a-bytes">—</td></tr>
+          <tr><th scope="row">줄 수</th><td class="num" id="a-lines">—</td></tr>
+          <tr><th scope="row">SHA-256</th><td><code id="a-sha">—</code></td></tr>
+          <tr><th scope="row">구조</th><td>히어로 포털 &middot; 스크롤 연동 토끼굴 하강 &middot; 돋보기 스테이지 &middot; 캐릭터 카드 4장과 뒤집힌 듀오 &middot; 거울 체스 &middot; Drink Me / Eat Me &middot; 불가능한 여섯 가지 &middot; 푸터.</td></tr>
+          <tr><th scope="row">의존성</th><td>없음. 외부 스타일시트, 스크립트, 폰트, 이미지 모두 없습니다.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>출처</h2>
+    <div class="src">
+<div>1. opencode 세션 스토어 — %LOCALAPPDATA%\..\opencode\opencode.db, `message` 테이블, 세션 <span id="src-session">—</span></div>
+<div>     구간: 어시스턴트 메시지 인덱스 <span id="src-idx">—</span> / 레코드마다 tokens{input, output, reasoning, cache.read, cache.write, total}</div>
+<div>     경계 표시는 스토어 자체 텍스트에서 읽음: "Page task starts now." / "Page task done. Now the measurement step."</div>
+<div>2. 파일 메타데이터 — looking-glass.html, 바이트/줄 수/SHA-256 는 디스크의 파일에서 계산</div>
+<div>3. 브라우저 — Playwright 로 Chromium 을 1440/1280/834/390/360 px 에서 확인. 위 문장에 인용한 콘솔·네트워크·계산 스타일 단언</div>
+<div>4. metrics.json — 이 페이지에 있는 모든 내용의 기계 판독용 형태</div>
+    </div>
+    <p class="sub" style="margin-top:1.1rem;margin-bottom:0">
+      위에서 밝히지 않은 항목은 측정하지 않았습니다. 다음 모델을 위해서는
+      <code>.agents/skills/benchmark-alice-page</code> 의 절차를 다시 돌리면 됩니다.
+      이 스킬은 새 모델 출시를 감시하지 않습니다.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="looking-glass.html">looking-glass.html</a> &middot;
+    <a href="metrics.json">metrics.json</a> &middot;
+    benchmark.html &middot; 측정 대상 페이지 태스크와 분리된 태스크로 생성함
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var M = {
+  session: "ses_f0aec2785ffeSbq7DmiJcrJxxZ",
+  model: "space-bunny-free", provider: "opencode", variant: "max",
+  started: "2026-10-01T10:36:37.415+09:00",
+  completed: "2026-10-01T11:31:26.557+09:00",
+  wall_ms: 3289142, wall: "0:54:49",
+  idx: [15,121], turns: 107,
+  input: 14736819, cached: 14279838, uncached: 456981,
+  visible: 72444, reasoning: 28624,
+  total: 14837887, cache_write: 0,
+  cache_share_input: 96.9, cache_share_total: 96.24,
+  bytes: 57185, lines: 1084,
+  sha: "5d8138d933e4b3fe600d10ec09c3bbc3cfcc85b6b74669b0fca417f687b62176",
+  alt: { turns: 104, total: 14251309, cache_share: 96.79, wall: "0:53:41" },
+  network: "문서 자신 외에는 없음. 네트워크 패널에서 확인했습니다."
+};
+
+var byId = function(id){ return document.getElementById(id); };
+function set(id, v){ var el = byId(id); if (el) el.textContent = v; }
+function num(n){ return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+function pct(part, whole){ return whole ? (100 * part / whole).toFixed(2) + "%" : "\u2014"; }
+
+var output = M.visible + M.reasoning;
+
+set("k-duration", M.wall);
+set("k-duration-sub", M.started.slice(11,19) + " \u2192 " + M.completed.slice(11,19) + " KST");
+set("k-total", num(M.total));
+set("k-cacheshare", M.cache_share_input.toFixed(1) + "%");
+set("k-cacheshare-sub", "캐시 " + num(M.cached) + " \u00b7 input 합계 " + num(M.input));
+set("k-bytes", num(M.bytes));
+set("k-lines", num(M.lines) + " 줄 \u00b7 단일 파일");
+
+set("lg-cached", num(M.cached));
+set("lg-uncached", num(M.uncached));
+set("lg-output", num(M.visible));
+set("lg-reasoning", num(M.reasoning));
+[["seg1",M.cached],["seg2",M.uncached],["seg3",M.visible],["seg4",M.reasoning]].forEach(function(p){
+  byId(p[0]).style.width = (100 * p[1] / M.total).toFixed(4) + "%";
+});
+
+set("s-session", M.session);
+set("s-idx", M.idx[0] + "\u2013" + M.idx[1]);
+set("s-turns", num(M.turns));
+
+set("t-total", num(M.total));
+set("t-input", num(M.input));
+set("t-input-pct", pct(M.input, M.total));
+set("t-cached", num(M.cached));
+set("t-cached-pct", pct(M.cached, M.total));
+set("t-uncached", num(M.uncached));
+set("t-uncached-pct", pct(M.uncached, M.total));
+set("t-output", num(output));
+set("t-output-pct", pct(output, M.total));
+set("t-visible", num(M.visible));
+set("t-visible-pct", pct(M.visible, M.total));
+set("t-reasoning", num(M.reasoning));
+set("t-reasoning-pct", pct(M.reasoning, M.total));
+set("t-write", num(M.cache_write));
+set("t-check", num(M.input) + " + " + num(output) + " = " + num(M.input + output));
+
+byId("k-cache-sentence").textContent =
+  "input " + num(M.input) + " 토큰 가운데 " + num(M.cached) +
+  "개(" + M.cache_share_input.toFixed(1) + "%)가 캐시에서 처리되었고, 새로 읽은 것은 " +
+  num(M.uncached) + "개(" + pct(M.uncached, M.input) + ")뿐입니다.";
+
+set("b1-turns", num(M.turns));
+set("b1-total", num(M.total));
+set("b1-cache", M.cache_share_input.toFixed(2) + "%");
+set("b1-dur", M.wall);
+set("b2-turns", num(M.alt.turns));
+set("b2-total", num(M.alt.total));
+set("b2-cache", M.alt.cache_share + "%");
+set("b2-dur", M.alt.wall);
+
+set("r-model", M.model);
+set("r-provider", M.provider);
+set("r-effort", M.variant);
+set("r-date", "2026-10-01, " + M.started.slice(11,19) + "\u2013" + M.completed.slice(11,19) + " KST");
+set("r-prompt", "space-bunny-free \ud544\ub354\uc5d0 \u201c\uac70\uc6b8\ub098\ub77c\uc758 \uc560\ub9ac\uc2a4\u201d\ub97c \uc8fc\uc81c\ub85c \uc0c1\uc0dd\ud560 \uc218 \uc788\ub294 \uac00\uc7a5 \uc544\ubbf8\ud558 \uc18c HTML \ud30c\uc77c\uc744 \ub9cc\ub4e4\uc5b4 \ubcf4\uc138\uc694. \ubcf4\ub294 \uc0ac\ub7ec\ub4e4\uc774 \u201c\uc640!!\u201d\ub780 \uac10\ud0e0\uc0ac\ubc00\ud558\ub2e4 \ubc84\uc9d1\ub2c8 \ubc00 \uc788\ub294 \ud30c\uc77c\uc774\uc5b4\uc57c \ud569\ub2c8\ub2e4. \uc2dc\uac01\uc801\uc73c\ub85c \uc778\uc0c1\uc801\uc774\uace0 \uc544\ubbf8\ub2d0\uc6b0\uba74 \ub2e4\uc74c\uacfc \uc2dc\uac04\uc774 \ub3d9\uc131\uc744 \ud3fc\ud558\uc138\uc694. \uc2e4\ubb34\ub294 \uc808\ub300 \uae08\ubb3c\uc785\ub2c8\ub2e4.");
+set("r-dev", "문안 자체의 변경은 없습니다. 실행 조건 차이 두 가지가 위에 적혀 있습니다. 하나는 검증 중 테스트 브라우저가 file: 프로토콜을 막아 로컬 HTTP 서버로 제공했다는 점이고, 다른 하나는 폴더 이름이 글자 그대로 opencode/space-bunny-free가 아니라는 점입니다. 결과물에 외부 의존성이 없으므로 전달 방식은 내용을 바꾸지 않습니다.");
+set("r-net", M.network);
+
+set("a-bytes", num(M.bytes) + " 바이트");
+set("a-lines", num(M.lines) + " 줄");
+set("a-sha", M.sha);
+set("src-session", M.session);
+set("src-idx", M.idx[0] + "\u2013" + M.idx[1]);
+})();
+</script>
+</body>
+</html>

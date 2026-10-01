@@ -1,0 +1,99 @@
+{
+  "source": "opencode session store (opencode.db message table) - NOT the skill's Codex extract_metrics.py",
+  "schema_note": "opencode records reasoning as a stream disjoint from output and counts cache.read inside total. Fields below are remapped to the skill's Codex-style schema so total == input + output and reasoning_output <= output both hold.",
+  "model": {
+    "id": "space-bunny-free",
+    "providerID": "opencode",
+    "variant": "max"
+  },
+  "session_id": "ses_f0aec2785ffeSbq7DmiJcrJxxZ",
+  "scope": "one completed Alice HTML page task: authoring, defect-fixing and browser verification of space-bunny-free/looking-glass.html. Excludes skill setup and folder creation (message indexes 0-14) and all measurement/report work (indexes 122+).",
+  "page_task": {
+    "window_message_indexes": [
+      15,
+      121
+    ],
+    "assistant_messages": 107,
+    "raw_fresh_input": 456981,
+    "raw_cached_input": 14279838,
+    "raw_output": 72444,
+    "raw_reasoning_disjoint": 28624,
+    "raw_store_total": 14837887,
+    "input_tokens": 14736819,
+    "cached_input_tokens": 14279838,
+    "uncached_input_tokens": 456981,
+    "output_tokens": 101068,
+    "visible_output_tokens": 72444,
+    "reasoning_output_subset": 28624,
+    "total_tokens": 14837887,
+    "cache_write_tokens": 0,
+    "cached_share_of_input_percent": 96.9,
+    "uncached_share_of_input_percent": 3.1,
+    "cached_share_of_total_percent": 96.24,
+    "output_share_of_total_percent": 0.68,
+    "started_at_kst": "2026-10-01T10:36:37.415+09:00",
+    "completed_at_kst": "2026-10-01T11:31:26.557+09:00",
+    "wall_clock_ms": 3289142,
+    "wall_clock_hms": "0:54:49"
+  },
+  "page_task_excluding_final_cleanup": {
+    "window_message_indexes": [
+      15,
+      118
+    ],
+    "assistant_messages": 104,
+    "raw_fresh_input": 454679,
+    "raw_cached_input": 13695974,
+    "raw_output": 72130,
+    "raw_reasoning_disjoint": 28526,
+    "raw_store_total": 14251309,
+    "input_tokens": 14150653,
+    "cached_input_tokens": 13695974,
+    "uncached_input_tokens": 454679,
+    "output_tokens": 100656,
+    "visible_output_tokens": 72130,
+    "reasoning_output_subset": 28526,
+    "total_tokens": 14251309,
+    "cache_write_tokens": 0,
+    "cached_share_of_input_percent": 96.79,
+    "uncached_share_of_input_percent": 3.21,
+    "cached_share_of_total_percent": 96.1,
+    "output_share_of_total_percent": 0.71,
+    "started_at_kst": "2026-10-01T10:36:37.415+09:00",
+    "completed_at_kst": "2026-10-01T11:30:18.849+09:00",
+    "wall_clock_ms": 3221434,
+    "wall_clock_hms": "0:53:41"
+  },
+  "time_to_first_token_ms": null,
+  "time_to_first_token_note": "not recorded by the opencode session store; unmeasured",
+  "session_totals_whole_session": {
+    "input": 599203,
+    "output": 84029,
+    "reasoning": 32702,
+    "cache_read": 17999711
+  },
+  "artifact": {
+    "name": "looking-glass.html",
+    "bytes": 57185,
+    "lines": 1084,
+    "sha256": "5d8138d933e4b3fe600d10ec09c3bbc3cfcc85b6b74669b0fca417f687b62176"
+  },
+  "codex_extractor": {
+    "attempted": true,
+    "succeeded": false,
+    "reason": "no Codex rollout log records this model; extract_metrics.py refused on the expected-model check. Codex fields therefore remain unmeasured.",
+    "codex_logs_scanned": 3726,
+    "codex_turn_context_events": 32039,
+    "codex_models_seen": [
+      "codex-auto-review",
+      "gpt-5.4",
+      "gpt-5.5",
+      "gpt-5.6-luna",
+      "gpt-5.6-sol",
+      "gpt-5.6-terra",
+      "gpt-6-astra",
+      "gpt-6-sol",
+      "gpt-6.1-sol"
+    ]
+  }
+}
