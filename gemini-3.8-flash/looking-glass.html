@@ -1,0 +1,2431 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>거울나라의 앨리스 · Through the Looking-Glass</title>
+  <meta name="description" content="루이스 캐럴의 거울나라의 앨리스를 테마로 한 환상적인 인터랙티브 디지털 경험. 거울 속 체스판의 세계와 말하는 꽃들의 정원을 탐험하세요.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700;900&family=Noto+Serif+KR:wght@300;400;600;700;900&family=Marcellus&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       1. Design Tokens & Root Variables
+       ========================================================================== */
+    :root {
+      --bg-dark: #07060c;
+      --bg-deep: #0d0b18;
+      --bg-card: rgba(20, 17, 36, 0.72);
+      --bg-glass: rgba(255, 255, 255, 0.05);
+      --border-gold: rgba(212, 175, 55, 0.35);
+      --border-gold-glow: rgba(250, 219, 95, 0.65);
+      --gold-primary: #d4af37;
+      --gold-light: #fef08a;
+      --gold-deep: #996515;
+      --silver-mercury: #e2e8f0;
+      --silver-glow: rgba(226, 232, 240, 0.8);
+      --alice-cyan: #38bdf8;
+      --alice-glow: rgba(56, 189, 248, 0.5);
+      --red-queen: #e11d48;
+      --red-queen-glow: rgba(225, 29, 72, 0.6);
+      --white-queen: #e0e7ff;
+      --violet-mythic: #a855f7;
+      --font-display: 'Cinzel Decorative', 'Cinzel', 'Noto Serif KR', Georgia, serif;
+      --font-serif: 'Cinzel', 'Noto Serif KR', 'Batang', serif;
+      --font-body: 'Marcellus', 'Noto Serif KR', serif;
+      --ease-magic: cubic-bezier(0.2, 0.8, 0.2, 1);
+      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ==========================================================================
+       2. Global Reset & Typography
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-dark);
+      color: #f1f5f9;
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      font-size: 16px;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 20%, #15102a 0%, #080611 60%, #030206 100%);
+      line-height: 1.7;
+      letter-spacing: 0.02em;
+      position: relative;
+      transition: transform 0.8s var(--ease-magic), filter 0.8s var(--ease-magic);
+      transform-origin: center center;
+    }
+
+    /* Looking-Glass Mirror Inversion Mode */
+    body.mirror-inverted {
+      transform: scaleX(-1);
+      filter: saturate(1.2) contrast(1.05) hue-rotate(15deg);
+    }
+
+    body.mirror-inverted .mirror-sensitive-text {
+      transform: scaleX(-1);
+      display: inline-block;
+    }
+
+    ::selection {
+      background: rgba(212, 175, 55, 0.3);
+      color: #fff;
+      text-shadow: 0 0 8px rgba(254, 240, 138, 0.6);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090713;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #996515, #d4af37, #996515);
+      border-radius: 5px;
+      border: 2px solid #090713;
+    }
+
+    /* ==========================================================================
+       3. Canvas & Ambient Backgrounds
+       ========================================================================== */
+    #ambient-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    #liquid-mirror-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      cursor: crosshair;
+    }
+
+    .vignette-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(3, 2, 7, 0.85) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ==========================================================================
+       4. Navigation & Audio Header
+       ========================================================================== */
+    .glass-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1.2rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: rgba(10, 8, 20, 0.65);
+      border-bottom: 1px solid var(--border-gold);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      transition: all 0.4s ease;
+    }
+
+    .brand-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      filter: drop-shadow(0 0 8px var(--gold-primary));
+      animation: gentle-spin 20s linear infinite;
+    }
+
+    @keyframes gentle-spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      background: linear-gradient(135deg, #fff 0%, var(--gold-light) 50%, var(--gold-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .control-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 1.2rem;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-gold);
+      color: #e2e8f0;
+      font-family: var(--font-serif);
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-magic);
+      backdrop-filter: blur(8px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .control-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .control-btn:hover {
+      background: rgba(212, 175, 55, 0.15);
+      border-color: var(--border-gold-glow);
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.4);
+      transform: translateY(-2px);
+      color: #fff;
+    }
+
+    .control-btn:hover::before {
+      left: 100%;
+    }
+
+    .control-btn.active {
+      background: rgba(212, 175, 55, 0.25);
+      border-color: var(--gold-light);
+      box-shadow: 0 0 20px rgba(250, 219, 95, 0.5);
+    }
+
+    .audio-visualizer-bar {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 14px;
+      margin-left: 4px;
+    }
+
+    .audio-visualizer-bar span {
+      width: 3px;
+      height: 4px;
+      background: var(--gold-light);
+      border-radius: 1px;
+      transition: height 0.15s ease;
+    }
+
+    .audio-playing .audio-visualizer-bar span:nth-child(1) { animation: sound-bounce 0.6s infinite ease-in-out; }
+    .audio-playing .audio-visualizer-bar span:nth-child(2) { animation: sound-bounce 0.8s infinite 0.2s ease-in-out; }
+    .audio-playing .audio-visualizer-bar span:nth-child(3) { animation: sound-bounce 0.7s infinite 0.4s ease-in-out; }
+
+    @keyframes sound-bounce {
+      0%, 100% { height: 4px; }
+      50% { height: 14px; }
+    }
+
+    /* ==========================================================================
+       5. Hero: The Looking-Glass Portal
+       ========================================================================== */
+    .hero-section {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 7rem 2rem 4rem;
+      text-align: center;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    .hero-content {
+      position: relative;
+      max-width: 900px;
+      z-index: 5;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.45rem 1.4rem;
+      border-radius: 9999px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--alice-cyan);
+      font-family: var(--font-serif);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+      animation: pulse-glow 3s infinite alternate;
+    }
+
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.25); }
+      100% { box-shadow: 0 0 30px rgba(56, 189, 248, 0.45); border-color: rgba(56, 189, 248, 0.6); }
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 6.5vw, 5.2rem);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: 0.08em;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(180deg, #ffffff 15%, #fde047 55%, #ca8a04 90%, #996515 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 35px rgba(212, 175, 55, 0.35));
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-serif);
+      font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+      color: #cbd5e1;
+      max-width: 720px;
+      margin: 0 auto 2.5rem;
+      font-weight: 300;
+      line-height: 1.8;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    }
+
+    .hero-subtitle em {
+      font-style: normal;
+      color: var(--gold-light);
+      border-bottom: 1px dashed rgba(254, 240, 138, 0.5);
+      padding-bottom: 2px;
+    }
+
+    /* Central Looking-Glass Frame */
+    .mirror-frame-wrapper {
+      position: relative;
+      width: min(340px, 80vw);
+      height: min(440px, 100vw);
+      margin: 1.5rem auto 3rem;
+      border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+      padding: 14px;
+      background: linear-gradient(145deg, #e6ca65, #996515, #d4af37, #593907, #ffd700);
+      box-shadow: 
+        0 0 0 2px rgba(255, 255, 255, 0.3) inset,
+        0 25px 60px rgba(0, 0, 0, 0.9),
+        0 0 50px rgba(212, 175, 55, 0.4);
+      cursor: pointer;
+      transition: transform 0.5s var(--ease-bounce), box-shadow 0.5s ease;
+    }
+
+    .mirror-frame-wrapper:hover {
+      transform: scale(1.03) rotate(0.5deg);
+      box-shadow: 
+        0 0 0 3px rgba(255, 255, 255, 0.6) inset,
+        0 30px 70px rgba(0, 0, 0, 0.95),
+        0 0 70px rgba(250, 219, 95, 0.6);
+    }
+
+    .mirror-glass-pane {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+      overflow: hidden;
+      background: radial-gradient(circle at 45% 40%, rgba(20, 25, 50, 0.8) 0%, rgba(5, 7, 18, 0.95) 80%);
+      box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(56, 189, 248, 0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .mirror-silhouette {
+      position: absolute;
+      bottom: -10px;
+      width: 80%;
+      height: auto;
+      opacity: 0.85;
+      filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.5));
+      transition: transform 0.6s var(--ease-magic);
+      pointer-events: none;
+    }
+
+    .mirror-frame-wrapper:hover .mirror-silhouette {
+      transform: scale(1.08) translateY(-5px);
+      filter: drop-shadow(0 0 25px rgba(250, 219, 95, 0.8));
+    }
+
+    .mirror-reflection-glimmer {
+      position: absolute;
+      top: 0;
+      left: -150%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(
+        115deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.25) 45%,
+        rgba(56, 189, 248, 0.4) 50%,
+        rgba(255, 255, 255, 0.25) 55%,
+        transparent 65%
+      );
+      transform: rotate(20deg);
+      animation: mirror-glimmer 6s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes mirror-glimmer {
+      0%, 70% { left: -150%; }
+      100% { left: 150%; }
+    }
+
+    .mirror-hint-label {
+      position: absolute;
+      bottom: 25px;
+      padding: 0.4rem 1.2rem;
+      border-radius: 9999px;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-light);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      backdrop-filter: blur(6px);
+      z-index: 10;
+      pointer-events: none;
+      animation: bounce-subtle 2s infinite ease-in-out;
+    }
+
+    @keyframes bounce-subtle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .cta-group {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-portal {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.9rem 2.4rem;
+      border-radius: 9999px;
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #0d0a1a;
+      background: linear-gradient(135deg, #fff 0%, #fde047 30%, #d4af37 80%, #b45309 100%);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4), 0 0 20px rgba(254, 240, 138, 0.5);
+      transition: all 0.3s var(--ease-bounce);
+      text-decoration: none;
+    }
+
+    .btn-portal:hover {
+      transform: translateY(-4px) scale(1.04);
+      box-shadow: 0 15px 35px rgba(212, 175, 55, 0.6), 0 0 40px rgba(254, 240, 138, 0.8);
+      filter: brightness(1.08);
+    }
+
+    .btn-portal-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.9rem 2.2rem;
+      border-radius: 9999px;
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: #f1f5f9;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-gold);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: all 0.3s var(--ease-magic);
+      text-decoration: none;
+    }
+
+    .btn-portal-secondary:hover {
+      background: rgba(212, 175, 55, 0.15);
+      border-color: var(--border-gold-glow);
+      box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+      transform: translateY(-3px);
+      color: #fff;
+    }
+
+    /* ==========================================================================
+       6. Story Section Container & Ornate Dividers
+       ========================================================================== */
+    .section-wrap {
+      position: relative;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 6rem 2rem;
+      z-index: 10;
+    }
+
+    .ornate-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 4rem 0;
+      color: var(--gold-primary);
+      opacity: 0.8;
+    }
+
+    .ornate-divider::before,
+    .ornate-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
+    }
+
+    .ornate-divider svg {
+      width: 32px;
+      height: 32px;
+      filter: drop-shadow(0 0 8px var(--gold-primary));
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 4rem;
+    }
+
+    .section-tag {
+      font-family: var(--font-serif);
+      font-size: 0.85rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 0.8rem;
+      display: block;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      background: linear-gradient(135deg, #ffffff 30%, #e2e8f0 70%, var(--gold-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    }
+
+    .section-description {
+      font-size: 1.15rem;
+      color: #94a3b8;
+      line-height: 1.8;
+    }
+
+    /* ==========================================================================
+       7. Interactive 3D Chessboard Experience: The 8 Ranks
+       ========================================================================== */
+    .chessboard-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-gold);
+      border-radius: 24px;
+      padding: 3rem 2.5rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), inset 0 0 30px rgba(212, 175, 55, 0.05);
+      backdrop-filter: blur(20px);
+      margin-bottom: 4rem;
+    }
+
+    .chessboard-interactive-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      max-width: 840px;
+      margin: 0 auto 3rem;
+      perspective: 1000px;
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease;
+    }
+
+    .chess-tile {
+      aspect-ratio: 1 / 1;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.35s var(--ease-bounce);
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .chess-tile.tile-light {
+      background: linear-gradient(135deg, rgba(248, 250, 252, 0.12) 0%, rgba(203, 213, 225, 0.05) 100%);
+    }
+
+    .chess-tile.tile-dark {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 27, 58, 0.6) 100%);
+    }
+
+    .chess-tile.brook-edge {
+      border-bottom: 2px dashed rgba(56, 189, 248, 0.6);
+    }
+
+    .chess-tile:hover {
+      transform: translateY(-8px) scale(1.08) translateZ(20px);
+      border-color: var(--gold-light);
+      box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4), 0 0 15px rgba(254, 240, 138, 0.5);
+      z-index: 20;
+    }
+
+    .chess-tile.tile-active {
+      border-color: var(--alice-cyan);
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.3) 0%, rgba(14, 165, 233, 0.15) 100%);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.6), inset 0 0 15px rgba(56, 189, 248, 0.3);
+      transform: translateY(-6px) scale(1.05);
+      z-index: 15;
+    }
+
+    .chess-tile-coord {
+      position: absolute;
+      top: 4px;
+      left: 6px;
+      font-size: 0.65rem;
+      font-family: var(--font-serif);
+      color: rgba(255, 255, 255, 0.35);
+      font-weight: 600;
+    }
+
+    .chess-tile-icon {
+      font-size: 1.8rem;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+      transition: transform 0.3s ease;
+    }
+
+    .chess-tile:hover .chess-tile-icon {
+      transform: scale(1.2);
+    }
+
+    .alice-pawn-token {
+      position: absolute;
+      width: 70%;
+      height: 70%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: floating-token 2.5s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px var(--alice-cyan)) drop-shadow(0 0 20px var(--alice-cyan));
+    }
+
+    @keyframes floating-token {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    /* Rank Narrative Showcase Card */
+    .rank-narrative-card {
+      background: linear-gradient(135deg, rgba(26, 22, 48, 0.95) 0%, rgba(13, 11, 24, 0.98) 100%);
+      border: 1px solid var(--border-gold-glow);
+      border-radius: 18px;
+      padding: 2.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 2.5rem;
+      align-items: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      transition: all 0.4s var(--ease-magic);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rank-card-visual {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      aspect-ratio: 4 / 3;
+      background: radial-gradient(circle at center, #261f4b 0%, #0d0a1b 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+    }
+
+    .rank-card-visual svg {
+      width: 75%;
+      height: 75%;
+      transition: transform 0.6s var(--ease-bounce);
+    }
+
+    .rank-narrative-card:hover .rank-card-visual svg {
+      transform: scale(1.1) rotate(2deg);
+    }
+
+    .rank-meta-badge {
+      display: inline-block;
+      padding: 0.3rem 0.9rem;
+      border-radius: 9999px;
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-light);
+      font-size: 0.8rem;
+      font-family: var(--font-serif);
+      margin-bottom: 1rem;
+      letter-spacing: 0.1em;
+    }
+
+    .rank-title {
+      font-family: var(--font-display);
+      font-size: 1.85rem;
+      color: #fff;
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+
+    .rank-quote {
+      font-style: italic;
+      color: #cbd5e1;
+      font-size: 1.05rem;
+      border-left: 3px solid var(--gold-primary);
+      padding-left: 1.2rem;
+      margin-bottom: 1.4rem;
+      line-height: 1.8;
+      background: rgba(255, 255, 255, 0.02);
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .rank-description {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      margin-bottom: 1.6rem;
+    }
+
+    .rank-nav-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-step {
+      padding: 0.6rem 1.4rem;
+      border-radius: 9999px;
+      font-family: var(--font-serif);
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-gold);
+      color: #e2e8f0;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-step:hover {
+      background: var(--gold-primary);
+      color: #000;
+      font-weight: 700;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+    }
+
+    /* ==========================================================================
+       8. Interactive Garden of Live Flowers
+       ========================================================================== */
+    .flower-garden-wrapper {
+      position: relative;
+      background: radial-gradient(ellipse at 50% 100%, #1a1635 0%, #0c0919 60%, #05040a 100%);
+      border: 1px solid var(--border-gold);
+      border-radius: 28px;
+      overflow: hidden;
+      padding: 3rem 2rem 2rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      margin-bottom: 5rem;
+    }
+
+    #flower-garden-canvas {
+      width: 100%;
+      height: 480px;
+      display: block;
+      cursor: pointer;
+      border-radius: 18px;
+    }
+
+    .garden-controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .flower-dialogue-box {
+      background: rgba(18, 14, 34, 0.85);
+      border: 1px solid var(--border-gold-glow);
+      border-radius: 14px;
+      padding: 1.2rem 1.8rem;
+      max-width: 650px;
+      flex: 1;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .flower-speaker-name {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      color: var(--gold-light);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .flower-speech-text {
+      font-size: 1rem;
+      color: #e2e8f0;
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    /* ==========================================================================
+       9. Jabberwocky Mirror Decryption Chamber
+       ========================================================================== */
+    .jabberwocky-container {
+      background: linear-gradient(135deg, rgba(22, 16, 36, 0.85) 0%, rgba(10, 8, 20, 0.95) 100%);
+      border: 1px solid var(--border-gold);
+      border-radius: 24px;
+      padding: 3.5rem 2.5rem;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+      backdrop-filter: blur(15px);
+      margin-bottom: 5rem;
+      position: relative;
+    }
+
+    .mirror-script-display {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      margin: 2.5rem 0;
+    }
+
+    .script-pane {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 16px;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .script-pane-label {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #0f0c1e;
+      padding: 0.2rem 0.8rem;
+      border: 1px solid var(--border-gold);
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-family: var(--font-serif);
+      color: var(--gold-light);
+      letter-spacing: 0.1em;
+    }
+
+    .mirror-text-backward {
+      transform: scaleX(-1);
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      line-height: 2.2;
+      color: #94a3b8;
+      letter-spacing: 0.05em;
+      filter: blur(0.3px);
+    }
+
+    .mirror-text-forward {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      line-height: 2.2;
+      color: #f8fafc;
+      letter-spacing: 0.05em;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+
+    .mirror-text-forward em {
+      color: var(--gold-light);
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .vorpal-blade-interact {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 16px;
+      border: 1px dashed rgba(212, 175, 55, 0.3);
+    }
+
+    .vorpal-blade-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.8rem 2rem;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%);
+      color: #fff;
+      font-family: var(--font-serif);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 20px var(--red-queen-glow);
+      transition: all 0.3s var(--ease-bounce);
+    }
+
+    .vorpal-blade-btn:hover {
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 0 35px rgba(225, 29, 72, 0.85);
+    }
+
+    /* ==========================================================================
+       10. Six Impossible Things Before Breakfast (Oracle Cards)
+       ========================================================================== */
+    .impossible-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+      perspective: 1200px;
+    }
+
+    .impossible-card {
+      height: 380px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.8s var(--ease-magic);
+      cursor: pointer;
+    }
+
+    .impossible-card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .impossible-card-face {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      padding: 2.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid var(--border-gold);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(15px);
+    }
+
+    .card-front {
+      background: linear-gradient(145deg, rgba(25, 20, 45, 0.9) 0%, rgba(12, 10, 25, 0.95) 100%);
+      border-color: rgba(212, 175, 55, 0.4);
+    }
+
+    .card-back {
+      background: linear-gradient(145deg, rgba(30, 20, 50, 0.95) 0%, rgba(18, 12, 34, 0.98) 100%);
+      transform: rotateY(180deg);
+      border-color: var(--gold-light);
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.35);
+    }
+
+    .impossible-card:hover .card-front {
+      border-color: var(--gold-light);
+      box-shadow: 0 20px 45px rgba(212, 175, 55, 0.25);
+    }
+
+    .card-number {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: rgba(212, 175, 55, 0.35);
+      line-height: 1;
+    }
+
+    .card-icon-wrap {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(212, 175, 55, 0.1);
+      border: 1px solid var(--border-gold);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 1.5rem 0;
+      color: var(--gold-light);
+    }
+
+    .card-title {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      color: #fff;
+      margin-bottom: 0.6rem;
+      line-height: 1.4;
+    }
+
+    .card-prompt {
+      font-size: 0.85rem;
+      color: var(--alice-cyan);
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .back-quote {
+      font-style: italic;
+      color: var(--gold-light);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+
+    .back-explanation {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      line-height: 1.7;
+    }
+
+    /* ==========================================================================
+       11. The Queen Alice Coronation & Epilogue
+       ========================================================================== */
+    .coronation-section {
+      position: relative;
+      background: radial-gradient(circle at 50% 30%, rgba(225, 29, 72, 0.15) 0%, rgba(13, 10, 25, 0.9) 70%);
+      border: 1px solid var(--border-gold-glow);
+      border-radius: 28px;
+      padding: 5rem 3rem;
+      text-align: center;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.8), 0 0 60px rgba(225, 29, 72, 0.25);
+      margin-bottom: 6rem;
+      overflow: hidden;
+    }
+
+    .crown-interactive {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 2.5rem;
+      cursor: pointer;
+      transition: transform 0.6s var(--ease-bounce), filter 0.6s ease;
+      filter: drop-shadow(0 0 25px rgba(254, 240, 138, 0.6));
+    }
+
+    .crown-interactive:hover {
+      transform: scale(1.15) rotate(-3deg);
+      filter: drop-shadow(0 0 45px rgba(254, 240, 138, 0.95)) drop-shadow(0 0 60px rgba(225, 29, 72, 0.5));
+    }
+
+    .poem-epilogue {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      line-height: 2.3;
+      max-width: 680px;
+      margin: 2.5rem auto;
+      color: #e2e8f0;
+      letter-spacing: 0.04em;
+    }
+
+    .poem-epilogue .poem-final-line {
+      font-family: var(--font-display);
+      font-size: 1.85rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff, var(--gold-light), #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-top: 1.5rem;
+      display: block;
+    }
+
+    /* ==========================================================================
+       12. Footer & Benchmark Lore
+       ========================================================================== */
+    .glass-footer {
+      position: relative;
+      border-top: 1px solid var(--border-gold);
+      background: rgba(6, 4, 12, 0.95);
+      padding: 4rem 2rem 3rem;
+      text-align: center;
+      z-index: 10;
+    }
+
+    .footer-quote {
+      font-family: var(--font-serif);
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-credits {
+      font-size: 0.85rem;
+      color: #64748b;
+      letter-spacing: 0.05em;
+    }
+
+    .footer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      padding: 0.35rem 1rem;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.8rem;
+      color: #cbd5e1;
+    }
+
+    /* ==========================================================================
+       13. Responsive Adaptations
+       ========================================================================== */
+    @media (max-width: 900px) {
+      .glass-header {
+        padding: 0.9rem 1.2rem;
+      }
+      .brand-title {
+        font-size: 1.05rem;
+      }
+      .rank-narrative-card {
+        grid-template-columns: 1fr;
+        padding: 1.6rem;
+      }
+      .mirror-script-display {
+        grid-template-columns: 1fr;
+      }
+      .chessboard-interactive-grid {
+        gap: 3px;
+      }
+      .chess-tile-icon {
+        font-size: 1.2rem;
+      }
+      .chess-tile-coord {
+        font-size: 0.55rem;
+      }
+      #flower-garden-canvas {
+        height: 360px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .glass-header {
+        padding: 0.75rem 0.8rem;
+      }
+      .brand-title {
+        font-size: 0.95rem;
+        letter-spacing: 0.05em;
+      }
+      .brand-icon {
+        width: 28px;
+        height: 28px;
+      }
+      .header-controls {
+        gap: 0.5rem;
+      }
+      .header-controls .btn-text-hide {
+        display: none;
+      }
+      .control-btn {
+        padding: 0.45rem 0.65rem;
+        font-size: 0.8rem;
+      }
+      .section-wrap {
+        padding: 3.5rem 0.8rem;
+      }
+      .chessboard-container {
+        padding: 1.5rem 0.4rem;
+        border-radius: 16px;
+      }
+      .chessboard-interactive-grid {
+        gap: 2px;
+      }
+      .chess-tile {
+        border-radius: 4px;
+      }
+      .chess-tile-icon {
+        font-size: 1rem;
+      }
+      .chess-tile-coord {
+        font-size: 0.48rem;
+        top: 2px;
+        left: 3px;
+      }
+      .hero-section {
+        padding: 5.5rem 1rem 3rem;
+      }
+      .impossible-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .impossible-card {
+        height: 360px;
+      }
+      .impossible-card-face {
+        padding: 1.6rem;
+      }
+      .flower-garden-wrapper {
+        padding: 2rem 1rem 1.5rem;
+      }
+      .coronation-section {
+        padding: 3rem 1.2rem;
+      }
+      .jabberwocky-container {
+        padding: 2.2rem 1.2rem;
+      }
+      .script-pane {
+        padding: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Shimmer & Particle Surface Canvas -->
+  <canvas id="ambient-canvas"></canvas>
+  <div class="vignette-overlay"></div>
+
+  <!-- Header Navigation & Controls -->
+  <header class="glass-header">
+    <a href="#" class="brand-container" aria-label="거울나라의 앨리스 홈">
+      <!-- Ornate Pocket Watch SVG Icon -->
+      <svg class="brand-icon" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+        <circle cx="50" cy="54" r="38" stroke="url(#goldGrad)" stroke-width="4"/>
+        <circle cx="50" cy="54" r="34" stroke="rgba(212,175,55,0.4)" stroke-dasharray="2 4" stroke-width="1.5"/>
+        <path d="M50 16 V8 M42 8 H58" stroke="url(#goldGrad)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="50" cy="8" r="4" fill="none" stroke="url(#goldGrad)" stroke-width="3"/>
+        <!-- Reverse Clock Hands (Going counter-clockwise) -->
+        <line x1="50" y1="54" x2="35" y2="40" stroke="url(#goldGrad)" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="50" y1="54" x2="62" y2="35" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="50" cy="54" r="3.5" fill="#fde047"/>
+        <defs>
+          <linearGradient id="goldGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#fff"/>
+            <stop offset="0.5" stop-color="#fde047"/>
+            <stop offset="1" stop-color="#ca8a04"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span class="brand-title">Through the Looking-Glass</span>
+    </a>
+
+    <div class="header-controls">
+      <!-- Mirror Inversion Toggle -->
+      <button id="mirror-toggle-btn" class="control-btn" title="거울나라처럼 온 세상을 좌우로 반전합니다">
+        <span>🪞</span>
+        <span class="btn-text-hide">거울 반전</span>
+      </button>
+
+      <!-- Web Audio Ambient Music Toggle -->
+      <button id="audio-toggle-btn" class="control-btn" title="몽환적인 거울나라 하프 & 크리스탈 사운드 재생">
+        <span id="audio-icon">🔇</span>
+        <span class="btn-text-hide">크리스탈 하프</span>
+        <div class="audio-visualizer-bar" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+      </button>
+
+      <!-- Rapid Jump to Chessboard -->
+      <a href="#chessboard-realm" class="control-btn">
+        <span>♟️</span>
+        <span class="btn-text-hide">체스판 여행</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section: The Threshold of the Looking-Glass -->
+  <main>
+    <section class="hero-section">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span>✨</span>
+          <span>제1장 · 거울 속으로 건너간 소녀</span>
+        </div>
+
+        <h1 class="hero-title">
+          거울나라의 앨리스
+        </h1>
+
+        <p class="hero-subtitle">
+          벽난로 위의 은빛 유리벽이 부드러운 안개처럼 녹아내릴 때,<br>
+          <em>모든 상식이 거꾸로 춤추는 여덟 개의 거대한 체스 왕국</em>이 펼쳐집니다.
+        </p>
+
+        <!-- Interactive Gilded Looking-Glass Frame -->
+        <div id="hero-mirror-portal" class="mirror-frame-wrapper" title="거울을 클릭하여 파동을 일으키고 체스판으로 뛰어드세요">
+          <div class="mirror-glass-pane">
+            <canvas id="liquid-mirror-canvas"></canvas>
+            <!-- Alice Reaching Through the Glass Silhouette SVG -->
+            <svg class="mirror-silhouette" viewBox="0 0 200 300" fill="none">
+              <path d="M100 65 C115 65 125 50 120 35 C115 20 85 20 80 35 C75 50 85 65 100 65 Z" fill="url(#aliceSilv)"/>
+              <path d="M78 40 C70 50 62 70 65 85 C67 95 72 105 75 110 C70 125 55 160 50 180 C45 200 48 240 50 270 C60 275 80 280 100 280 C120 280 140 275 150 270 C152 240 155 200 150 180 C145 160 130 125 125 110 C128 105 133 95 135 85 C138 70 130 50 122 40 Z" fill="url(#aliceSilv)" fill-opacity="0.85"/>
+              <!-- Outstretched Hand touching the glass -->
+              <path d="M125 110 Q150 120 170 135 Q175 138 180 135 Q185 130 175 120 Q155 100 130 90 Z" fill="url(#aliceSilv)"/>
+              <defs>
+                <linearGradient id="aliceSilv" x1="0" y1="0" x2="0" y2="300" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#ffffff" stop-opacity="0.9"/>
+                  <stop offset="0.4" stop-color="#38bdf8" stop-opacity="0.7"/>
+                  <stop offset="0.8" stop-color="#d4af37" stop-opacity="0.5"/>
+                  <stop offset="1" stop-color="#0f0c1e" stop-opacity="0.9"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="mirror-reflection-glimmer"></div>
+            <div class="mirror-hint-label">거울 표면을 어루만져 보세요</div>
+          </div>
+        </div>
+
+        <div class="cta-group">
+          <a href="#chessboard-realm" class="btn-portal" id="btn-enter-mirror">
+            <span>거울 속으로 입장하기</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          <a href="#garden-realm" class="btn-portal-secondary">
+            <span>말하는 꽃들의 정원</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ornate Divider -->
+    <div class="ornate-divider">
+      <svg viewBox="0 0 100 100" fill="currentColor">
+        <path d="M50 10 L60 40 L90 50 L60 60 L50 90 L40 60 L10 50 L40 40 Z"/>
+      </svg>
+    </div>
+
+    <!-- Section 2: The 3D Chessboard Journey across the 8 Ranks -->
+    <section id="chessboard-realm" class="section-wrap">
+      <div class="section-header">
+        <span class="section-tag">THE GREAT CHESSBOARD OF LIFE</span>
+        <h2 class="section-title">여덟 개의 체스 격자와 시냇물</h2>
+        <p class="section-description">
+          온 세상은 사방이 시냇물과 초록 산울타리로 구획된 거대한 64칸 체스판입니다.<br>
+          앨리스는 폰(Pawn)의 운명을 띠고 두 번째 칸에서 출발하여, 시냇물을 건너며 여왕의 대관식에 도달합니다.
+        </p>
+      </div>
+
+      <div class="chessboard-container">
+        <!-- Interactive 8x8 Chessboard Representation -->
+        <div class="chessboard-interactive-grid" id="chessboard-grid" aria-label="8x8 체스판 격자">
+          <!-- Dynamically generated via JS with 64 tiles & brook boundaries -->
+        </div>
+
+        <!-- Rank Narrative Detail Card -->
+        <div class="rank-narrative-card" id="rank-narrative-display">
+          <div class="rank-card-visual" id="rank-visual-box">
+            <!-- Dynamic SVG Artwork representing current rank -->
+          </div>
+          <div class="rank-card-info">
+            <span class="rank-meta-badge" id="rank-badge-text">RANK II · 제2보</span>
+            <h3 class="rank-title" id="rank-title-text">붉은 여왕과의 끝없는 질주</h3>
+            <blockquote class="rank-quote" id="rank-quote-text">
+              “이곳에서는 말이야, 제자리에 머물기만 하려고 해도 온 힘을 다해 달려야 한단다!”
+            </blockquote>
+            <p class="rank-description" id="rank-desc-text">
+              언덕 위에서 바라본 세상은 온통 거대한 체스판 모양이었습니다. 붉은 여왕은 앨리스의 손을 잡고 맹렬히 달리기 시작했지만,
+              바람을 가르며 아무리 숨차게 달려도 두 사람은 여전히 같은 나무 아래에 서 있었습니다.
+            </p>
+            <div class="rank-nav-buttons">
+              <button class="btn-step" id="prev-rank-btn">
+                <span>← 이전 칸으로</span>
+              </button>
+              <button class="btn-step" id="next-rank-btn">
+                <span>시냇물 건너기 (다음 칸) →</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ornate Divider -->
+    <div class="ornate-divider">
+      <svg viewBox="0 0 100 100" fill="currentColor">
+        <circle cx="50" cy="50" r="10"/>
+        <path d="M20 50 Q50 20 80 50 Q50 80 20 50 Z" fill="none" stroke="currentColor" stroke-width="3"/>
+      </svg>
+    </div>
+
+    <!-- Section 3: The Garden of Live Flowers -->
+    <section id="garden-realm" class="section-wrap">
+      <div class="section-header">
+        <span class="section-tag">CHAPTER II · THE GARDEN OF LIVE FLOWERS</span>
+        <h2 class="section-title">속삭이는 살아있는 꽃들의 정원</h2>
+        <p class="section-description">
+          “꽃들도 말을 할 수 있나요?” 앨리스가 물었습니다.<br>
+          호랑나리가 대답했습니다. “들을 만한 귀를 가진 사람이 찾아오기만 한다면, 얼마든지!”<br>
+          바람이 스칠 때마다 흩날리는 금빛 꽃가루와 꼿꼿한 꽃들의 재치 있는 목소리에 귀를 기울여 보세요.
+        </p>
+      </div>
+
+      <div class="flower-garden-wrapper">
+        <canvas id="flower-garden-canvas"></canvas>
+
+        <div class="garden-controls-bar">
+          <div class="flower-dialogue-box">
+            <div class="flower-speaker-name" id="flower-speaker">
+              <span>🌸</span>
+              <span id="flower-speaker-title">호랑나리 (Tiger-Lily)</span>
+            </div>
+            <div class="flower-speech-text" id="flower-quote-output">
+              “우린 우리가 원할 때만 말을 하지. 하지만 넌 흙이 너무 부드러워서 생각이 늘 졸린 모양이구나!”
+            </div>
+          </div>
+
+          <button id="stir-breeze-btn" class="control-btn active" style="padding: 0.8rem 1.6rem; font-size: 0.95rem;">
+            <span>🍃</span>
+            <span>꽃바람 일으키기</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Jabberwocky Decryption Chamber -->
+    <section id="jabberwocky-realm" class="section-wrap">
+      <div class="section-header">
+        <span class="section-tag">CHAPTER I · THE LOOKING-GLASS BOOK</span>
+        <h2 class="section-title">재버워키의 거울 암호방</h2>
+        <p class="section-description">
+          거울나라의 책은 첫눈에 보면 완전히 뒤집힌 이상한 언어로 적혀 있습니다.<br>
+          오직 거울에 반사시켜 비추어야만, 괴수 재버워키와 번쩍이는 보팔 검(Vorpal Sword)의 서사시가 온전한 모습을 드러냅니다.
+        </p>
+      </div>
+
+      <div class="jabberwocky-container">
+        <div class="mirror-script-display">
+          <!-- Mirrored / Inverted Text -->
+          <div class="script-pane">
+            <span class="script-pane-label">거울 속 반사문 (Reversed Script)</span>
+            <div class="mirror-text-backward">
+              ’Twas brillig, and the slithy toves<br>
+              Did gyre and gimble in the wabe:<br>
+              All mimsy were the borogoves,<br>
+              And the mome raths outgrabe.<br><br>
+              “Beware the Jabberwock, my son!<br>
+              The jaws that bite, the claws that catch!”
+            </div>
+          </div>
+
+          <!-- Forward Decoded Poetic Korean -->
+          <div class="script-pane">
+            <span class="script-pane-label">거울 해독문 (Decoded Epiphany)</span>
+            <div class="mirror-text-forward">
+              시간은 <em>브릴릭(brillig)</em>, 날렵한 <em>슬라이디 토브</em>들이<br>
+              해시계 풀밭(wabe) 속에서 회전하며 구멍을 파고들었네.<br>
+              가련한 <em>보로고브</em> 새들은 온통 시름에 잠겼고,<br>
+              길 잃은 초록 돼지 <em>몸 래스</em>들은 비명을 내질렀네.<br><br>
+              “아들아, <em>재버워키</em>를 조심하거라!<br>
+              물어뜯는 이빨과 낚아채는 날카로운 발톱을!”
+            </div>
+          </div>
+        </div>
+
+        <div class="vorpal-blade-interact">
+          <div style="text-align: left;">
+            <strong style="color: var(--gold-light); display: block; font-family: var(--font-display); font-size: 1.1rem;">
+              스니커-스낵! (Snicker-Snack!)
+            </strong>
+            <span style="color: #94a3b8; font-size: 0.9rem;">
+              보팔 검을 휘둘러 허공의 거울 균열을 가르고 크리스탈 울림을 깨워보세요.
+            </span>
+          </div>
+          <button id="vorpal-slash-btn" class="vorpal-blade-btn">
+            <span>⚔️</span>
+            <span>보팔 검 휘두르기</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Six Impossible Things Before Breakfast -->
+    <section id="impossible-realm" class="section-wrap">
+      <div class="section-header">
+        <span class="section-tag">CHAPTER V · THE WHITE QUEEN’S ORACLE</span>
+        <h2 class="section-title">아침 식사 전의 여섯 가지 불가능</h2>
+        <p class="section-description">
+          “난 불가능한 일은 믿을 수 없어요.” 앨리스가 말했습니다.<br>
+          하얀 여왕은 가소롭다는 듯 대답했지요. “연습이 부족해서 그런 거란다. 내 나이 때엔 하루에 아침을 먹기 전에도<br>
+          서슴없이 여섯 가지나 되는 불가능한 것들을 상상하고 믿었단다!”<br>
+          <em style="color: var(--gold-light); font-style: normal;">카드를 클릭하여 거울나라의 6대 역설을 뒤집어 보세요.</em>
+        </p>
+      </div>
+
+      <div class="impossible-grid" id="impossible-cards-grid">
+        <!-- 6 Cards generated with interactive 3D Flip -->
+      </div>
+    </section>
+
+    <!-- Section 6: Queen Alice's Coronation & Epilogue -->
+    <section id="coronation-realm" class="section-wrap">
+      <div class="coronation-section">
+        <!-- Ornate Golden Crown SVG -->
+        <svg id="interactive-crown" class="crown-interactive" viewBox="0 0 100 100" fill="none" title="황금 왕관을 클릭하여 즉위의 축포를 울리세요">
+          <path d="M15 75 L85 75 L80 40 L65 60 L50 25 L35 60 L20 40 Z" fill="url(#crownGrad)" stroke="#fef08a" stroke-width="2"/>
+          <circle cx="50" cy="22" r="5" fill="#e11d48" filter="drop-shadow(0 0 6px #e11d48)"/>
+          <circle cx="20" cy="38" r="4.5" fill="#38bdf8" filter="drop-shadow(0 0 6px #38bdf8)"/>
+          <circle cx="80" cy="38" r="4.5" fill="#38bdf8" filter="drop-shadow(0 0 6px #38bdf8)"/>
+          <circle cx="35" cy="58" r="3.5" fill="#fde047"/>
+          <circle cx="65" cy="58" r="3.5" fill="#fde047"/>
+          <!-- Ornate Crown Base Rim -->
+          <rect x="15" y="75" width="70" height="12" rx="3" fill="#996515" stroke="#fef08a" stroke-width="1.5"/>
+          <circle cx="25" cy="81" r="2.5" fill="#fff"/>
+          <circle cx="38" cy="81" r="2.5" fill="#e11d48"/>
+          <circle cx="50" cy="81" r="3" fill="#38bdf8"/>
+          <circle cx="62" cy="81" r="2.5" fill="#e11d48"/>
+          <circle cx="75" cy="81" r="2.5" fill="#fff"/>
+          <defs>
+            <linearGradient id="crownGrad" x1="15" y1="20" x2="85" y2="85" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#fff"/>
+              <stop offset="0.3" stop-color="#fde047"/>
+              <stop offset="0.7" stop-color="#d4af37"/>
+              <stop offset="1" stop-color="#78350f"/>
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <span class="section-tag" style="color: var(--gold-light);">CHAPTER IX · QUEEN ALICE</span>
+        <h2 class="section-title" style="margin-bottom: 1.5rem;">여왕 앨리스의 대관식과 잠에서 깨어남</h2>
+
+        <div class="poem-epilogue">
+          햇살 아래 강물을 미끄러져 가는 작은 조각배,<br>
+          황혼의 그림자 속으로 유유히 나아갈 때,<br>
+          바짝 다가앉은 세 아이의 맑은 눈망울이<br>
+          신비로운 옛이야기를 간절히 조르고 있네.<br><br>
+          기억의 강물은 아득히 흘러가고 여름날은 저물었으나,<br>
+          우리가 머물렀던 거울 속의 경이로운 환상은 결코 지지 않으리.<br>
+          <span class="poem-final-line">“인생이란, 한낱 꿈이 아니겠는가?”<br>— Life, what is it but a dream?</span>
+        </div>
+
+        <button id="wake-up-btn" class="btn-portal" style="margin-top: 1.5rem;">
+          <span>꿈의 궤적으로 환원하기 (새로운 시작)</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M1 4v6h6M23 20v-6h-6"/>
+            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Gilded Footer -->
+  <footer class="glass-footer">
+    <p class="footer-quote">
+      “거울을 통과하면 벽난로도, 시계도, 체스판도 모두 살아 움직인답니다.”
+    </p>
+    <p class="footer-credits">
+      Lewis Carroll's <em>Through the Looking-Glass, and What Alice Found There</em> (1871)<br>
+      Interactive Web Visual Journey & Engine
+    </p>
+    <div class="footer-badge">
+      <span>✨</span>
+      <span>Gemini 3.8 Flash · High Fidelity Showcase</span>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       14. Interactive Script Logic: Canvas Physics, Audio Synth, & State
+       ========================================================================== -->
+  <script>
+    (function() {
+      'use strict';
+
+      /* ------------------------------------------------------------------------
+         1. Web Audio API Synthesizer (Zero External Dependencies)
+         ------------------------------------------------------------------------ */
+      class SoundEngine {
+        constructor() {
+          this.ctx = null;
+          this.isPlaying = false;
+          this.masterGain = null;
+          this.ambientGain = null;
+          this.chordTimer = null;
+          this.chordIndex = 0;
+          this.isMuted = true;
+
+          // Pentatonic Celestial Looking-Glass scale (D minor / Dorian dream)
+          this.frequencies = [
+            146.83, // D3
+            220.00, // A3
+            293.66, // D4
+            329.63, // E4
+            369.99, // F#4 (Lydian/Major shimmer)
+            440.00, // A4
+            554.37, // C#5
+            587.33, // D5
+            659.25, // E5
+            739.99  // F#5
+          ];
+
+          this.chords = [
+            [146.83, 220.00, 369.99, 440.00, 587.33], // D Maj9
+            [196.00, 246.94, 293.66, 392.00, 587.33], // G Maj7
+            [164.81, 246.94, 329.63, 392.00, 493.88], // E min7
+            [220.00, 277.18, 329.63, 440.00, 554.37]  // A Maj9
+          ];
+        }
+
+        initContext() {
+          if (!this.ctx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContextClass();
+
+            this.masterGain = this.ctx.createGain();
+            this.masterGain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+            this.masterGain.connect(this.ctx.destination);
+
+            this.ambientGain = this.ctx.createGain();
+            this.ambientGain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+            this.ambientGain.connect(this.masterGain);
+          }
+          if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+        }
+
+        toggleAudio() {
+          this.initContext();
+          this.isMuted = !this.isMuted;
+
+          const btn = document.getElementById('audio-toggle-btn');
+          const icon = document.getElementById('audio-icon');
+
+          if (!this.isMuted) {
+            this.startAmbient();
+            btn.classList.add('active', 'audio-playing');
+            icon.textContent = '🔊';
+            this.playGlassChime(587.33, 1.2);
+          } else {
+            this.stopAmbient();
+            btn.classList.remove('active', 'audio-playing');
+            icon.textContent = '🔇';
+          }
+          return !this.isMuted;
+        }
+
+        startAmbient() {
+          if (this.chordTimer) return;
+          this.playAmbientChordStep();
+          this.chordTimer = setInterval(() => this.playAmbientChordStep(), 4800);
+        }
+
+        stopAmbient() {
+          if (this.chordTimer) {
+            clearInterval(this.chordTimer);
+            this.chordTimer = null;
+          }
+        }
+
+        playAmbientChordStep() {
+          if (!this.ctx || this.isMuted) return;
+          const chord = this.chords[this.chordIndex % this.chords.length];
+          this.chordIndex++;
+
+          chord.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            const filter = this.ctx.createBiquadFilter();
+
+            osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+            osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+            // Subtle vibrato
+            const lfo = this.ctx.createOscillator();
+            const lfoGain = this.ctx.createGain();
+            lfo.frequency.value = 0.5 + Math.random() * 0.5;
+            lfoGain.gain.value = 1.8;
+            lfo.connect(osc.frequency);
+            lfo.start();
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(800 + idx * 250, this.ctx.currentTime);
+
+            const now = this.ctx.currentTime;
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(0.045 / chord.length, now + 1.8);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 4.6);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.ambientGain);
+
+            osc.start(now);
+            osc.stop(now + 4.7);
+            lfo.stop(now + 4.7);
+          });
+        }
+
+        playGlassChime(freq = 587.33, duration = 1.2) {
+          if (!this.ctx || this.isMuted) return;
+          const now = this.ctx.currentTime;
+
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const overtone = this.ctx.createOscillator();
+          const overtoneGain = this.ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+
+          overtone.type = 'sine';
+          overtone.frequency.setValueAtTime(freq * 2.76, now); // Bell/glass harmonic
+
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+          overtoneGain.gain.setValueAtTime(0.08, now);
+          overtoneGain.gain.exponentialRampToValueAtTime(0.0001, now + (duration * 0.7));
+
+          osc.connect(gain);
+          overtone.connect(overtoneGain);
+
+          gain.connect(this.masterGain);
+          overtoneGain.connect(this.masterGain);
+
+          osc.start(now);
+          overtone.start(now);
+          osc.stop(now + duration + 0.1);
+          overtone.stop(now + duration + 0.1);
+        }
+
+        playVorpalSlash() {
+          if (!this.ctx || this.isMuted) return;
+          const now = this.ctx.currentTime;
+
+          // White noise buffer for blade swoosh
+          const bufferSize = this.ctx.sampleRate * 0.4;
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+          }
+
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buffer;
+
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(1200, now);
+          filter.frequency.exponentialRampToValueAtTime(4500, now + 0.15);
+          filter.frequency.exponentialRampToValueAtTime(600, now + 0.35);
+          filter.Q.value = 4.0;
+
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.4, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.masterGain);
+
+          noise.start(now);
+          noise.stop(now + 0.4);
+
+          // Metallic slice ring
+          this.playGlassChime(1174.66, 0.9); // D6
+        }
+      }
+
+      const sound = new SoundEngine();
+      document.getElementById('audio-toggle-btn').addEventListener('click', () => {
+        sound.toggleAudio();
+      });
+
+      /* ------------------------------------------------------------------------
+         2. Looking-Glass Mirror Inversion Mode
+         ------------------------------------------------------------------------ */
+      const mirrorToggleBtn = document.getElementById('mirror-toggle-btn');
+      mirrorToggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('mirror-inverted');
+        const isActive = document.body.classList.contains('mirror-inverted');
+        mirrorToggleBtn.classList.toggle('active', isActive);
+        sound.playGlassChime(isActive ? 739.99 : 440.00, 1.0);
+      });
+
+      /* ------------------------------------------------------------------------
+         3. Ambient Canvas: Multi-layer Starburst & Drift Engine
+         ------------------------------------------------------------------------ */
+      const ambientCanvas = document.getElementById('ambient-canvas');
+      const ambientCtx = ambientCanvas.getContext('2d');
+      let particles = [];
+      let width = 0;
+      let height = 0;
+
+      function resizeAmbientCanvas() {
+        width = ambientCanvas.width = window.innerWidth;
+        height = ambientCanvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resizeAmbientCanvas);
+      resizeAmbientCanvas();
+
+      class ShimmerParticle {
+        constructor() {
+          this.reset();
+        }
+
+        reset() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.size = Math.random() * 2.5 + 0.6;
+          this.vx = (Math.random() - 0.5) * 0.4;
+          this.vy = -Math.random() * 0.6 - 0.1; // Slow upward float
+          this.alpha = Math.random() * 0.7 + 0.2;
+          this.pulseSpeed = Math.random() * 0.03 + 0.01;
+          this.pulse = Math.random() * Math.PI;
+          this.color = Math.random() > 0.4 ? 'rgba(254, 240, 138,' : 'rgba(56, 189, 248,';
+        }
+
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          this.pulse += this.pulseSpeed;
+
+          if (this.y < -10 || this.x < -10 || this.x > width + 10) {
+            this.reset();
+            this.y = height + 10;
+          }
+        }
+
+        draw(ctx) {
+          const currentAlpha = (Math.sin(this.pulse) * 0.35 + 0.5) * this.alpha;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = `${this.color} ${currentAlpha})`;
+          ctx.fill();
+
+          // Delicate starlight cross for larger particles
+          if (this.size > 2.0 && currentAlpha > 0.5) {
+            ctx.strokeStyle = `rgba(255, 255, 255, ${currentAlpha * 0.6})`;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(this.x - 4, this.y);
+            ctx.lineTo(this.x + 4, this.y);
+            ctx.moveTo(this.x, this.y - 4);
+            ctx.lineTo(this.x, this.y + 4);
+            ctx.stroke();
+          }
+        }
+      }
+
+      for (let i = 0; i < 90; i++) {
+        particles.push(new ShimmerParticle());
+      }
+
+      function renderAmbient() {
+        ambientCtx.clearRect(0, 0, width, height);
+        particles.forEach(p => {
+          p.update();
+          p.draw(ambientCtx);
+        });
+        requestAnimationFrame(renderAmbient);
+      }
+      renderAmbient();
+
+      /* ------------------------------------------------------------------------
+         4. Hero Liquid Mirror Canvas (Wave & Ripple Simulation)
+         ------------------------------------------------------------------------ */
+      const mirrorCanvas = document.getElementById('liquid-mirror-canvas');
+      const mirrorCtx = mirrorCanvas.getContext('2d');
+      let mWidth = 0, mHeight = 0;
+      let ripples = [];
+
+      function resizeMirrorCanvas() {
+        const rect = mirrorCanvas.getBoundingClientRect();
+        mWidth = mirrorCanvas.width = rect.width;
+        mHeight = mirrorCanvas.height = rect.height;
+      }
+      resizeMirrorCanvas();
+      window.addEventListener('resize', resizeMirrorCanvas);
+
+      class MirrorRipple {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.radius = 2;
+          this.maxRadius = Math.max(mWidth, mHeight) * 0.85;
+          this.speed = 2.8;
+          this.alpha = 0.85;
+        }
+
+        update() {
+          this.radius += this.speed;
+          this.alpha = Math.max(0, 0.85 * (1 - this.radius / this.maxRadius));
+        }
+
+        draw(ctx) {
+          if (this.alpha <= 0) return;
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(186, 230, 253, ${this.alpha * 0.7})`;
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+
+          // Second prismatic echo ring
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, Math.max(1, this.radius - 12), 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(254, 240, 138, ${this.alpha * 0.4})`;
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      function addMirrorRipple(e) {
+        const rect = mirrorCanvas.getBoundingClientRect();
+        const x = (e.clientX || (e.touches && e.touches[0].clientX) || rect.left + rect.width / 2) - rect.left;
+        const y = (e.clientY || (e.touches && e.touches[0].clientY) || rect.top + rect.height / 2) - rect.top;
+        ripples.push(new MirrorRipple(x, y));
+        sound.playGlassChime(440 + Math.random() * 200, 0.6);
+      }
+
+      mirrorCanvas.parentElement.addEventListener('mousemove', (e) => {
+        if (Math.random() < 0.15) addMirrorRipple(e);
+      });
+      mirrorCanvas.parentElement.addEventListener('click', addMirrorRipple);
+      mirrorCanvas.parentElement.addEventListener('touchstart', (e) => addMirrorRipple(e.touches[0]), { passive: true });
+
+      function renderLiquidMirror() {
+        mirrorCtx.clearRect(0, 0, mWidth, mHeight);
+        for (let i = ripples.length - 1; i >= 0; i--) {
+          const r = ripples[i];
+          r.update();
+          r.draw(mirrorCtx);
+          if (r.alpha <= 0 || r.radius >= r.maxRadius) {
+            ripples.splice(i, 1);
+          }
+        }
+        requestAnimationFrame(renderLiquidMirror);
+      }
+      renderLiquidMirror();
+
+      /* ------------------------------------------------------------------------
+         5. The 64-Tile Chessboard & 8 Ranks Data Journey
+         ------------------------------------------------------------------------ */
+      const chessboardGrid = document.getElementById('chessboard-grid');
+
+      const ranksData = [
+        {
+          rank: 1,
+          badge: "RANK I · 제1보: 거울의 문턱",
+          title: "벽난로 위의 거울방과 잠든 말들",
+          quote: "“거울 속 집으로 들어갈 수만 있다면 얼마나 멋질까! 거울 속 세상은 온통 부드러운 안개 같아.”",
+          desc: "따뜻한 응접실의 은빛 거울을 짚자 유리가 맑은 물처럼 녹아내렸습니다. 앨리스는 마침내 거울 속 방으로 건너가 재 속을 서성이는 체스 말들을 목격합니다.",
+          visualSvg: `<svg viewBox="0 0 100 100" fill="none"><path d="M20 85 L80 85 L75 30 L25 30 Z" stroke="#d4af37" stroke-width="2"/><circle cx="50" cy="50" r="18" fill="rgba(56,189,248,0.2)" stroke="#38bdf8" stroke-width="2"/><path d="M50 38 V62 M38 50 H62" stroke="#fef08a" stroke-width="1.5"/></svg>`
+        },
+        {
+          rank: 2,
+          badge: "RANK II · 제2보: 꽃들의 정원",
+          title: "붉은 여왕과의 끝없는 질주",
+          quote: "“이곳에서는 말이야, 제자리에 머물기만 하려고 해도 온 힘을 다해 달려야 한단다!”",
+          desc: "언덕 꼭대기에서 붉은 여왕과 앨리스는 바람처럼 달렸습니다. 하지만 주변 풍경은 한 치도 바뀌지 않았지요. 다른 곳으로 가려면 최소한 두 배는 더 빨리 뛰어야 합니다.",
+          visualSvg: `<svg viewBox="0 0 100 100" fill="none"><path d="M50 15 L62 45 L90 50 L65 70 L72 98 L50 80 L28 98 L35 70 L10 50 L38 45 Z" fill="rgba(225,29,72,0.3)" stroke="#e11d48" stroke-width="2.5"/><circle cx="50" cy="50" r="12" fill="#fde047"/></svg>`
+        },
+        {
+          rank: 3,
+          badge: "RANK III · 제3보: 첫 번째 시냇물",
+          title: "거울나라 기차와 곤충들의 속삭임",
+          quote: "“이 기차표는 천 원어치의 말로 사야 해! 연기는 한 모금에 천 파운드란다.”",
+          desc: "첫 번째 시냇물을 건너자마자 앨리스는 기차 안에 앉아 있었습니다. 빵나비(Bread-and-butterfly)와 흔들목마파리가 귓가에 신기한 수수께끼를 속삭였지요.",
+          visualSvg: `<svg viewBox="0 0 100 100" fill="none"><rect x="15" y="35" width="70" height="35" rx="6" stroke="#38bdf8" stroke-width="2" fill="rgba(56,189,248,0.15)"/><circle cx="30" cy="75" r="7" stroke="#d4af37" stroke-width="2"/><circle cx="70" cy="75" r="7" stroke="#d4af37" stroke-width="2"/><path d="M25 35 Q50 10 75 35" stroke="#fef08a" stroke-width="2"/></svg>`
+        },
+        {
+          rank: 4,
+          badge: "RANK IV · 제4보: 트위들의 숲",
+          title: "트위들덤, 트위들디, 그리고 잠든 붉은 왕",
+          quote: "“저 왕이 잠에서 깨어나면 넌 촛불처럼 훅 꺼져버릴 거야. 넌 왕의 꿈에 불과하니까!”",
+          desc: "쌍둥이 형제는 바다표범과 목수 이야기를 들려준 뒤, 깊이 코를 골며 잠든 붉은 왕을 가리켰습니다. 이 모든 세계가 붉은 왕의 꿈에 불과하다면 앨리스는 과연 누구일까요?",
+          visualSvg: `<svg viewBox="0 0 100 100" fill="none"><circle cx="35" cy="50" r="18" stroke="#d4af37" stroke-width="2" fill="rgba(212,175,55,0.2)"/><circle cx="65" cy="50" r="18" stroke="#38bdf8" stroke-width="2" fill="rgba(56,189,248,0.2)"/><path d="M35 50 Q50 35 65 50" stroke="#fff" stroke-width="2"/></svg>`
+        },
+        {
+          rank: 5,
+          badge: "RANK V · 제5보: 세 번째 시냇물",
+          title: "하얀 여왕과 시간을 거꾸로 사는 지혜",
+          quote: "“어제도 잼, 내일도 잼, 하지만 오늘은 절대 잼이 없단다.”",
+          desc: "세 번째 시냇물을 뛰어넘자 하얀 여왕이 손가락에 붕대를 감으며 비명을 지릅니다. 얼마 지나지 않아 옷핀에 찔릴 것이기 때문에 미리 아파하는 것이라면서요.",
+          visualSvg: `<svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="32" stroke="#e0e7ff" stroke-width="2.5" stroke-dasharray="4 4"/><path d="M50 25 V50 L68 50" stroke="#fef08a" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="4" fill="#38bdf8"/></svg>`
+        },
+        {
+          rank: 6,
+          badge: "RANK VI · 제6보: 높은 담벼락",
+          title: "험프티 덤프티와 단어의 군주",
+          quote: "“내가 단어를 쓸 때 그 단어는 오직 내가 뜻하는 것만을 의미하지. 주인이 누구냐의 문제야.”",
+          desc: "폭이 좁은 높은 담벼락 위에 위태롭게 앉은 거대한 알 험프티 덤프티. 그는 비생일(Un-birthday) 축하의 의미와 이름의 엄격한 정의에 대해 거만한 강의를 펼칩니다.",
+          visualSvg: `<svg viewBox="0 0 100 100" fill="none"><ellipse cx="50" cy="45" rx="26" ry="32" stroke="#d4af37" stroke-width="2.5" fill="rgba(254,240,138,0.2)"/><rect x="15" y="75" width="70" height="15" stroke="#94a3b8" stroke-width="2" fill="rgba(15,23,42,0.6)"/><line x1="38" y1="42" x2="44" y2="42" stroke="#fff" stroke-width="2"/><line x1="56" y1="42" x2="62" y2="42" stroke="#fff" stroke-width="2"/><path d="M42 55 Q50 62 58 55" stroke="#e11d48" stroke-width="2"/></svg>`
+        },
+        {
+          rank: 7,
+          badge: "RANK VII · 제7보: 숲속의 노을",
+          title: "하얀 기사의 슬프고 기묘한 발명품",
+          quote: "“이건 내가 직접 발명한 푸른빛 상자란다. 거꾸로 달아두면 아무것도 쏟아지지 않지!”",
+          desc: "말에서 굴러떨어지기를 수없이 반복하면서도 언제나 다정했던 하얀 기사. 그는 석양 아래 앨리스에게 작별의 노래를 불러주며 다음 시냇물을 건너 여왕이 되라고 격려합니다.",
+          visualSvg: `<svg viewBox="0 0 100 100" fill="none"><path d="M30 75 L30 45 Q30 25 50 25 Q70 25 70 45 L70 75 Z" stroke="#38bdf8" stroke-width="2" fill="rgba(56,189,248,0.15)"/><path d="M50 15 L50 25" stroke="#fde047" stroke-width="3"/><circle cx="50" cy="12" r="3" fill="#fde047"/><line x1="40" y1="50" x2="60" y2="50" stroke="#fff" stroke-width="2"/></svg>`
+        },
+        {
+          rank: 8,
+          badge: "RANK VIII · 제8보: 대관식",
+          title: "여왕 앨리스의 왕관과 대단원",
+          quote: "“세상에, 내 머리에 무거운 황금 왕관이 놓여 있어! 내가 드디어 여왕이 되었어!”",
+          desc: "마지막 시냇물을 뛰어넘는 순간, 앨리스의 머리 위에 번쩍이는 왕관이 씌워졌습니다. 붉은 여왕과 하얀 여왕이 곁에 앉아 대관식 연회를 선포하지만 식탁은 온통 환상으로 물듭니다.",
+          visualSvg: `<svg viewBox="0 0 100 100" fill="none"><path d="M20 75 L80 75 L75 40 L62 55 L50 25 L38 55 L25 40 Z" fill="rgba(254,240,138,0.3)" stroke="#fde047" stroke-width="2.5"/><circle cx="50" cy="22" r="4" fill="#e11d48"/><circle cx="25" cy="38" r="3.5" fill="#38bdf8"/><circle cx="75" cy="38" r="3.5" fill="#38bdf8"/></svg>`
+        }
+      ];
+
+      let currentRank = 2; // Alice starts as Pawn on Rank 2
+
+      function createChessboard() {
+        chessboardGrid.innerHTML = '';
+        const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
+        // Render from Rank 8 down to Rank 1 (standard chess orientation)
+        for (let r = 8; r >= 1; r--) {
+          for (let f = 0; f < 8; f++) {
+            const tile = document.createElement('div');
+            const isLight = (r + f) % 2 === 1;
+            const coord = `${files[f]}${r}`;
+
+            tile.className = `chess-tile ${isLight ? 'tile-light' : 'tile-dark'}`;
+            if (r % 2 === 0) tile.classList.add('brook-edge'); // Silver brook hedges
+            if (r === currentRank && f === 3) tile.classList.add('tile-active');
+
+            tile.dataset.rank = r;
+            tile.dataset.coord = coord;
+
+            const coordSpan = document.createElement('span');
+            coordSpan.className = 'chess-tile-coord';
+            coordSpan.textContent = coord;
+            tile.appendChild(coordSpan);
+
+            // Chess icons on key positions
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'chess-tile-icon';
+
+            if (r === 2 && f === 3) {
+              iconSpan.innerHTML = '♟️'; // Alice's pawn starting square (d2)
+              iconSpan.classList.add('alice-pawn-token');
+            } else if (r === 8 && f === 3) {
+              iconSpan.innerHTML = '👑'; // Queen Alice goal square (d8)
+            } else if (r === 2 && f === 4) {
+              iconSpan.innerHTML = '🔴'; // Red Queen
+            } else if (r === 1 && f === 4) {
+              iconSpan.innerHTML = '⚪'; // White Queen
+            } else if (r === 7 && f === 1) {
+              iconSpan.innerHTML = '🦄'; // Unicorn
+            } else if (r === 7 && f === 6) {
+              iconSpan.innerHTML = '🦁'; // Lion
+            }
+
+            tile.appendChild(iconSpan);
+
+            tile.addEventListener('click', () => {
+              setRank(r);
+              sound.playGlassChime(260 + r * 50, 0.8);
+            });
+
+            chessboardGrid.appendChild(tile);
+          }
+        }
+      }
+
+      function setRank(rankNum) {
+        if (rankNum < 1) rankNum = 1;
+        if (rankNum > 8) rankNum = 8;
+        currentRank = rankNum;
+
+        // Update narrative display
+        const data = ranksData[currentRank - 1];
+        document.getElementById('rank-badge-text').textContent = data.badge;
+        document.getElementById('rank-title-text').textContent = data.title;
+        document.getElementById('rank-quote-text').textContent = data.quote;
+        document.getElementById('rank-desc-text').textContent = data.desc;
+        document.getElementById('rank-visual-box').innerHTML = data.visualSvg;
+
+        // Update active tile indicator
+        document.querySelectorAll('.chess-tile').forEach(tile => {
+          const r = parseInt(tile.dataset.rank, 10);
+          if (r === currentRank) {
+            tile.classList.add('tile-active');
+          } else {
+            tile.classList.remove('tile-active');
+          }
+        });
+      }
+
+      document.getElementById('prev-rank-btn').addEventListener('click', () => {
+        setRank(currentRank - 1);
+        sound.playGlassChime(350, 0.7);
+      });
+
+      document.getElementById('next-rank-btn').addEventListener('click', () => {
+        setRank(currentRank + 1);
+        sound.playGlassChime(550, 0.7);
+      });
+
+      createChessboard();
+      setRank(currentRank);
+
+      /* ------------------------------------------------------------------------
+         6. Interactive Flower Garden (Procedural Swaying Flowers Canvas)
+         ------------------------------------------------------------------------ */
+      const flowerCanvas = document.getElementById('flower-garden-canvas');
+      const flowerCtx = flowerCanvas.getContext('2d');
+      let fWidth = 0, fHeight = 0;
+      let breezeForce = 0;
+
+      function resizeFlowerCanvas() {
+        const rect = flowerCanvas.getBoundingClientRect();
+        fWidth = flowerCanvas.width = rect.width;
+        fHeight = flowerCanvas.height = rect.height;
+      }
+      resizeFlowerCanvas();
+      window.addEventListener('resize', resizeFlowerCanvas);
+
+      const flowers = [
+        {
+          name: "호랑나리 (Tiger-Lily)",
+          color: "#ea580c",
+          petalColor: "#f97316",
+          spotColor: "#7c2d12",
+          xRatio: 0.22,
+          stemHeight: 240,
+          quote: "“우린 우리가 원할 때만 말을 하지. 하지만 넌 흙이 너무 부드러워서 생각이 늘 졸린 모양이구나!”"
+        },
+        {
+          name: "붉은 장미 (Rose)",
+          color: "#be123c",
+          petalColor: "#f43f5e",
+          spotColor: "#ffe4e6",
+          xRatio: 0.42,
+          stemHeight: 270,
+          quote: "“색깔만 예쁘면 뭐 하니? 장미의 진정한 영혼은 가시와 매혹적인 향기 속에 있는 법이야.”"
+        },
+        {
+          name: "데이지 합창단 (Daisies)",
+          color: "#ca8a04",
+          petalColor: "#fef08a",
+          spotColor: "#ffffff",
+          xRatio: 0.62,
+          stemHeight: 210,
+          quote: "“수다쟁이 인간이 또 왔네! 조용히 좀 해봐, 꽃잎 사이로 아침이슬이 흘러내리잖아!”"
+        },
+        {
+          name: "보랏빛 제비꽃 (Violet)",
+          color: "#7e22ce",
+          petalColor: "#a855f7",
+          spotColor: "#f3e8ff",
+          xRatio: 0.82,
+          stemHeight: 230,
+          quote: "“고개를 너무 높이 들지 않는 게 좋아. 숲속의 바람은 겸손하게 몸을 낮춘 자의 뺨에만 입맞추니까.”"
+        }
+      ];
+
+      let flowerTime = 0;
+
+      function drawFlowers() {
+        flowerCtx.clearRect(0, 0, fWidth, fHeight);
+        flowerTime += 0.025;
+
+        // Ground hill gradient
+        const groundGrad = flowerCtx.createLinearGradient(0, fHeight - 60, 0, fHeight);
+        groundGrad.addColorStop(0, '#16122d');
+        groundGrad.addColorStop(1, '#070510');
+        flowerCtx.fillStyle = groundGrad;
+        flowerCtx.beginPath();
+        flowerCtx.moveTo(0, fHeight - 35);
+        flowerCtx.quadraticCurveTo(fWidth * 0.5, fHeight - 70, fWidth, fHeight - 35);
+        flowerCtx.lineTo(fWidth, fHeight);
+        flowerCtx.lineTo(0, fHeight);
+        flowerCtx.fill();
+
+        // Render each procedural flower
+        flowers.forEach((fl, idx) => {
+          const rootX = fWidth * fl.xRatio;
+          const rootY = fHeight - 40;
+          const sway = Math.sin(flowerTime + idx * 1.5) * 16 + breezeForce * 25;
+          const headX = rootX + sway;
+          const headY = rootY - fl.stemHeight;
+
+          // Stem
+          flowerCtx.beginPath();
+          flowerCtx.moveTo(rootX, rootY);
+          flowerCtx.quadraticCurveTo(rootX - sway * 0.4, rootY - fl.stemHeight * 0.5, headX, headY);
+          flowerCtx.strokeStyle = '#22c55e';
+          flowerCtx.lineWidth = 4.5;
+          flowerCtx.lineCap = 'round';
+          flowerCtx.stroke();
+
+          // Leaves
+          flowerCtx.beginPath();
+          const leafY = rootY - fl.stemHeight * 0.35;
+          flowerCtx.ellipse(rootX - 15 + sway * 0.2, leafY, 18, 6, -0.4, 0, Math.PI * 2);
+          flowerCtx.fillStyle = 'rgba(34, 197, 94, 0.7)';
+          flowerCtx.fill();
+
+          // Flower Blossom Petals
+          const petalCount = 7;
+          for (let p = 0; p < petalCount; p++) {
+            const angle = (p / petalCount) * Math.PI * 2 + flowerTime * 0.2;
+            const px = headX + Math.cos(angle) * 32;
+            const py = headY + Math.sin(angle) * 32;
+
+            flowerCtx.beginPath();
+            flowerCtx.arc(px, py, 14, 0, Math.PI * 2);
+            flowerCtx.fillStyle = fl.petalColor;
+            flowerCtx.shadowColor = fl.color;
+            flowerCtx.shadowBlur = 12;
+            flowerCtx.fill();
+            flowerCtx.shadowBlur = 0;
+          }
+
+          // Flower Center
+          flowerCtx.beginPath();
+          flowerCtx.arc(headX, headY, 16, 0, Math.PI * 2);
+          flowerCtx.fillStyle = fl.color;
+          flowerCtx.fill();
+
+          // Center Stamen Pistils
+          flowerCtx.beginPath();
+          flowerCtx.arc(headX, headY, 8, 0, Math.PI * 2);
+          flowerCtx.fillStyle = fl.spotColor;
+          flowerCtx.fill();
+        });
+
+        // Decay breeze impulse smoothly
+        breezeForce *= 0.95;
+
+        requestAnimationFrame(drawFlowers);
+      }
+      drawFlowers();
+
+      // Click flower canvas to identify nearest flower and hear its quote
+      flowerCanvas.addEventListener('click', (e) => {
+        const rect = flowerCanvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        let closest = flowers[0];
+        let minDiff = 99999;
+
+        flowers.forEach(fl => {
+          const diff = Math.abs(clickX - (fWidth * fl.xRatio));
+          if (diff < minDiff) {
+            minDiff = diff;
+            closest = fl;
+          }
+        });
+
+        breezeForce += 1.8;
+        document.getElementById('flower-speaker-title').textContent = closest.name;
+        document.getElementById('flower-quote-output').textContent = closest.quote;
+        sound.playGlassChime(440 + Math.random() * 250, 1.0);
+      });
+
+      document.getElementById('stir-breeze-btn').addEventListener('click', () => {
+        breezeForce = 3.5;
+        const randomFlower = flowers[Math.floor(Math.random() * flowers.length)];
+        document.getElementById('flower-speaker-title').textContent = randomFlower.name;
+        document.getElementById('flower-quote-output').textContent = randomFlower.quote;
+        sound.playGlassChime(659.25, 1.4);
+      });
+
+      /* ------------------------------------------------------------------------
+         7. Vorpal Blade Slash Effect
+         ------------------------------------------------------------------------ */
+      document.getElementById('vorpal-slash-btn').addEventListener('click', () => {
+        sound.playVorpalSlash();
+
+        // Flash slash effect across page
+        const slashDiv = document.createElement('div');
+        slashDiv.style.cssText = `
+          position: fixed;
+          top: 0; left: 0; width: 100vw; height: 100vh;
+          background: linear-gradient(135deg, transparent 48%, rgba(255,255,255,0.85) 50%, rgba(225,29,72,0.9) 52%, transparent 54%);
+          pointer-events: none;
+          z-index: 9999;
+          opacity: 1;
+          transition: opacity 0.4s ease;
+        `;
+        document.body.appendChild(slashDiv);
+        setTimeout(() => {
+          slashDiv.style.opacity = '0';
+          setTimeout(() => slashDiv.remove(), 400);
+        }, 80);
+      });
+
+      /* ------------------------------------------------------------------------
+         8. Six Impossible Things Before Breakfast (Oracle 3D Flip Cards)
+         ------------------------------------------------------------------------ */
+      const impossibleData = [
+        {
+          num: "I",
+          title: "거꾸로 흐르는 시간",
+          prompt: "시간의 역류와 선행하는 상처",
+          quote: "“상처가 먼저 나고 피가 흐른 뒤에야 옷핀에 찔린다!”",
+          desc: "하얀 여왕의 기억은 과거뿐만 아니라 미래까지도 두 방향으로 작동합니다. 우리는 이미 지나온 내일의 후회를 오늘 기억할 수 있습니다."
+        },
+        {
+          num: "II",
+          title: "머무르기 위한 질주",
+          prompt: "붉은 여왕의 역설적 상대성",
+          quote: "“온 힘을 다해 달려야만 지금 있는 그 자리를 겨우 지킨다.”",
+          desc: "정지해 있는 모든 것은 실상 뒤로 밀려나는 중입니다. 끊임없이 요동치는 현실에서 영혼의 중심을 지키는 유일한 방법은 부단히 전진하는 것뿐입니다."
+        },
+        {
+          num: "III",
+          title: "이름을 잃은 숲",
+          prompt: "명명(命名)을 초월한 순수한 교감",
+          quote: "“사슴과 앨리스는 서로의 이름을 잊은 채 다정히 어깨를 나란히 했다.”",
+          desc: "모든 사물의 고유명사가 증발하는 숲속에서, 인간과 야생 사슴은 두려움 없이 서로를 포옹했습니다. 이름이라는 규정이 사라질 때 진정한 교감이 시작됩니다."
+        },
+        {
+          num: "IV",
+          title: "어제와 내일의 잼",
+          prompt: "영원히 유예되는 기대의 섭리",
+          quote: "“규칙은 분명해. 내일의 잼과 어제의 잼뿐! 오늘은 결코 없어!”",
+          desc: "행복이란 언제나 회상되거나 고대될 뿐, 지금 이 순간의 손아귀에 쥐어지지 않는다는 루이스 캐럴의 날카롭고 유쾌한 시간 철학입니다."
+        },
+        {
+          num: "V",
+          title: "붉은 왕의 깊은 잠",
+          prompt: "우리는 누구의 꿈속 환영인가",
+          quote: "“왕이 눈을 뜨면, 넌 연기처럼 흩어질 거야.”",
+          desc: "우리가 보고 만지는 이 세상의 현실성이 사실은 깊은 숲속에서 코를 골며 자고 있는 타자의 꿈에 기대어 있다면, 우리는 과연 실재하는 것일까요?"
+        },
+        {
+          num: "VI",
+          title: "아홉 번째 칸의 도약",
+          prompt: "체스판의 경계를 넘어선 자유",
+          quote: "“64칸의 사각형 너머에 무엇이 기다리고 있는지 아는 자는 없다.”",
+          desc: "폰이 여왕이 되어 체스판의 끝에 다다랐을 때, 게임은 끝나고 꿈꾸는 자는 눈을 뜹니다. 모든 법칙의 종착역은 오직 새로운 의식의 시작입니다."
+        }
+      ];
+
+      const impossibleGrid = document.getElementById('impossible-cards-grid');
+      impossibleData.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'impossible-card';
+        card.innerHTML = `
+          <div class="impossible-card-face card-front">
+            <div>
+              <span class="card-number">${item.num}</span>
+              <h4 class="card-title">${item.title}</h4>
+            </div>
+            <div class="card-icon-wrap">
+              <span style="font-size: 1.5rem;">🔮</span>
+            </div>
+            <div class="card-prompt">
+              <span>카드 뒤집어 보기</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </div>
+          <div class="impossible-card-face card-back">
+            <div>
+              <span class="card-number" style="color: var(--gold-light);">${item.num}</span>
+              <blockquote class="back-quote">${item.quote}</blockquote>
+              <p class="back-explanation">${item.desc}</p>
+            </div>
+            <div class="card-prompt" style="color: var(--gold-light);">
+              <span>다시 뒤집기</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          card.classList.toggle('flipped');
+          sound.playGlassChime(320 + Math.random() * 300, 0.7);
+        });
+
+        impossibleGrid.appendChild(card);
+      });
+
+      /* ------------------------------------------------------------------------
+         9. Interactive Crown Celebration & Awakening
+         ------------------------------------------------------------------------ */
+      const crown = document.getElementById('interactive-crown');
+      crown.addEventListener('click', () => {
+        sound.playGlassChime(880, 1.8);
+        for (let i = 0; i < 25; i++) {
+          setTimeout(() => {
+            sound.playGlassChime(500 + Math.random() * 600, 0.5);
+          }, i * 60);
+        }
+      });
+
+      document.getElementById('wake-up-btn').addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        sound.playGlassChime(587.33, 1.8);
+      });
+
+      document.getElementById('btn-enter-mirror').addEventListener('click', (e) => {
+        sound.playGlassChime(440, 1.2);
+      });
+
+    })();
+  </script>
+</body>
+</html>

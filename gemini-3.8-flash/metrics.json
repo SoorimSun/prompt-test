@@ -1,0 +1,51 @@
+{
+  "source": "Antigravity session transcript (transcript.jsonl) - Gemini 3.8 Flash (High)",
+  "schema_note": "Token counts mapped to skill standard schema: total = input + output; input = uncached_input + cached_input.",
+  "model": {
+    "id": "gemini-3.8-flash",
+    "provider": "Google DeepMind",
+    "displayName": "Gemini 3.8 Flash (High)",
+    "effort": "high"
+  },
+  "turn_id": "c6d3fae2-fabd-4717-9c9a-444f9ccb12fb-turn-0",
+  "scope": "one completed Alice HTML task; authoring, visual design, interactive simulation, defect fixing, and headless browser validation of gemini-3.8-flash/looking-glass.html. Excludes subsequent report creation.",
+  "started_at_kst": "2026-10-14T10:26:11+09:00",
+  "completed_at_kst": "2026-10-14T10:48:47+09:00",
+  "duration_ms": 1356000,
+  "duration_hms": "00:22:36",
+  "tokens": {
+    "total": 1449898,
+    "input": 1402607,
+    "cached_input": 1070626,
+    "uncached_input": 331981,
+    "output": 47291,
+    "cached_share_of_input_percent": 76.33,
+    "cached_share_of_total_percent": 73.84
+  },
+  "estimated_cost_usd": {
+    "basis": "Gemini Flash API standard rates ($0.075 / 1M uncached input, $0.01875 / 1M cached input, $0.30 / 1M output)",
+    "uncached_input_usd": 0.024899,
+    "cached_input_usd": 0.020074,
+    "output_usd": 0.014187,
+    "total_usd": 0.05916,
+    "krw_estimate_approx": 82
+  },
+  "artifact": {
+    "name": "looking-glass.html",
+    "bytes": 89567,
+    "lines": 2431,
+    "sha256": "997e429547bcb41528cd068f5a0219738db01bef8e230817ff5e61bb7a0b55db"
+  },
+  "verification": {
+    "browser": "Chromium (Playwright)",
+    "desktop_viewport": "1920x1080 (0 overflow, 0 errors)",
+    "mobile_viewport": "375x812 (0 overflow, 0 errors)",
+    "audio_synth": "Web Audio API polyphonic crystal synthesizer verified",
+    "canvas_physics": "Interactive liquid mirror heightfield & IK swaying flower garden verified"
+  },
+  "sources": {
+    "transcript_log": "transcript.jsonl",
+    "start_step": 0,
+    "complete_step": 59
+  }
+}
