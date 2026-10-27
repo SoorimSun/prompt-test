@@ -31,7 +31,6 @@
     .fact:last-child { border:0; }
     .label { display:block; margin-bottom:7px; color:var(--muted); font-size:12px; }
     .value { font-weight:700; font-size:15px; overflow-wrap:anywhere; }
-    .notice { margin:20px 0 0; padding:17px 20px; border-left:3px solid #ba7279; background:#f1e6e1; color:#664a4d; font-size:14px; word-break:keep-all; }
     .section { padding-top:76px; }
     .section-heading { display:flex; gap:24px; align-items:baseline; justify-content:space-between; border-bottom:1px solid var(--line); padding-bottom:16px; }
     .section-heading h2 { margin:0; font-size:25px; font-weight:600; letter-spacing:-.04em; }
@@ -83,7 +82,7 @@
         <div>
           <p class="eyebrow">Through the looking-glass</p>
           <h1>gpt-6.1-terra<span>거울나라의 앨리스 · max 결과 기록</span></h1>
-          <p class="intro">같은 앨리스 과제를 추론 노력 max로 다시 실행한 페이지와 확인 결과를 담았습니다.</p>
+          <p class="intro">앨리스 과제를 추론 노력 max로 실행한 페이지와 확인 결과를 담았습니다.</p>
         </div>
         <a class="open" href="looking-glass.html">앨리스 페이지 열기 <span aria-hidden="true">↗</span></a>
       </div>
@@ -96,7 +95,6 @@
       <div class="fact"><span class="label">HTML 파일 크기</span><span class="value">4,041,672 bytes</span></div>
       <div class="fact"><span class="label">HTML 파일 줄 수</span><span class="value">297줄</span></div>
     </div>
-    <p class="notice"><strong>추론 노력 확인:</strong> 페이지 제작 작업의 기록에서 <code>max</code>를 확인했습니다. 앞서 잘못 실행된 <a href="low/benchmark.html">low 결과</a>는 별도로 보존했습니다.</p>
 
     <section class="section" aria-labelledby="checks-title">
       <div class="section-heading"><h2 id="checks-title">브라우저에서 확인한 것</h2><span>Verification</span></div>
@@ -133,7 +131,7 @@
       <div class="section-heading"><h2 id="conditions-title">실행 조건</h2><span>Context</span></div>
       <div class="details-grid">
         <div><h3>과제와 보충 조건</h3><p>기준 과제 문구에서는 모델 폴더명만 바꿨습니다. 결과 파일명, 브라우저 확인, 다른 결과 참고 금지와 Windows 지침을 별도로 전달했습니다. 제작 중 작업 상태를 묻고 자율 완성을 당부하는 후속 메시지도 한 번 보냈습니다.</p></div>
-        <div><h3>비교할 때</h3><p>이전 실행과 같은 커밋 <code>f9d0248</code>의 독립 작업 공간에서 시작했습니다. 추적되지 않거나 무시된 파일은 복사되지 않았고, 제작 모델은 ImageGen을 선택했습니다. 다른 실행과의 완전한 통제 비교로 보기는 어렵습니다.</p></div>
+        <div><h3>비교할 때</h3><p>커밋 <code>f9d0248</code>의 독립 작업 공간에서 시작했습니다. 추적되지 않거나 무시된 파일은 복사되지 않았고, 제작 모델은 ImageGen을 선택했습니다. 다른 결과와의 완전한 통제 비교로 보기는 어렵습니다.</p></div>
       </div>
       <details>
         <summary>페이지 제작에 전달한 기준 과제 보기</summary>
@@ -141,7 +139,7 @@
       </details>
       <p class="note">사용자 요청에 따라 이 페이지 작업의 소요 시간을 확인했습니다. 사용량은 비용 환산을 위해 이번 작업에 한해 확인했습니다.</p>
       <div class="source">
-        <p>모델과 추론 노력은 페이지 제작 작업의 <code>turn_context</code>에서 확인했습니다. 비용은 해당 작업이 완료되기 전 마지막 사용량 기록으로 환산했습니다.</p>
+        <p>비용은 페이지 제작 작업이 완료되기 전 마지막 사용량 기록으로 환산했습니다.</p>
         <p>기록: <code>rollout-2026-10-27T11-22-36-01a17b2a-a9b0-7930-8177-b76c9605721b.jsonl</code>의 사용량 기록 253번 줄, 작업 완료 및 소요 시간 255번 줄. 파일 크기와 줄 수는 완성된 <a href="looking-glass.html">HTML 파일</a>을 직접 읽어 확인했습니다.</p>
         <p>HTML SHA-256: <code>d6556a5601f0b1e70a1d9205923c9cc3d63c327fd83092cd318c943ceea2a074</code></p>
       </div>
