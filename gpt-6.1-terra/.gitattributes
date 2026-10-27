@@ -1,0 +1,4 @@
+# Keep the max page's recorded hash stable across platforms.
+looking-glass.html text eol=lf
+# Preserve the archived low page exactly, including its original line ending.
+low/looking-glass.html -text !eol whitespace=cr-at-eol

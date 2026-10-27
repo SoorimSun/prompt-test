@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>gpt-6.1-terra · 앨리스 페이지 벤치마크</title>
+  <style>
+    :root { --navy:#182641; --navy-deep:#101a30; --paper:#f8f4eb; --ink:#24344c; --muted:#5b6676; --rose:#ba7279; --line:#d9d1c5; --gold:#d9bd8f; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:"Malgun Gothic", "Apple SD Gothic Neo", sans-serif; line-height:1.7; }
+    a { color:inherit; }
+    a:focus-visible, summary:focus-visible { outline:3px solid #cb7780; outline-offset:5px; }
+    .cover { position:relative; overflow:hidden; background:var(--navy-deep); color:#f8f1e5; }
+    .cover::after { content:""; position:absolute; right:-9rem; top:-15rem; width:42rem; height:42rem; border:1px solid #d9bd8f55; border-radius:50%; box-shadow:0 0 0 5rem #d9bd8f0a, 0 0 0 10rem #d9bd8f0a; pointer-events:none; }
+    .cover-inner, .content { width:min(1080px, calc(100% - 48px)); margin:auto; }
+    .cover-inner { position:relative; z-index:1; padding:38px 0 74px; }
+    .topline { display:flex; justify-content:space-between; gap:20px; align-items:center; color:#dcc9ab; font:11px/1.5 Arial,sans-serif; letter-spacing:.15em; text-transform:uppercase; }
+    .mark { color:#efd8b6; }
+    .hero-grid { display:grid; grid-template-columns:1fr auto; gap:32px; align-items:end; margin-top:70px; }
+    .eyebrow { margin:0 0 15px; color:#d9bd8f; font:11px/1.5 Arial,sans-serif; letter-spacing:.19em; text-transform:uppercase; }
+    h1 { margin:0; font:400 clamp(38px,7vw,74px)/1.05 Georgia,serif; letter-spacing:-.04em; overflow-wrap:anywhere; }
+    h1 span { display:block; margin-top:12px; font:400 clamp(18px,2.5vw,26px)/1.4 "Malgun Gothic",sans-serif; letter-spacing:0; color:#e8c6c5; }
+    .intro { max-width:620px; margin:26px 0 0; color:#d9dbe1; font-size:15px; word-break:keep-all; }
+    .open { display:inline-flex; align-items:center; justify-content:center; gap:20px; min-height:52px; padding:12px 20px; background:#f5e8d5; color:#192840; text-decoration:none; font-size:14px; font-weight:700; white-space:nowrap; }
+    .open:hover { background:#fff8ed; }
+    .content { padding:0 0 80px; }
+    .facts { position:relative; display:grid; grid-template-columns:repeat(4,1fr); margin-top:-1px; background:white; box-shadow:0 12px 36px #1826410c; }
+    .fact { min-width:0; padding:24px 20px; border-right:1px solid #eee7dc; }
+    .fact:last-child { border:0; }
+    .label { display:block; margin-bottom:7px; color:var(--muted); font-size:12px; }
+    .value { font-weight:700; font-size:15px; overflow-wrap:anywhere; }
+    .notice { margin:20px 0 0; padding:17px 20px; border-left:3px solid #ba7279; background:#f1e6e1; color:#664a4d; font-size:14px; word-break:keep-all; }
+    .section { padding-top:76px; }
+    .section-heading { display:flex; gap:24px; align-items:baseline; justify-content:space-between; border-bottom:1px solid var(--line); padding-bottom:16px; }
+    .section-heading h2 { margin:0; font-size:25px; font-weight:600; letter-spacing:-.04em; }
+    .section-heading span { color:var(--rose); font:11px Arial,sans-serif; letter-spacing:.16em; text-transform:uppercase; }
+    .checks { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:22px; }
+    .check { background:#fffdfa; padding:24px; border:1px solid #eae1d5; }
+    .check strong { display:block; margin-bottom:9px; font-size:17px; }
+    .check p { margin:0; color:var(--muted); font-size:14px; word-break:keep-all; }
+    .dot { display:inline-block; width:8px; height:8px; margin-right:9px; border-radius:50%; background:#6a8d7b; vertical-align:2px; }
+    .note { margin:20px 0 0; color:var(--muted); font-size:13px; word-break:keep-all; }
+    .cost { display:grid; grid-template-columns:minmax(170px, 1fr) 2fr; gap:24px; margin-top:22px; padding:24px; background:#fffdfa; border:1px solid #eae1d5; }
+    .cost strong { display:block; font-size:19px; }
+    .cost p { margin:0; color:var(--muted); font-size:14px; word-break:keep-all; }
+    .cost p + p { margin-top:12px; }
+    .cost a { display:inline-block; margin-top:12px; color:#8c5158; font-size:13px; font-weight:700; }
+    .details-grid { display:grid; grid-template-columns:1fr 1fr; gap:42px; padding-top:24px; }
+    .details-grid h3 { margin:0 0 10px; font-size:16px; }
+    .details-grid p { margin:0; color:var(--muted); font-size:14px; word-break:keep-all; }
+    details { margin-top:26px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+    summary { padding:16px 0; cursor:pointer; font-size:14px; font-weight:700; }
+    blockquote { margin:0 0 20px; padding:20px 22px; background:#efe9df; border-left:3px solid #c99091; font-size:14px; line-height:1.9; word-break:keep-all; }
+    .source { margin-top:26px; padding:20px 0; color:var(--muted); font-size:12px; border-top:1px solid var(--line); }
+    .source p { margin:8px 0; }
+    code { font-family:Consolas,monospace; overflow-wrap:anywhere; }
+    @media (max-width:760px) {
+      .hero-grid { grid-template-columns:1fr; margin-top:54px; }
+      .open { justify-self:start; }
+      .facts { grid-template-columns:1fr 1fr; }
+      .fact:nth-child(2) { border-right:0; }
+      .fact:nth-child(-n+2) { border-bottom:1px solid #eee7dc; }
+      .checks { grid-template-columns:1fr; }
+      .cost { grid-template-columns:1fr; gap:12px; }
+      .details-grid { grid-template-columns:1fr; gap:24px; }
+      .section { padding-top:55px; }
+    }
+    @media (max-width:360px) {
+      .cover-inner, .content { width:calc(100% - 32px); }
+      .topline { font-size:9px; }
+      .fact { padding:19px 13px; }
+    }
+    @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+  </style>
+</head>
+<body>
+  <header class="cover">
+    <div class="cover-inner">
+      <div class="topline"><span class="mark">✦ &nbsp; ALICE PAGE BENCHMARK</span><span>2026. 10. 27</span></div>
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Through the looking-glass</p>
+          <h1>gpt-6.1-terra<span>거울나라의 앨리스 · 결과 기록</span></h1>
+          <p class="intro">같은 앨리스 과제를 지정한 모델에 맡겨 제작한 페이지와 확인 결과를 담았습니다.</p>
+        </div>
+        <a class="open" href="looking-glass.html">앨리스 페이지 열기 <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </header>
+  <main class="content">
+    <div class="facts" aria-label="작업 정보">
+      <div class="fact"><span class="label">실행에 지정한 모델</span><span class="value">gpt-6.1-terra</span></div>
+      <div class="fact"><span class="label">추론 노력</span><span class="value">low</span></div>
+      <div class="fact"><span class="label">HTML 파일 크기</span><span class="value">9,887 bytes</span></div>
+      <div class="fact"><span class="label">HTML 파일 줄 수</span><span class="value">8줄</span></div>
+    </div>
+    <p class="notice"><strong>추론 노력 확인:</strong> 원래 세션은 max였지만, 별도 페이지 제작 작업에 추론 노력을 명시하지 않았고 실제 작업 기록은 low였습니다. low가 적용된 내부 원인은 확인되지 않았습니다. 이 페이지와 아래 기록은 low 실행 결과입니다.</p>
+
+    <section class="section" aria-labelledby="checks-title">
+      <div class="section-heading"><h2 id="checks-title">브라우저에서 확인한 것</h2><span>Verification</span></div>
+      <div class="checks">
+        <article class="check"><strong><span class="dot" aria-hidden="true"></span>화면과 가로 넘침</strong><p>Edge에서 1440×900, 390×844, 320×700 화면을 확인했습니다. 세 화면의 문서 너비는 화면 너비와 같았습니다.</p></article>
+        <article class="check"><strong><span class="dot" aria-hidden="true"></span>링크와 키보드</strong><p>세 화면에서 링크 3개를 각각 마우스와 키보드로 실행해 지정된 위치로 이동하는지 확인했습니다.</p></article>
+        <article class="check"><strong><span class="dot" aria-hidden="true"></span>브라우저 오류</strong><p>확인 중 페이지 오류, 콘솔 오류와 실패한 리소스 요청이 관찰되지 않았습니다.</p></article>
+      </div>
+      <p class="note">브라우저 검증은 페이지 제작이 끝난 뒤 별도 작업으로 수행했습니다. 페이지 제작 모델은 브라우저 검증을 완료하지 못했습니다. 확인은 Windows의 Edge와 Playwright를 사용했고, 링크 검사는 움직임 줄이기 설정에서 실행했습니다.</p>
+    </section>
+
+    <section class="section" aria-labelledby="duration-title">
+      <div class="section-heading"><h2 id="duration-title">페이지 제작 시간</h2><span>Duration</span></div>
+      <div class="cost">
+        <div><span class="label">페이지 제작 작업 시작부터 완료까지</span><strong>56.377초</strong></div>
+        <div><p>HTML 작성과 제작 모델의 브라우저 확인 시도를 포함한 작업 시간입니다. 별도로 수행한 브라우저 검증과 이 보고서 작성은 포함하지 않았습니다.</p></div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="cost-title">
+      <div class="section-heading"><h2 id="cost-title">비용</h2><span>Cost</span></div>
+      <div class="cost">
+        <div><span class="label">API 표준 단가 기준 추정 비용</span><strong>$0.07283</strong></div>
+        <div>
+          <p>2026년 10월 27일에 확인한 GPT-6.1 Terra의 표준 텍스트 API 단가를 기준으로 합니다. 100만 토큰당 일반 입력 $1.00, 캐시된 입력 $0.05, 출력 $5.00입니다.</p>
+          <p>환산식은 <code>(일반 입력 × 1.00 + 캐시된 입력 × 0.05 + 출력 × 5.00) ÷ 1,000,000</code> 달러입니다. 페이지 제작 작업의 기록만 계산했으며, 뒤이어 수행한 검증과 보고서 작성은 포함하지 않았습니다.</p>
+          <p>표준 단문 컨텍스트 단가로 비교하기 위한 추정이며, 캐시 쓰기·추가 도구·장문 컨텍스트 및 처리 방식에 따른 추가 요금은 포함하지 않습니다. 실제 청구액은 확인되지 않았습니다.</p>
+          <a href="https://developers.openai.com/api/docs/models/gpt-6.1-terra">OpenAI 공식 모델 및 API 단가 보기 ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="conditions-title">
+      <div class="section-heading"><h2 id="conditions-title">실행 조건</h2><span>Context</span></div>
+      <div class="details-grid">
+        <div><h3>과제와 보충 조건</h3><p>기준 과제 문구에서는 모델 폴더명만 바꿨습니다. 별도로 결과 파일명, 브라우저 확인, 다른 모델 결과를 참고하지 않는 조건과 사용자의 Windows·사용량 지침을 전달했습니다.</p></div>
+        <div><h3>비교할 때</h3><p>작업 시작 전 저장소의 기준 커밋은 <code>f9d0248</code>이었고 변경 사항은 없었습니다. 다른 모델의 실행 환경은 여기서 확인하지 않았으므로 통제된 비교인지는 확인되지 않았습니다.</p></div>
+      </div>
+      <details>
+        <summary>페이지 제작에 전달한 기준 과제 보기</summary>
+        <blockquote>gpt-6.1-terra 폴더에 "거울나라의 앨리스"를 주제로 상상할 수 있는 가장 아름다운 HTML 파일을 만들어 보세요. 보는 사람들이 "와!!!"라는 감탄사밖에 나오지 않을 만한 파일이어야 합니다. 시각적으로 인상적이고 아름다우며 눈을 즐겁게 하는 파일이어야 합니다. 꼼꼼하게 작업하되 창의력을 발휘하세요. 실수는 절대 금물입니다.</blockquote>
+      </details>
+      <p class="note">사용자 요청에 따라 이 페이지 작업의 소요 시간을 확인했습니다. 사용량은 비용 환산을 위해 이번 작업에 한해 확인했습니다.</p>
+      <div class="source">
+        <p>모델과 추론 노력은 페이지 제작 작업의 <code>turn_context</code>에서 확인했습니다. 비용은 해당 작업이 완료되기 전 마지막 사용량 기록으로 환산했습니다.</p>
+        <p>기록: <code>rollout-2026-10-27T10-55-20-01a17b11-b45a-7ca3-8423-3ac53e7bbac4.jsonl</code>의 사용량 기록 70번 줄, 작업 완료 및 소요 시간 72번 줄. 파일 크기와 줄 수는 완성된 <a href="looking-glass.html">HTML 파일</a>을 직접 읽어 확인했습니다.</p>
+        <p>HTML SHA-256: <code>931b743be94007bfab526ff968aeb326133887f41dfdbe073cade8b6a55cb77c</code></p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
