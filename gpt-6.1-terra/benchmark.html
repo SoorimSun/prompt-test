@@ -31,6 +31,20 @@
     .fact:last-child { border:0; }
     .label { display:block; margin-bottom:7px; color:var(--muted); font-size:12px; }
     .value { font-weight:700; font-size:15px; overflow-wrap:anywhere; }
+    .tokens { display:grid; grid-template-columns:minmax(190px, 1fr) 2fr; gap:36px; margin-top:22px; padding:30px; background:#fffdfa; border:1px solid #eae1d5; }
+    .token-total { display:block; margin:4px 0 8px; color:var(--navy); font:400 clamp(34px,4vw,48px)/1.1 Georgia,serif; letter-spacing:-.04em; }
+    .token-summary p, .token-explanation { margin:0; color:var(--muted); font-size:13px; word-break:keep-all; }
+    .cache-heading { display:flex; align-items:baseline; justify-content:space-between; gap:20px; margin-bottom:12px; }
+    .cache-heading h3 { margin:0; font-size:15px; }
+    .cache-heading strong { color:var(--rose); font:400 30px/1 Georgia,serif; }
+    .token-bar { display:flex; height:13px; overflow:hidden; border-radius:20px; background:#ece5dc; }
+    .token-bar .cached, .swatch.cached { background:#bd7a80; }
+    .token-bar .uncached, .swatch.uncached { background:#d6b58e; }
+    .token-bar .output, .swatch.output { background:#506781; }
+    .token-legend { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px; margin:20px 0; }
+    .token-legend span { display:block; color:var(--muted); font-size:12px; }
+    .token-legend strong { display:block; margin-top:4px; font-size:15px; overflow-wrap:anywhere; }
+    .swatch { display:inline-block; width:8px; height:8px; margin-right:7px; border-radius:50%; vertical-align:1px; }
     .section { padding-top:76px; }
     .section-heading { display:flex; gap:24px; align-items:baseline; justify-content:space-between; border-bottom:1px solid var(--line); padding-bottom:16px; }
     .section-heading h2 { margin:0; font-size:25px; font-weight:600; letter-spacing:-.04em; }
@@ -62,6 +76,10 @@
       .fact:nth-child(2) { border-right:0; }
       .fact:nth-child(-n+2) { border-bottom:1px solid #eee7dc; }
       .checks { grid-template-columns:1fr; }
+      .tokens { grid-template-columns:1fr; gap:26px; padding:24px; }
+      .token-legend { grid-template-columns:1fr; gap:10px; }
+      .token-legend div { display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
+      .token-legend strong { margin:0; }
       .cost { grid-template-columns:1fr; gap:12px; }
       .details-grid { grid-template-columns:1fr; gap:24px; }
       .section { padding-top:55px; }
@@ -95,6 +113,32 @@
       <div class="fact"><span class="label">HTML 파일 크기</span><span class="value">4,041,672 bytes</span></div>
       <div class="fact"><span class="label">HTML 파일 줄 수</span><span class="value">297줄</span></div>
     </div>
+
+    <section class="section" aria-labelledby="tokens-title">
+      <div class="section-heading"><h2 id="tokens-title">토큰의 구성</h2><span>Token usage</span></div>
+      <div class="tokens">
+        <div class="token-summary">
+          <span class="label">누적 처리 토큰</span>
+          <strong class="token-total" data-metric="total">1,810,880</strong>
+          <p>입력과 출력을 합한 페이지 제작 작업의 처리량입니다.</p>
+        </div>
+        <div>
+          <div class="cache-heading"><h3>입력 중 캐시 비중</h3><strong data-metric="cache-share">93.75%</strong></div>
+          <div class="token-bar" role="img" aria-label="전체 처리량 중 캐시 입력 1,675,904, 비캐시 입력 111,811, 출력 23,165 토큰">
+            <span class="cached" style="flex-basis:92.546386287%"></span>
+            <span class="uncached" style="flex-basis:6.174401396%"></span>
+            <span class="output" style="flex-basis:1.279212317%"></span>
+          </div>
+          <div class="token-legend">
+            <div><span><i class="swatch cached"></i>캐시 입력</span><strong data-metric="cached-input">1,675,904</strong></div>
+            <div><span><i class="swatch uncached"></i>비캐시 입력</span><strong data-metric="uncached-input">111,811</strong></div>
+            <div><span><i class="swatch output"></i>출력</span><strong data-metric="output">23,165</strong></div>
+          </div>
+          <p class="token-explanation">전체 입력 <b data-metric="input">1,787,715</b> 토큰 · 출력 중 추론 <b data-metric="reasoning-output">8,536</b> 토큰.</p>
+        </div>
+      </div>
+      <p class="note">입력과 출력은 반복된 문맥 처리를 포함한 누적량입니다. 캐시 입력은 전체 입력에, 추론 토큰은 출력에 포함되어 합계에 다시 더하지 않습니다. ImageGen의 별도 처리량은 확인되지 않았습니다.</p>
+    </section>
 
     <section class="section" aria-labelledby="checks-title">
       <div class="section-heading"><h2 id="checks-title">브라우저에서 확인한 것</h2><span>Verification</span></div>
@@ -137,7 +181,7 @@
         <summary>페이지 제작에 전달한 기준 과제 보기</summary>
         <blockquote>gpt-6.1-terra 폴더에 "거울나라의 앨리스"를 주제로 상상할 수 있는 가장 아름다운 HTML 파일을 만들어 보세요. 보는 사람들이 "와!!!"라는 감탄사밖에 나오지 않을 만한 파일이어야 합니다. 시각적으로 인상적이고 아름다우며 눈을 즐겁게 하는 파일이어야 합니다. 꼼꼼하게 작업하되 창의력을 발휘하세요. 실수는 절대 금물입니다.</blockquote>
       </details>
-      <p class="note">사용자 요청에 따라 이 페이지 작업의 소요 시간을 확인했습니다. 사용량은 비용 환산을 위해 이번 작업에 한해 확인했습니다.</p>
+      <p class="note">소요 시간과 사용량은 페이지 제작 작업을 기준으로 기록했으며, 보고서 작성은 포함하지 않았습니다.</p>
       <div class="source">
         <p>비용은 페이지 제작 작업이 완료되기 전 마지막 사용량 기록으로 환산했습니다.</p>
         <p>기록: <code>rollout-2026-10-27T11-22-36-01a17b2a-a9b0-7930-8177-b76c9605721b.jsonl</code>의 사용량 기록 253번 줄, 작업 완료 및 소요 시간 255번 줄. 파일 크기와 줄 수는 완성된 <a href="looking-glass.html">HTML 파일</a>을 직접 읽어 확인했습니다.</p>
