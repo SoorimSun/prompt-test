@@ -1,0 +1,2 @@
+# Keep the page's recorded size and hash stable across platforms.
+looking-glass.html text eol=lf
