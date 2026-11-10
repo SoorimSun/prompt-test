@@ -1,0 +1,98 @@
+{
+  "currency": "USD",
+  "unit": "per million tokens",
+  "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+  "checked_at_kst": "2026-11-10T12:48:22+09:00",
+  "notes": [
+    "Anthropic first-party API list prices. Re-check the source before reporting a cost and update checked_at_kst.",
+    "A tier applies when the request's whole prompt (uncached input + cache writes + cache reads) is at most max_prompt_tokens; null means no limit.",
+    "The source lists only input and output for fast mode; fast cache rates here are fast input x the published cache multipliers (5m write 1.25x, 1h write 2x, cache read per model).",
+    "inference_geo_multipliers apply to every token class (data residency pricing). The source prices only global (standard) and us (1.1x).",
+    "not_available is what some session logs record when the response reported no geography; it is priced at the standard rate as an assumption, and the script lists it under cost.assumptions."
+  ],
+  "inference_geo_multipliers": {
+    "global": "1",
+    "us": "1.1",
+    "not_available": "1"
+  },
+  "models": {
+    "claude-fable-5-2": {
+      "standard": [
+        {"max_prompt_tokens": null, "input": "8", "cache_write_5m": "10", "cache_write_1h": "16", "cache_read": "0.20", "output": "40"}
+      ],
+      "fast": [
+        {"max_prompt_tokens": null, "input": "16", "cache_write_5m": "20", "cache_write_1h": "32", "cache_read": "0.40", "output": "80"}
+      ]
+    },
+    "claude-fable-5-1": {
+      "standard": [
+        {"max_prompt_tokens": null, "input": "10", "cache_write_5m": "12.50", "cache_write_1h": "20", "cache_read": "0.25", "output": "50"}
+      ]
+    },
+    "claude-fable-5": {
+      "standard": [
+        {"max_prompt_tokens": null, "input": "10", "cache_write_5m": "12.50", "cache_write_1h": "20", "cache_read": "1", "output": "50"}
+      ]
+    },
+    "claude-opus-5-5": {
+      "standard": [
+        {"max_prompt_tokens": null, "input": "4", "cache_write_5m": "5", "cache_write_1h": "8", "cache_read": "0.20", "output": "20"}
+      ],
+      "fast": [
+        {"max_prompt_tokens": null, "input": "8", "cache_write_5m": "10", "cache_write_1h": "16", "cache_read": "0.40", "output": "40"}
+      ]
+    },
+    "claude-opus-5": {
+      "standard": [
+        {"max_prompt_tokens": null, "input": "5", "cache_write_5m": "6.25", "cache_write_1h": "10", "cache_read": "0.50", "output": "25"}
+      ],
+      "fast": [
+        {"max_prompt_tokens": null, "input": "10", "cache_write_5m": "12.50", "cache_write_1h": "20", "cache_read": "1", "output": "50"}
+      ]
+    },
+    "claude-opus-4-8": {
+      "standard": [
+        {"max_prompt_tokens": null, "input": "5", "cache_write_5m": "6.25", "cache_write_1h": "10", "cache_read": "0.50", "output": "25"}
+      ],
+      "fast": [
+        {"max_prompt_tokens": null, "input": "10", "cache_write_5m": "12.50", "cache_write_1h": "20", "cache_read": "1", "output": "50"}
+      ]
+    },
+    "claude-opus-4-7": {
+      "standard": [
+        {"max_prompt_tokens": null, "input": "5", "cache_write_5m": "6.25", "cache_write_1h": "10", "cache_read": "0.50", "output": "25"}
+      ]
+    },
+    "claude-opus-4-6": {
+      "standard": [
+        {"max_prompt_tokens": null, "input": "5", "cache_write_5m": "6.25", "cache_write_1h": "10", "cache_read": "0.50", "output": "25"}
+      ]
+    },
+    "claude-sonnet-5-5": {
+      "standard": [
+        {"max_prompt_tokens": null, "input": "2", "cache_write_5m": "2.50", "cache_write_1h": "4", "cache_read": "0.10", "output": "10"}
+      ]
+    },
+    "claude-sonnet-5": {
+      "standard": [
+        {"max_prompt_tokens": null, "input": "2", "cache_write_5m": "2.50", "cache_write_1h": "4", "cache_read": "0.20", "output": "10"}
+      ]
+    },
+    "claude-sonnet-4-6": {
+      "standard": [
+        {"max_prompt_tokens": null, "input": "3", "cache_write_5m": "3.75", "cache_write_1h": "6", "cache_read": "0.30", "output": "15"}
+      ]
+    },
+    "claude-haiku-5-5": {
+      "standard": [
+        {"max_prompt_tokens": 100000, "input": "0.10", "cache_write_5m": "0.125", "cache_write_1h": "0.20", "cache_read": "0.01", "output": "0.50"},
+        {"max_prompt_tokens": null, "input": "0.50", "cache_write_5m": "0.625", "cache_write_1h": "1", "cache_read": "0.05", "output": "2.50"}
+      ]
+    },
+    "claude-haiku-4-5": {
+      "standard": [
+        {"max_prompt_tokens": null, "input": "1", "cache_write_5m": "1.25", "cache_write_1h": "2", "cache_read": "0.10", "output": "5"}
+      ]
+    }
+  }
+}
