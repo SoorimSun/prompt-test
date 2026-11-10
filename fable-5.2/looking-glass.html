@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>거울나라의 앨리스 — Through the Looking-Glass</title>
+<meta name="description" content="루이스 캐럴 『거울나라의 앨리스』를 체스판 여덟 칸의 여정으로 그린 인터랙티브 페이지">
+<meta name="theme-color" content="#060a18">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500;1,600&family=Gowun+Batang:wght@400;700&family=Noto+Serif+KR:wght@700;900&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+:root{--night:#060a18;--deep:#0c1330;--silver:#dfe6f6;--gold:#e8c56a;--gold2:#b88a2c;--rose:#c2183a;
+--kr:"Gowun Batang","Noto Serif KR","Nanum Myeongjo","Batang","AppleMyungjo",serif;
+--ti:"Noto Serif KR","Gowun Batang","Nanum Myeongjo","Batang",serif;
+--en:"Cormorant Garamond","Palatino Linotype","Book Antiqua",Georgia,serif}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--night);color:var(--silver);font-family:var(--kr);line-height:1.85;overflow-x:hidden;word-break:keep-all;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(120% 80% at 50% 0%,#17235a 0%,#0a1030 48%,#060a18 100%)}
+#motes{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+.defs{position:absolute;width:0;height:0;overflow:hidden}
+a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+
+/* ── hero : the looking-glass ── */
+.hero{position:relative;z-index:1;height:100vh;height:100svh;min-height:560px;overflow:hidden;display:grid;place-items:center;--W:min(76vw,54vh,680px)}
+#glass{position:absolute;inset:0;width:100%;height:100%;display:block;background:radial-gradient(circle at 50% 45%,#93a4d6,#2a3768 55%,#0a1030)}
+.oval{position:relative;width:var(--W);height:calc(var(--W)*1.34);border-radius:50%;display:grid;place-items:center;text-align:center;
+box-shadow:0 0 0 2px #fff3c4,0 0 0 9px #c79a3b,0 0 0 11px #6d4c12,0 0 0 15px #e8c56a,0 0 0 17px #4d340b,0 0 70px 22px rgba(232,197,106,.42),0 0 0 200vmax rgba(5,8,22,.68),inset 0 0 90px rgba(255,255,255,.22),inset 0 0 0 1px rgba(255,255,255,.55);
+animation:breathe 7s ease-in-out infinite}
+@keyframes breathe{50%{box-shadow:0 0 0 2px #fff3c4,0 0 0 9px #c79a3b,0 0 0 11px #6d4c12,0 0 0 15px #e8c56a,0 0 0 17px #4d340b,0 0 110px 34px rgba(232,197,106,.55),0 0 0 200vmax rgba(5,8,22,.68),inset 0 0 130px rgba(255,255,255,.3),inset 0 0 0 1px rgba(255,255,255,.55)}}
+.crest{position:absolute;top:calc(var(--W)*-.118);left:50%;width:calc(var(--W)*.2);height:calc(var(--W)*.138);transform:translateX(-50%);fill:url(#gg);filter:drop-shadow(0 2px 6px rgba(0,0,0,.65))}
+.oval::before{content:"";position:absolute;inset:20% 3% 18%;border-radius:50%;background:radial-gradient(closest-side,rgba(5,8,24,.52),rgba(5,8,24,0))}
+.ttl{position:relative;padding:0 6%}
+.eyebrow{margin:0 0 calc(var(--W)*.035);font:600 calc(var(--W)*.034)/1 var(--en);letter-spacing:.42em;text-indent:.42em;text-transform:uppercase;color:#fff3cf;text-shadow:0 1px 12px rgba(4,7,20,.95)}
+h1{margin:0;font:900 calc(var(--W)*.168)/1.16 var(--ti);letter-spacing:-.02em;filter:drop-shadow(0 6px 22px rgba(4,7,20,.8))}
+h1 span{display:block;background:linear-gradient(100deg,#fff6d8 0%,#edc96f 26%,#fffdf2 48%,#c9983a 72%,#fff6d8 100%) 0 0/200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:sheen 9s linear infinite}
+@keyframes sheen{to{background-position:200% 0}}
+.rule{display:block;width:calc(var(--W)*.36);height:1px;margin:calc(var(--W)*.05) auto;background:linear-gradient(90deg,transparent,#fff3c4,transparent)}
+.sub{margin:0;font:italic 600 calc(var(--W)*.062)/1.25 var(--en);color:#fff;text-shadow:0 2px 14px rgba(4,7,20,.95)}
+.sub small{display:block;font-size:.68em;font-weight:500;color:#e8ecfa;margin-top:.25em}
+.flipin{display:inline-block;animation:unmirror 2.6s cubic-bezier(.7,0,.2,1) 1s both}
+@keyframes unmirror{0%,40%{transform:scaleX(-1)}100%{transform:scaleX(1)}}
+.down{position:absolute;left:50%;bottom:max(2.4vh,14px);transform:translateX(-50%);display:grid;justify-items:center;gap:8px;color:#fff3cf;text-decoration:none;font-size:13px;letter-spacing:.3em;text-indent:.3em;padding:6px 12px;border-radius:8px;white-space:nowrap}
+.down i{width:1px;height:30px;background:linear-gradient(#fff3cf,transparent);animation:drip 2.2s ease-in-out infinite;transform-origin:top}
+@keyframes drip{0%{transform:scaleY(0)}50%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
+
+/* ── the file of eight squares ── */
+.file{position:fixed;z-index:5;right:clamp(10px,1.6vw,22px);top:50%;transform:translateY(-50%)}
+.file ol{position:relative;list-style:none;margin:0;padding:5px;display:flex;flex-direction:column-reverse;border-radius:10px;background:rgba(6,10,24,.6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 0 0 1px rgba(232,197,106,.5),0 10px 30px rgba(0,0,0,.45)}
+.file button{all:unset;box-sizing:border-box;display:grid;place-items:center;width:34px;height:34px;cursor:pointer;font:700 14px/1 var(--en);color:#0c1330;background:#ece4cf;font-variant-numeric:lining-nums;transition:filter .3s,color .3s}
+.file li:nth-child(even) button{background:#2a3465;color:#dfe6f6}
+.file button:hover{filter:brightness(1.18)}
+.file button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;position:relative;z-index:2}
+.file button[aria-current]{color:transparent}
+.piece{position:absolute;left:0;top:0;width:34px;height:34px;display:grid;place-items:center;pointer-events:none;transition:transform .7s cubic-bezier(.5,1.5,.4,1);filter:drop-shadow(0 2px 3px rgba(0,0,0,.7))}
+.piece svg{width:19px;height:26px;fill:#fff;stroke:#0c1330;stroke-width:2.5;paint-order:stroke;transition:fill .5s}
+.piece.q svg{width:22px;fill:var(--gold)}
+
+/* ── squares ── */
+main,.foot{position:relative;z-index:1}
+.sq{position:relative;overflow:hidden;min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,6vw,96px);align-items:center;padding:clamp(84px,12vh,150px) max(8vw,92px) clamp(84px,12vh,150px) clamp(22px,8vw,130px);color:var(--c);background:var(--bg)}
+.sq.d{--c:#e6ebfa;--m:#a9b4d8;--a:#e8c56a;--ln:rgba(232,197,106,.38);--card:rgba(255,255,255,.055);--bg:linear-gradient(180deg,rgba(6,10,24,0),rgba(12,19,48,.6) 30%,rgba(12,19,48,.6) 70%,rgba(6,10,24,0))}
+.sq.l{--c:#171c3c;--m:#565c80;--a:#96650f;--ln:rgba(23,28,60,.2);--card:rgba(23,28,60,.055);--bg:radial-gradient(90% 70% at 18% 8%,#fffaf0,rgba(255,250,240,0) 60%),repeating-conic-gradient(rgba(23,28,60,.03) 0 25%,rgba(0,0,0,0) 0 50%) 0 0/96px 96px,#f1e9d6;box-shadow:0 0 0 1px rgba(232,197,106,.5),0 0 80px rgba(0,0,0,.5)}
+.sq.flip .txt{order:2}
+.num{position:absolute;top:-.1em;right:.04em;font:700 clamp(180px,30vw,460px)/1 var(--en);font-variant-numeric:lining-nums;color:transparent;-webkit-text-stroke:1px var(--ln);pointer-events:none;-webkit-user-select:none;user-select:none}
+.sq.flip .num{right:auto;left:.04em}
+.txt,.vis{position:relative;min-width:0}
+.kick{font:700 clamp(13px,1.1vw,15px)/1 var(--en);letter-spacing:.34em;text-transform:uppercase;color:var(--a);margin:0 0 18px;display:flex;align-items:center;gap:14px}
+.kick::before{content:"";width:38px;height:1px;background:currentColor}
+h2{font:900 clamp(30px,4.3vw,58px)/1.24 var(--ti);margin:0 0 8px;letter-spacing:-.015em}
+.en{display:inline-block;font:italic 600 clamp(19px,2vw,27px)/1.3 var(--en);color:var(--a);margin:0 0 26px}
+.js .en{transform:scaleX(-1);transition:transform 1.2s cubic-bezier(.7,0,.2,1) .45s}
+.js .in .en{transform:none}
+.txt p{font-size:clamp(16px,1.25vw,19px);margin:0 0 18px;max-width:34em}
+blockquote{margin:30px 0 0;padding:22px 26px;border-left:2px solid var(--a);background:var(--card);border-radius:0 14px 14px 0;font-size:clamp(17px,1.45vw,22px);line-height:1.72;font-weight:700;max-width:30em}
+blockquote cite{display:block;margin-top:10px;font:italic 500 16px/1.3 var(--en);color:var(--m)}
+.vis{display:grid;place-items:center}
+.js .rv{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i,0)*.13s)}
+.js .in .rv{opacity:1;transform:none}
+.foot{text-align:center;padding:46px 20px 60px;color:#8f9bc4;font:italic 500 17px/1.6 var(--en);letter-spacing:.06em}
+.foot p{margin:0}
+.foot b{color:var(--gold);font-weight:600;font-size:1.25em}
+.foot span{display:block;margin-top:10px;font:400 14px/1.6 var(--kr);letter-spacing:.08em}
+figure{margin:0}
+figcaption{margin-top:20px;font-size:14px;color:var(--m);letter-spacing:.05em;text-align:center}
+/* 1 · jabberwocky */
+.jab{position:relative;width:min(100%,440px);padding:40px 34px 32px;border-radius:6px;background:linear-gradient(135deg,#fbf5e6,#e9dfc6);color:#1a1f3d;box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(232,197,106,.6),inset 0 0 60px rgba(160,120,40,.18);transform:rotate(-2deg);text-align:center}
+.jab::after{content:"";position:absolute;inset:10px;border:1px solid rgba(150,101,15,.38);pointer-events:none;border-radius:3px}
+.jab-h{margin:0 0 16px;font:700 15px/1 var(--en);letter-spacing:.5em;text-indent:.5em;color:#96650f}
+.poem{margin:0;font:italic 600 clamp(19px,1.9vw,24px)/1.55 var(--en);transform:scaleX(-1);transition:transform 1s cubic-bezier(.7,0,.2,1)}
+.poem span{display:block}
+.jab .ko{margin:16px 0 0;font-size:15px;line-height:1.8;color:#4a4f72;opacity:0;transition:opacity .8s .45s}
+.jab.read .poem{transform:none}
+.jab.read .ko{opacity:1}
+.btn{all:unset;box-sizing:border-box;position:relative;z-index:1;margin-top:20px;display:inline-flex;align-items:center;gap:10px;cursor:pointer;padding:12px 24px;border-radius:999px;font:700 15px/1 var(--kr);color:#fff8e2;background:linear-gradient(180deg,#2a3465,#121838);box-shadow:0 0 0 1px #c79a3b,0 8px 20px rgba(12,19,48,.35);transition:transform .25s,box-shadow .25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 0 0 1px #e8c56a,0 12px 26px rgba(12,19,48,.45)}
+.btn:focus-visible{outline:2px solid #96650f;outline-offset:4px}
+/* 2 · the running field */
+.field{position:relative;width:100%;max-width:560px;aspect-ratio:5/4;border-radius:22px;overflow:hidden;perspective:420px;perspective-origin:50% 38%;background:linear-gradient(180deg,#1b2a66 0%,#6a5a9c 30%,#f3a98c 47%,#ffd9a8 54%);box-shadow:0 30px 60px rgba(23,28,60,.35),0 0 0 1px rgba(150,101,15,.5),0 0 0 8px #fffaf0,0 0 0 9px rgba(150,101,15,.5)}
+.plane{position:absolute;left:-75%;right:-75%;bottom:-6%;height:150%;transform-origin:50% 100%;transform:rotateX(76deg);background:repeating-conic-gradient(#2f8a58 0 25%,#1b5e3b 0 50%) 0 0/110px 110px;animation:run .9s linear infinite}
+@keyframes run{to{background-position:0 110px}}
+.haze{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,217,168,0) 36%,rgba(255,217,168,.95) 50%,rgba(255,217,168,0) 70%)}
+.sun{position:absolute;left:62%;top:30%;width:17%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#fff8e0,#ffd08a 60%,rgba(255,208,138,0) 72%)}
+.tree{position:absolute;left:5%;bottom:33%;width:19%}
+.run{position:absolute;bottom:12%;width:15%;height:26%;transform-origin:50% 100%;animation:bob .42s ease-in-out infinite alternate;filter:drop-shadow(0 8px 6px rgba(0,0,0,.35))}
+.rq{left:52%;height:31%;fill:url(#rd)}
+.al{left:32%;fill:url(#sv);animation-delay:-.2s}
+@keyframes bob{from{transform:translateY(0) rotate(7deg)}to{transform:translateY(-9%) rotate(11deg)}}
+/* 3 · looking-glass insects */
+.glade{position:relative;width:100%;max-width:500px;aspect-ratio:1}
+.moon{position:absolute;inset:13%;border-radius:50%;background:radial-gradient(circle at 38% 34%,#f2f5ff,#aab6dc 52%,#56639a);box-shadow:0 0 90px 22px rgba(190,205,255,.3),inset -20px -20px 60px rgba(20,26,60,.45)}
+.bug{position:absolute;width:40%;animation:drift 7s ease-in-out infinite alternate;filter:drop-shadow(0 10px 10px rgba(4,7,20,.5))}
+.b1{left:4%;top:12%}
+.b2{right:4%;bottom:15%;animation-delay:-3.5s;animation-duration:9s}
+@keyframes drift{0%{transform:translate(0,0) rotate(-6deg)}50%{transform:translate(9%,-12%) rotate(5deg)}100%{transform:translate(-6%,9%) rotate(-3deg)}}
+.wing{transform-box:fill-box;transform-origin:50% 100%;animation:flap .26s ease-in-out infinite alternate}
+.wing.w2{transform-origin:50% 50%;animation:flap2 .55s ease-in-out infinite alternate}
+@keyframes flap{to{transform:scaleY(.5)}}
+@keyframes flap2{to{transform:scaleX(.45)}}
+.lbl{position:absolute;font-size:14px;line-height:1;color:#fff3cf;letter-spacing:.08em;padding:7px 14px;border:1px solid rgba(232,197,106,.5);border-radius:999px;background:rgba(6,10,24,.66);white-space:nowrap}
+.l1{left:6%;top:50%}.l2{right:4%;bottom:6%}
+/* 4 · the twins and the dreaming king */
+.twins{width:100%;max-width:520px}
+.twins>svg{display:block;width:100%;height:auto;overflow:visible}
+.sway{transform-box:fill-box;transform-origin:50% 100%;animation:sway 2.6s ease-in-out infinite alternate}
+@keyframes sway{from{transform:rotate(-3.5deg)}to{transform:rotate(3.5deg)}}
+.dream{display:flex;align-items:flex-end;justify-content:center;gap:12px;margin-top:22px;height:96px}
+.kg{width:44px;height:62px;fill:url(#rd);transform:rotate(78deg) translateX(-10px);filter:drop-shadow(-4px 4px 4px rgba(23,28,60,.3))}
+.z{font:italic 700 22px/1 var(--en);color:#96650f;opacity:0;animation:zz 2.4s ease-in-out infinite}
+.z:nth-of-type(2){font-size:28px;animation-delay:.5s}
+.z:nth-of-type(3){font-size:34px;animation-delay:1s}
+@keyframes zz{0%{opacity:0;transform:translateY(6px)}40%{opacity:1}100%{opacity:0;transform:translateY(-22px)}}
+.bub{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#fff,#dfe6f6 60%,#b9c4e4);box-shadow:0 10px 26px rgba(23,28,60,.25),inset 0 0 0 1px #fff;animation:candle 4.5s ease-in-out infinite}
+.bub svg{width:30px;height:46px;fill:#171c3c}
+@keyframes candle{0%,68%,100%{opacity:1}78%{opacity:.3}86%{opacity:.9}93%{opacity:.5}}
+/* 5 · the backward clock and the jam */
+.clock{display:block;width:min(74%,330px);height:auto;filter:drop-shadow(0 24px 40px rgba(0,0,0,.55)) drop-shadow(0 0 34px rgba(232,197,106,.28))}
+.hh,.mh{transform-origin:100px 100px;animation:ccw 72s linear infinite}
+.mh{animation-duration:6s}
+@keyframes ccw{to{transform:rotate(-360deg)}}
+.jam{list-style:none;display:flex;gap:clamp(14px,3vw,34px);justify-content:center;margin:34px 0 0;padding:0;font-size:14px;line-height:1.3;color:var(--m);text-align:center}
+.jar{display:block;position:relative;width:58px;height:66px;margin:0 auto 12px;border:2px solid rgba(223,230,246,.8);border-radius:8px 8px 14px 14px;background:rgba(255,255,255,.06);overflow:hidden}
+.jar::before{content:"";position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(#ff6b7f,#9c0f2c)}
+.jar.full::before{height:70%}
+.jar::after{content:"";position:absolute;top:0;left:0;right:0;height:8px;background:var(--gold)}
+.jam li:nth-child(2){color:#fff3cf}
+.jam li:nth-child(2) .jar{border-style:dashed}
+/* 6 · humpty dumpty */
+.hd{width:100%;max-width:440px;text-align:center}
+.egg{all:unset;box-sizing:border-box;display:block;position:relative;z-index:1;width:46%;margin:0 auto -5%;cursor:pointer;transform-origin:50% 96%;border-radius:50%;-webkit-tap-highlight-color:transparent}
+.egg svg{display:block;width:100%;height:auto;filter:drop-shadow(0 14px 12px rgba(23,28,60,.3))}
+.egg:hover{animation:teeter 1.6s ease-in-out infinite}
+.egg.wob{animation:wob .9s cubic-bezier(.3,.6,.3,1)}
+.egg:focus-visible{outline:2px solid #96650f;outline-offset:6px}
+@keyframes teeter{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+@keyframes wob{0%{transform:rotate(0)}20%{transform:rotate(-13deg)}45%{transform:rotate(10deg)}65%{transform:rotate(-6deg)}82%{transform:rotate(3deg)}100%{transform:rotate(0)}}
+.wall{position:relative;height:118px;border-radius:4px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='56'%3E%3Cpath d='M0 1h64M0 29h64M1 0v28M33 28v28' stroke='%23f1e9d6' stroke-width='2'/%3E%3C/svg%3E") 0 12px,linear-gradient(#b5503f,#8f3a2e);box-shadow:0 22px 34px rgba(23,28,60,.28)}
+.wall::before{content:"";position:absolute;left:-3%;right:-3%;top:-4px;height:16px;border-radius:5px;background:linear-gradient(#e9dfc6,#c9bb97);box-shadow:0 3px 6px rgba(23,28,60,.3)}
+.say{min-height:3.5em;margin:22px 0 0;font-size:16px;line-height:1.65;color:var(--c)}
+.say b{color:var(--a);font-size:1.12em}
+/* 7 · the white knight's tour */
+.tour{position:relative;width:100%;max-width:400px;aspect-ratio:1;border-radius:6px;background:repeating-conic-gradient(#ece4cf 0 25%,#2a3465 0 50%) 0 0/40% 40%;box-shadow:0 0 0 1px #e8c56a,0 0 0 10px #121838,0 0 0 11px rgba(232,197,106,.6),0 40px 80px rgba(0,0,0,.6),0 0 130px rgba(255,150,90,.28)}
+.path{position:absolute;inset:0;width:100%;height:100%}
+.path polygon{fill:none;stroke:#f0a43c;stroke-width:.035;stroke-dasharray:.09 .09;stroke-linejoin:round}
+.kn{position:absolute;left:0;top:0;width:20%;height:20%;animation:tour 15s cubic-bezier(.6,0,.3,1) infinite}
+.kn svg{display:block;width:100%;height:100%;padding:12%;fill:url(#sv);stroke:#121838;stroke-width:2;paint-order:stroke;filter:drop-shadow(0 6px 5px rgba(0,0,0,.55));transform-origin:50% 90%;animation:hop 1.5s ease-in-out infinite}
+@keyframes tour{0%,100%{transform:translate(0,0)}10%{transform:translate(100%,200%)}20%{transform:translate(300%,300%)}30%{transform:translate(400%,100%)}40%{transform:translate(200%,0)}50%{transform:translate(0,100%)}60%{transform:translate(100%,300%)}70%{transform:translate(300%,400%)}80%{transform:translate(400%,200%)}90%{transform:translate(200%,100%)}}
+@keyframes hop{0%,100%{transform:translateY(0) rotate(0)}35%{transform:translateY(-34%) rotate(-14deg)}70%{transform:translateY(0) rotate(9deg)}}
+/* 8 · queen alice */
+.coron{position:relative;width:100%;max-width:460px;aspect-ratio:1;display:grid;place-items:center}
+.rays{position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(rgba(200,150,40,.36) 0 6deg,rgba(200,150,40,0) 6deg 18deg);-webkit-mask:radial-gradient(circle,#000 16%,transparent 68%);mask:radial-gradient(circle,#000 16%,transparent 68%);animation:spin 70s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.qa{position:relative;width:36%;height:54%;margin-top:24%;fill:url(#sv);stroke:#171c3c;stroke-width:1.2;filter:drop-shadow(0 18px 16px rgba(23,28,60,.35))}
+.cr{position:absolute;left:50%;top:9%;width:38%;height:26%;transform:translateX(-50%);fill:url(#gg);stroke:#8a5f10;stroke-width:1.5;filter:drop-shadow(0 8px 14px rgba(150,101,15,.5));animation:crown 5s ease-in-out infinite}
+@keyframes crown{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-8%)}}
+.sp{position:absolute;width:16px;height:16px;background:#e2a31c;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);animation:twk 2.6s ease-in-out infinite}
+.sp:nth-of-type(2){left:16%;top:24%}
+.sp:nth-of-type(3){right:14%;top:18%;width:22px;height:22px;animation-delay:-.7s}
+.sp:nth-of-type(4){left:22%;bottom:24%;width:12px;height:12px;animation-delay:-1.3s}
+.sp:nth-of-type(5){right:20%;bottom:30%;animation-delay:-1.9s}
+.sp:nth-of-type(6){left:48%;top:2%;width:11px;height:11px;animation-delay:-2.2s}
+@keyframes twk{0%,100%{transform:scale(0) rotate(0)}50%{transform:scale(1) rotate(90deg)}}
+/* waking */
+.sq.fin{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center;padding-inline:clamp(22px,8vw,130px)}
+.fin .kick{justify-content:center}
+.fin .kick::after{content:"";width:38px;height:1px;background:currentColor}
+.fin .txt{width:100%}
+.fin .txt p{margin-inline:auto}
+.fin .txt .last{max-width:none}
+.fin .ask{font-size:clamp(18px,1.7vw,24px);font-weight:700;line-height:1.8}
+.fin .last{margin-top:48px;color:var(--m);font-size:clamp(16px,1.4vw,20px)}
+.last span{display:block;margin-bottom:14px;font:italic 600 clamp(32px,5.4vw,70px)/1.2 var(--en);background:linear-gradient(100deg,#fff6d8,#edc96f 30%,#fffdf2 50%,#c9983a 72%,#fff6d8) 0 0/200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:sheen 9s linear infinite}
+.again{margin-top:30px}
+@media(max-width:860px){
+.sq{grid-template-columns:minmax(0,1fr);padding:84px 22px 110px;min-height:0}
+.sq.flip .txt{order:0}
+.sq.flip .num{left:auto;right:.04em}
+.file{right:auto;left:50%;top:auto;bottom:10px;transform:translateX(-50%)}
+.file ol{flex-direction:row}
+.file button,.piece{width:30px;height:30px}
+.down{bottom:62px}.down i{display:none}
+.foot{padding-bottom:84px}
+}
+@media(prefers-reduced-motion:reduce){
+html{scroll-behavior:auto}
+*,*::before,*::after{animation:none!important;transition:none!important}
+.js .rv{opacity:1;transform:none}.js .en{transform:none}
+}
+</style>
+</head>
+<body>
+<svg class="defs" aria-hidden="true" focusable="false">
+<defs>
+<linearGradient id="gg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6d0"/><stop offset=".45" stop-color="#e8c56a"/><stop offset="1" stop-color="#a87a1e"/></linearGradient>
+<linearGradient id="sv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#b9c4e4"/></linearGradient>
+<linearGradient id="rd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6b7f"/><stop offset="1" stop-color="#9c0f2c"/></linearGradient>
+</defs>
+<symbol id="crown" viewBox="-4 -2 128 88"><path d="M10 70 4 22l26 22L60 6l30 38 26-22-6 48z"/><rect x="10" y="73" width="100" height="10" rx="3"/><circle cx="4" cy="18" r="5"/><circle cx="60" cy="4" r="5"/><circle cx="116" cy="18" r="5"/></symbol>
+<symbol id="pawn" viewBox="0 0 40 60"><circle cx="20" cy="13" r="9"/><path d="M11 25h18l-2 4H13zM14 30h12c0 10 5 14 7 20H7c2-6 7-10 7-20zM4 51h32v6H4z"/></symbol>
+<symbol id="queen" viewBox="0 0 44 60"><circle cx="22" cy="5" r="3.4"/><circle cx="6" cy="11" r="3"/><circle cx="38" cy="11" r="3"/><path d="M5 14l8 12 9-17 9 17 8-12-5 22H10zM11 37h22c0 6 4 9 6 14H5c2-5 6-8 6-14zM3 52h38v6H3z"/></symbol>
+<symbol id="king" viewBox="0 0 44 62"><path d="M20 0h4v5h5v4h-5v6h-4V9h-5V5h5z"/><path d="M22 14c8 0 15 5 15 12 0 5-3 8-6 11H13c-3-3-6-6-6-11 0-7 7-12 15-12zM11 39h22c0 6 4 9 6 14H5c2-5 6-8 6-14zM3 54h38v6H3z"/></symbol>
+<symbol id="knight" viewBox="0 0 44 60"><path d="M12 50c0-12 8-16 6-24-3 2-6 5-10 4l-3-4c3-6 8-10 13-14l-1-8 6 5c10 1 16 9 16 20 0 9-4 14-4 21zM5 52h34v6H5z"/></symbol>
+</svg>
+<canvas id="motes" aria-hidden="true"></canvas>
+
+<nav class="file" aria-label="체스판 여정 — 칸 이동">
+<ol>
+<li><button type="button" data-to="s1" aria-label="첫째 칸: 거울 속의 집">1</button></li>
+<li><button type="button" data-to="s2" aria-label="둘째 칸: 살아 있는 꽃들의 정원">2</button></li>
+<li><button type="button" data-to="s3" aria-label="셋째 칸: 거울 나라의 곤충들">3</button></li>
+<li><button type="button" data-to="s4" aria-label="넷째 칸: 트위들덤과 트위들디">4</button></li>
+<li><button type="button" data-to="s5" aria-label="다섯째 칸: 하얀 여왕">5</button></li>
+<li><button type="button" data-to="s6" aria-label="여섯째 칸: 험프티 덤프티">6</button></li>
+<li><button type="button" data-to="s7" aria-label="일곱째 칸: 하얀 기사">7</button></li>
+<li><button type="button" data-to="s8" aria-label="여덟째 칸: 여왕 앨리스">8</button></li>
+<li class="piece" aria-hidden="true"><svg><use href="#pawn"/></svg></li>
+</ol>
+</nav>
+
+<header class="hero" id="top" data-n="1">
+<canvas id="glass" aria-hidden="true"></canvas>
+<div class="oval">
+<svg class="crest" aria-hidden="true"><use href="#crown"/></svg>
+<div class="ttl">
+<p class="eyebrow">Lewis Carroll · 1871</p>
+<h1><span>거울나라의</span><span>앨리스</span></h1>
+<i class="rule" aria-hidden="true"></i>
+<p class="sub"><span class="flipin">Through the Looking-Glass</span><small>and What Alice Found There</small></p>
+</div>
+</div>
+<a class="down" href="#s1"><span>거울 속으로</span><i aria-hidden="true"></i></a>
+</header>
+
+<main>
+<section class="sq d" id="s1" data-n="1">
+<span class="num" aria-hidden="true">1</span>
+<div class="txt">
+<p class="kick rv">첫째 칸</p>
+<h2 class="rv" style="--i:1">거울 속의 집</h2>
+<p class="en">Looking-Glass House</p>
+<p class="rv" style="--i:2">눈송이가 창을 두드리는 겨울 오후, 앨리스는 벽난로 위 거울을 올려다보며 새끼 고양이 키티에게 속삭입니다. 저 너머에는 우리 방과 똑같지만 모든 것이 거꾸로인 방이 있다고요.</p>
+<p class="rv" style="--i:3">벽난로 선반에 올라선 순간, 유리는 환한 은빛 안개처럼 스르르 녹아내리고 — 앨리스는 거울을 지나갑니다. 그곳의 책은 거울에 비춰야만 읽을 수 있습니다.</p>
+<blockquote class="rv" style="--i:4">“거울 속의 집으로 들어갈 수 있다면 얼마나 좋을까! 봐, 유리가 안개처럼 부드러워지고 있어.”<cite>— Alice</cite></blockquote>
+</div>
+<div class="vis rv" style="--i:2">
+<div class="jab" id="jab">
+<p class="jab-h">Jabberwocky</p>
+<p class="poem" lang="en"><span>’Twas brillig, and the slithy toves</span><span>Did gyre and gimble in the wabe;</span><span>All mimsy were the borogoves,</span><span>And the mome raths outgrabe.</span></p>
+<p class="ko">저녁굽이 무렵, 미끈낭창한 토브들이<br>해시계 풀밭에서 빙글대고 송곳질했네.<br>보로고브들은 온통 가냘처량했고<br>집 잃은 래스들은 꽥휘파람 불었네.</p>
+<button type="button" class="btn" id="flip" aria-pressed="false">거울에 비춰 보기</button>
+</div>
+</div>
+</section>
+
+<section class="sq l flip" id="s2" data-n="2">
+<span class="num" aria-hidden="true">2</span>
+<div class="txt">
+<p class="kick rv">둘째 칸</p>
+<h2 class="rv" style="--i:1">살아 있는 꽃들의 정원</h2>
+<p class="en">The Garden of Live Flowers</p>
+<p class="rv" style="--i:2">언덕에 오르자 온 나라가 거대한 체스판처럼 펼쳐집니다. 작은 시내가 가로줄을, 초록 울타리가 세로줄을 긋고 있지요. 앨리스는 하얀 졸이 되어 둘째 칸에서 길을 떠납니다. 여덟째 칸에 닿으면, 여왕이 됩니다.</p>
+<p class="rv" style="--i:3">붉은 여왕은 앨리스의 손을 잡고 바람처럼 달립니다. 더 빨리, 더 빨리! 그런데 숨이 턱에 닿도록 달려도 나무는 처음 그 자리에 서 있습니다.</p>
+<blockquote class="rv" style="--i:4">“여기서는 말이다, 같은 자리에 있으려면 있는 힘껏 달려야 한단다. 다른 곳에 가고 싶으면 적어도 그 두 배는 빨리 달려야 하고!”<cite>— The Red Queen</cite></blockquote>
+</div>
+<figure class="vis rv" style="--i:2">
+<div class="field" role="img" aria-label="제자리에서 달리는 붉은 여왕과 앨리스, 발밑으로 흘러가는 체스판 들판">
+<i class="sun"></i><div class="plane"></div><i class="haze"></i>
+<svg class="tree" viewBox="0 0 60 92" aria-hidden="true"><rect x="27" y="50" width="6" height="42" rx="2" fill="#5a3a1c"/><circle cx="30" cy="30" r="27" fill="#1d6b47"/><circle cx="20" cy="22" r="11" fill="#2f8a58"/><circle cx="40" cy="36" r="8" fill="#17573a"/></svg>
+<svg class="run al" aria-hidden="true"><use href="#pawn"/></svg>
+<svg class="run rq" aria-hidden="true"><use href="#queen"/></svg>
+</div>
+<figcaption>달리고 또 달려도, 나무는 그 자리에.</figcaption>
+</figure>
+</section>
+
+<section class="sq d" id="s3" data-n="3">
+<span class="num" aria-hidden="true">3</span>
+<div class="txt">
+<p class="kick rv">셋째 칸</p>
+<h2 class="rv" style="--i:1">거울 나라의 곤충들</h2>
+<p class="en">Looking-Glass Insects</p>
+<p class="rv" style="--i:2">졸의 첫걸음은 두 칸. 셋째 칸은 기차를 타고 단숨에 지나갑니다. 차표는 승객보다 크고, 기관차의 연기 한 모금은 천 파운드나 한다지요.</p>
+<p class="rv" style="--i:3">가지 사이로는 흔들목마파리가 그네를 타고, 버터빵나비가 크림 넣은 묽은 차를 찾아 날아다닙니다. 그리고 이름이 사라지는 숲에서, 앨리스는 아기 사슴과 다정히 걷습니다 — 서로가 누구인지 잊은 채로.</p>
+<blockquote class="rv" style="--i:4">“불러도 대답하지 않을 거라면, 이름이 있어 봐야 무슨 소용이지?”<cite>— The Gnat</cite></blockquote>
+</div>
+<div class="vis rv" style="--i:2">
+<div class="glade" role="img" aria-label="달빛 아래를 나는 흔들목마파리와 버터빵나비">
+<i class="moon"></i>
+<svg class="bug b1" viewBox="0 0 120 100" aria-hidden="true">
+<g class="wing"><ellipse cx="48" cy="26" rx="26" ry="11" fill="rgba(255,255,255,.55)" stroke="#fff" transform="rotate(-24 48 26)"/><ellipse cx="74" cy="24" rx="26" ry="11" fill="rgba(255,255,255,.4)" stroke="#fff" transform="rotate(20 74 24)"/></g>
+<path d="M34 46h44a8 8 0 0 1 8 8v8H34z" fill="url(#gg)"/><path d="M30 52 19 34l10-7 13 11v14z" fill="url(#gg)"/><circle cx="27" cy="35" r="1.8" fill="#1a1f3d"/>
+<path d="M42 62v13M76 62v13" stroke="#e8c56a" stroke-width="4" stroke-linecap="round"/><path d="M86 52q12-2 14 10" fill="none" stroke="#e8c56a" stroke-width="3" stroke-linecap="round"/>
+<path d="M16 73q44 26 88 0" fill="none" stroke="#e0364f" stroke-width="5" stroke-linecap="round"/>
+</svg>
+<svg class="bug b2" viewBox="0 0 120 100" aria-hidden="true">
+<g class="wing w2"><rect x="12" y="20" width="42" height="46" rx="12" fill="#f6dfa4" stroke="#b9772c" stroke-width="4"/><rect x="21" y="29" width="24" height="28" rx="7" fill="#ffe873"/><rect x="66" y="20" width="42" height="46" rx="12" fill="#f6dfa4" stroke="#b9772c" stroke-width="4"/><rect x="75" y="29" width="24" height="28" rx="7" fill="#ffe873"/></g>
+<rect x="56" y="24" width="8" height="52" rx="4" fill="#8a4f1c"/><rect x="53" y="11" width="14" height="13" rx="2" fill="#fff"/>
+</svg>
+<span class="lbl l1">흔들목마파리</span><span class="lbl l2">버터빵나비</span>
+</div>
+</div>
+</section>
+
+<section class="sq l flip" id="s4" data-n="4">
+<span class="num" aria-hidden="true">4</span>
+<div class="txt">
+<p class="kick rv">넷째 칸</p>
+<h2 class="rv" style="--i:1">트위들덤과 트위들디</h2>
+<p class="en">Tweedledum and Tweedledee</p>
+<p class="rv" style="--i:2">거울에 비춘 듯 꼭 닮은 두 형제는 어깨동무를 하고 서서 ‘바다코끼리와 목수’를 끝까지 읊어 줍니다. 그러고는 나무 아래에서 코를 고는 붉은 왕을 가리키지요.</p>
+<p class="rv" style="--i:3">“왕은 지금 네 꿈을 꾸는 중이야. 왕이 깨어나면 넌 — 훅! — 촛불처럼 꺼져 버릴걸.” 앨리스는 울음을 터뜨리지만, 그 눈물이 진짜인지조차 알 수 없습니다.</p>
+<blockquote class="rv" style="--i:4">“반대로 말이지, 그랬다면 그랬을 수도 있고, 그랬다 치면 그랬을 테지만, 그렇지 않으니까 그렇지 않은 거야. 그게 논리지.”<cite>— Tweedledee</cite></blockquote>
+</div>
+<figure class="vis rv" style="--i:2">
+<div class="twins">
+<svg viewBox="0 0 220 160" role="img" aria-label="거울상처럼 마주 선 트위들덤과 트위들디">
+<line x1="110" y1="2" x2="110" y2="156" stroke="#96650f" stroke-width="1" stroke-dasharray="3 5"/>
+<g class="sway"><g id="twin">
+<ellipse cx="55" cy="151" rx="34" ry="5" fill="rgba(23,28,60,.16)"/>
+<rect x="38" y="122" width="12" height="25" rx="5" fill="#fffaf0" stroke="#171c3c" stroke-width="2"/><rect x="60" y="122" width="12" height="25" rx="5" fill="#fffaf0" stroke="#171c3c" stroke-width="2"/>
+<path d="M31 146h21v6H29zM58 146h21l2 6H58z" fill="#171c3c"/>
+<path d="M88 92q13-3 22-12" fill="none" stroke="#b3122e" stroke-width="9" stroke-linecap="round"/>
+<ellipse cx="55" cy="98" rx="37" ry="33" fill="url(#rd)"/>
+<path d="M20 90q35 15 70 0" fill="none" stroke="#fff3c4" stroke-width="3"/>
+<ellipse cx="55" cy="68" rx="27" ry="9" fill="#fff" stroke="#171c3c" stroke-width="1.5"/>
+<circle cx="55" cy="44" r="19" fill="#f6d7b8" stroke="#171c3c" stroke-width="1.5"/>
+<circle cx="48" cy="42" r="2" fill="#171c3c"/><circle cx="63" cy="42" r="2" fill="#171c3c"/>
+<circle cx="43" cy="50" r="3.6" fill="#f08a78" opacity=".6"/><circle cx="68" cy="50" r="3.6" fill="#f08a78" opacity=".6"/>
+<path d="M49 52q7 5 13 0" fill="none" stroke="#171c3c" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M35 34q20-25 40 0z" fill="#171c3c"/><path d="M29 35h28" stroke="#171c3c" stroke-width="5" stroke-linecap="round"/><circle cx="55" cy="20" r="3" fill="#e8c56a"/>
+</g></g>
+<g transform="translate(220 0) scale(-1 1)"><g class="sway"><use href="#twin"/></g></g>
+<g font-family="Cormorant Garamond,Georgia,serif" font-size="8.5" font-weight="700" fill="#171c3c" text-anchor="middle" letter-spacing="1.5"><text x="55.7" y="71">DUM</text><text x="165.7" y="71">DEE</text></g>
+</svg>
+<div class="dream" aria-hidden="true"><svg class="kg"><use href="#king"/></svg><span class="z">z</span><span class="z">z</span><span class="z">z</span><span class="bub"><svg><use href="#pawn"/></svg></span></div>
+</div>
+<figcaption>붉은 왕의 꿈속에서, 앨리스는 촛불처럼 깜빡입니다.</figcaption>
+</figure>
+</section>
+
+<section class="sq d" id="s5" data-n="5">
+<span class="num" aria-hidden="true">5</span>
+<div class="txt">
+<p class="kick rv">다섯째 칸</p>
+<h2 class="rv" style="--i:1">양털과 물</h2>
+<p class="en">Wool and Water</p>
+<p class="rv" style="--i:2">바람에 날려 온 숄을 붙잡자 하얀 여왕이 허둥지둥 달려옵니다. 여왕은 시간을 거꾸로 삽니다. 손가락이 찔리기도 전에 비명을 지르고, 다음다음 주에 일어날 일을 가장 또렷이 기억하지요.</p>
+<p class="rv" style="--i:3">눈 깜짝할 사이 여왕은 뜨개질하는 양이 되고, 가게는 노 젓는 배가 됩니다. 선반 위의 달걀은 다가갈수록 멀어지며 점점 커집니다.</p>
+<blockquote class="rv" style="--i:4">“규칙은 이렇단다. 내일의 잼, 어제의 잼은 있어도 — 오늘의 잼은 절대 없지.”<cite>— The White Queen</cite></blockquote>
+</div>
+<figure class="vis rv" style="--i:2">
+<svg class="clock" viewBox="0 0 200 200" role="img" aria-label="바늘이 거꾸로 도는 거울 나라의 시계">
+<circle cx="100" cy="100" r="97" fill="url(#gg)"/><circle cx="100" cy="100" r="87" fill="#f6f0e2"/>
+<circle cx="100" cy="100" r="76" fill="none" stroke="#96650f" stroke-width="7" stroke-dasharray="2 37.794"/>
+<g fill="#171c3c" font-family="Cormorant Garamond,Georgia,serif" font-size="21" font-weight="700" text-anchor="middle"><text x="100" y="45">XII</text><text x="41" y="107">III</text><text x="100" y="170">VI</text><text x="159" y="107">IX</text></g>
+<g class="hh"><path d="M100 104V58" stroke="#171c3c" stroke-width="6" stroke-linecap="round"/></g>
+<g class="mh"><path d="M100 108V34" stroke="#c2183a" stroke-width="3.5" stroke-linecap="round"/></g>
+<circle cx="100" cy="100" r="6.5" fill="#96650f"/><circle cx="100" cy="100" r="2.5" fill="#fff3c4"/>
+</svg>
+<ul class="jam" aria-label="잼의 규칙"><li><i class="jar full"></i>어제의 잼</li><li><i class="jar"></i>오늘의 잼</li><li><i class="jar full"></i>내일의 잼</li></ul>
+<figcaption>“나는 아침을 먹기도 전에 불가능한 일을 여섯 가지나 믿곤 했단다.”</figcaption>
+</figure>
+</section>
+
+<section class="sq l flip" id="s6" data-n="6">
+<span class="num" aria-hidden="true">6</span>
+<div class="txt">
+<p class="kick rv">여섯째 칸</p>
+<h2 class="rv" style="--i:1">험프티 덤프티</h2>
+<p class="en">Humpty Dumpty</p>
+<p class="rv" style="--i:2">점점 커지던 달걀은 눈과 코와 입이 생기더니, 높고 좁은 담장 위에 다리를 꼬고 앉습니다. 이 달걀 신사는 낱말의 주인입니다. 일을 많이 시킨 낱말에게는 토요일 밤마다 품삯을 더 쳐준다나요.</p>
+<p class="rv" style="--i:3">그는 ‘재버워키’의 어려운 낱말을 척척 풀어 주고, 일 년에 삼백예순네 번이나 받을 수 있는 ‘비생일 선물’을 자랑합니다.</p>
+<blockquote class="rv" style="--i:4">“내가 낱말을 쓰면, 그 낱말은 내가 고른 바로 그 뜻만 의미해 — 더도 말고 덜도 말고.”<cite>— Humpty Dumpty</cite></blockquote>
+</div>
+<div class="vis rv" style="--i:2">
+<div class="hd">
+<button type="button" class="egg" id="egg" aria-label="험프티 덤프티에게 낱말의 뜻 묻기">
+<svg viewBox="0 0 160 204" aria-hidden="true">
+<defs><radialGradient id="eg" cx=".38" cy=".3" r=".85"><stop offset="0" stop-color="#fffef8"/><stop offset=".6" stop-color="#f5e8cb"/><stop offset="1" stop-color="#c9b383"/></radialGradient></defs>
+<path d="M58 178v18M102 178v18" stroke="#171c3c" stroke-width="7" stroke-linecap="round"/><path d="M48 196h16v6H46zM98 196h16l2 6H98z" fill="#171c3c"/>
+<ellipse cx="80" cy="102" rx="62" ry="82" fill="url(#eg)" stroke="#a8925e" stroke-width="1.5"/>
+<path d="M21 128q59 24 118 0" fill="none" stroke="#c2183a" stroke-width="9"/><path d="M80 141l-17-10v21zM80 141l17-10v21z" fill="#c2183a"/><circle cx="80" cy="141" r="5" fill="#7a0d22"/>
+<ellipse cx="60" cy="76" rx="5" ry="7.5" fill="#171c3c"/><ellipse cx="100" cy="76" rx="5" ry="7.5" fill="#171c3c"/><circle cx="62" cy="73" r="1.6" fill="#fff"/><circle cx="102" cy="73" r="1.6" fill="#fff"/>
+<path d="M49 60q11-8 21-1M90 59q10-7 21 1" fill="none" stroke="#171c3c" stroke-width="3" stroke-linecap="round"/>
+<circle cx="46" cy="94" r="7" fill="#f08a78" opacity=".45"/><circle cx="114" cy="94" r="7" fill="#f08a78" opacity=".45"/>
+<path d="M54 100q26 20 52 0" fill="none" stroke="#171c3c" stroke-width="3.5" stroke-linecap="round"/>
+</svg>
+</button>
+<div class="wall" aria-hidden="true"></div>
+<p class="say" id="say" aria-live="polite">달걀 신사를 눌러 낱말의 뜻을 물어보세요.</p>
+</div>
+</div>
+</section>
+
+<section class="sq d" id="s7" data-n="7">
+<span class="num" aria-hidden="true">7</span>
+<div class="txt">
+<p class="kick rv">일곱째 칸</p>
+<h2 class="rv" style="--i:1">사자와 유니콘, 그리고 하얀 기사</h2>
+<p class="en">“It’s My Own Invention”</p>
+<p class="rv" style="--i:2">왕관을 두고 온 마을을 돌며 싸우던 사자와 유니콘은 앨리스를 ‘전설 속 괴물’이라 부르며 건포도 케이크를 내밉니다. 북소리가 숲을 뒤흔들고 지나가면, 일곱째 칸은 고요해집니다.</p>
+<p class="rv" style="--i:3">그때 하얀 기사가 나타납니다. 자꾸만 말에서 떨어지고, 쓸모없는 발명품을 주렁주렁 매단 다정한 기사. 그는 숲 끝 마지막 개울까지 앨리스를 바래다주고, 노을 속에서 오래도록 손을 흔듭니다.</p>
+<blockquote class="rv" style="--i:4">“네가 나를 믿어 준다면, 나도 너를 믿으마. 어때, 공정한 거래지?”<cite>— The Unicorn</cite></blockquote>
+</div>
+<figure class="vis rv" style="--i:2">
+<div class="tour" role="img" aria-label="체스판 위를 L자로 뛰어다니는 하얀 기사">
+<svg class="path" viewBox="0 0 5 5" aria-hidden="true"><polygon points=".5,.5 1.5,2.5 3.5,3.5 4.5,1.5 2.5,.5 .5,1.5 1.5,3.5 3.5,4.5 4.5,2.5 2.5,1.5"/></svg>
+<div class="kn"><svg aria-hidden="true"><use href="#knight"/></svg></div>
+</div>
+<figcaption>앞으로 두 칸, 옆으로 한 칸 — 그리고 꽈당.</figcaption>
+</figure>
+</section>
+
+<section class="sq l flip" id="s8" data-n="8">
+<span class="num" aria-hidden="true">8</span>
+<div class="txt">
+<p class="kick rv">여덟째 칸</p>
+<h2 class="rv" style="--i:1">여왕 앨리스</h2>
+<p class="en">Queen Alice</p>
+<p class="rv" style="--i:2">마지막 개울을 훌쩍 뛰어넘자, 이끼처럼 보드라운 풀밭 위에서 머리에 묵직한 것이 얹힙니다. 황금 왕관. 하얀 졸은 마침내 여왕이 되었습니다.</p>
+<p class="rv" style="--i:3">잔치에서는 양고기가 인사를 하고, 푸딩이 말대꾸를 하고, 촛불이 천장까지 자라납니다. “더는 못 참아!” 앨리스는 붉은 여왕을 붙잡아 흔듭니다. 여왕은 점점 작아지고, 포동포동해지고, 보드라워져서 —</p>
+<blockquote class="rv" style="--i:4">“— 결국, 그건 정말로 새끼 고양이였습니다.”<cite>— Chapter XI · Waking</cite></blockquote>
+</div>
+<div class="vis rv" style="--i:2">
+<div class="coron" role="img" aria-label="황금 왕관을 쓰게 된 하얀 졸, 여왕 앨리스">
+<i class="rays"></i><i class="sp"></i><i class="sp"></i><i class="sp"></i><i class="sp"></i><i class="sp"></i>
+<svg class="cr" aria-hidden="true"><use href="#crown"/></svg>
+<svg class="qa" aria-hidden="true"><use href="#pawn"/></svg>
+</div>
+</div>
+</section>
+
+<section class="sq d fin" id="end" data-n="8">
+<div class="txt">
+<p class="kick rv">깨어나서</p>
+<h2 class="rv" style="--i:1">누가 꿈을 꾸었을까</h2>
+<p class="en">Which Dreamed It?</p>
+<p class="ask rv" style="--i:2">“키티, 꿈을 꾼 건 나였을까, 붉은 왕이었을까?<br>그는 내 꿈의 일부였지만 — 나 역시 그의 꿈의 일부였는걸.”</p>
+<p class="last rv" style="--i:3"><span lang="en">Life, what is it but a dream?</span>삶이란, 꿈이 아니면 무엇일까요.</p>
+<a class="btn again rv" style="--i:4" href="#top">다시 거울 앞으로</a>
+</div>
+</section>
+</main>
+
+<footer class="foot"><p><b>Through the Looking-Glass</b><br>Lewis Carroll · 1871<span>거울 저편에서 보낸 작은 오마주</span></p></footer>
+
+<script>
+(function(){
+'use strict';
+var d=document,root=d.documentElement,rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function all(s){return Array.prototype.slice.call(d.querySelectorAll(s))}
+
+/* ── the file of squares: a pawn that walks, and is crowned on the eighth ── */
+var btns=all('.file button'),piece=d.querySelector('.piece'),use=piece.querySelector('use'),cur=0;
+function place(n,force){
+  if(n===cur&&!force)return;cur=n;
+  btns.forEach(function(b,i){if(i===n-1)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')});
+  var b=btns[n-1];
+  piece.style.transform='translate('+b.offsetLeft+'px,'+b.offsetTop+'px)';
+  use.setAttribute('href',n===8?'#queen':'#pawn');
+  piece.classList.toggle('q',n===8);
+}
+btns.forEach(function(b){b.addEventListener('click',function(){
+  var el=d.getElementById(b.getAttribute('data-to'));
+  if(el)el.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'});
+})});
+place(1);
+
+/* ── reveal on scroll + which square are we on ── */
+var secs=all('.hero,.sq'),hero=d.querySelector('.hero'),heroOn=true;
+if('IntersectionObserver' in window){
+  var rv=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');rv.unobserve(e.target)}})},{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+  secs.forEach(function(s){rv.observe(s)});
+  new IntersectionObserver(function(es){heroOn=es[0].isIntersecting},{threshold:0}).observe(hero);
+}else{secs.forEach(function(s){s.classList.add('in')})}
+var spyQ=false;
+function spy(){
+  spyQ=false;
+  var c=window.innerHeight/2,n=cur||1;
+  for(var i=0;i<secs.length;i++){var b=secs[i].getBoundingClientRect();if(b.top<=c&&b.bottom>c){n=+secs[i].getAttribute('data-n');break}}
+  place(n);
+}
+window.addEventListener('scroll',function(){if(!spyQ){spyQ=true;requestAnimationFrame(spy)}},{passive:true});
+
+/* ── jabberwocky: hold the page up to the glass ── */
+var jab=d.getElementById('jab'),fb=d.getElementById('flip');
+fb.addEventListener('click',function(){
+  var on=jab.classList.toggle('read');
+  fb.setAttribute('aria-pressed',on?'true':'false');
+  fb.textContent=on?'다시 거울 속으로':'거울에 비춰 보기';
+});
+
+/* ── humpty dumpty: master of words ── */
+var egg=d.getElementById('egg'),say=d.getElementById('say'),wi=0,words=[
+['영광','상대를 납작하게 눌러 버리는, 멋들어진 논증'],
+['꿰뚫을 수 없음','그 얘기는 이만하면 됐으니, 이제 뭘 할 건지 말하라는 뜻'],
+['비생일 선물','생일이 아닌 삼백예순네 날에 받는 선물'],
+['미끈낭창한','‘미끈한’과 ‘낭창한’ — 두 뜻을 한 낱말에 접어 넣은 여행 가방 같은 말'],
+['저녁굽이','저녁거리를 굽기 시작하는 오후 네 시']];
+egg.addEventListener('click',function(){
+  var w=words[wi++%words.length],b=d.createElement('b');
+  b.textContent=w[0];say.textContent='';say.appendChild(b);say.appendChild(d.createTextNode(' — '+w[1]));
+  egg.classList.remove('wob');void egg.offsetWidth;egg.classList.add('wob');
+});
+egg.addEventListener('animationend',function(e){if(e.animationName==='wob')egg.classList.remove('wob')});
+
+/* ── drifting motes of silver and gold ── */
+var mc=d.getElementById('motes'),mx=mc.getContext('2d'),P=[],mw=0,mh=0;
+function msize(){
+  var w=window.innerWidth,h=window.innerHeight,r=Math.min(window.devicePixelRatio||1,2),re=w!==mw;
+  mw=w;mh=h;mc.width=Math.round(w*r);mc.height=Math.round(h*r);mx.setTransform(r,0,0,r,0,0);
+  if(re){P=[];var n=Math.round(Math.min(110,w*h/14000));
+    for(var i=0;i<n;i++)P.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.5+.3,v:Math.random()*.16+.04,p:Math.random()*6.283,g:Math.random()<.24})}
+}
+function mdraw(t,move){
+  mx.clearRect(0,0,mw,mh);
+  for(var i=0;i<P.length;i++){var p=P[i];
+    if(move){p.y-=p.v;p.x+=Math.sin(t*.0004+p.p)*.12;if(p.y<-4){p.y=mh+4;p.x=Math.random()*mw}}
+    mx.globalAlpha=Math.max(.06,.38+.46*Math.sin(t*.0012+p.p));
+    mx.fillStyle=p.g?'#f3d488':'#dfe6f6';mx.beginPath();mx.arc(p.x,p.y,p.r,0,6.283);mx.fill()}
+}
+
+/* ── the glass itself: silver mist over a chessboard country (WebGL) ── */
+var gc=d.getElementById('glass'),gl=null,U={},ptr=null,click=[.5,.5],kt=-100;
+var FS='#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n'+
+'uniform vec2 r,m,c;uniform float t,k;'+
+'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}'+
+'float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}'+
+'float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*n(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}'+
+'void main(){float q=min(r.x,r.y);'+
+'vec2 uv=(gl_FragCoord.xy-.5*r)/q,mm=(m-.5*r)/q,cc=(c-.5*r)/q;'+
+'float d=length(uv-mm),dc=length(uv-cc),e=t-k;'+
+'vec2 p=uv+normalize(uv-mm+1e-4)*sin(d*36.-t*4.)*exp(-d*5.5)*.02;'+
+'p+=normalize(uv-cc+1e-4)*sin(dc*34.-e*10.)*exp(-abs(dc-e*.55)*7.)*exp(-e*1.1)*.06;'+
+'vec2 w=p+.5*(vec2(fbm(p*1.7+t*.05),fbm(p*1.7+vec2(5.2,1.3)-t*.045))-.5);'+
+'float f=fbm(w*2.3+t*.035);'+
+'vec2 g=w*4.2;g.y+=t*.06;'+
+'float ch=smoothstep(-.1,.1,sin(g.x*3.14159)*sin(g.y*3.14159));'+
+'vec3 col=mix(vec3(.04,.07,.2),vec3(.6,.69,.9),smoothstep(.2,.8,f));'+
+'col*=.64+.56*ch;'+
+'col+=vec3(.95,.97,1.)*pow(smoothstep(.48,.9,fbm(w*3.6-t*.07)),3.)*.85;'+
+'col+=vec3(1.,.8,.45)*pow(max(0.,1.-d*1.5),3.)*.2;'+
+'col*=1.-.3*dot(uv,uv);'+
+'gl_FragColor=vec4(col,1.);}';
+function mk(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return gl.getShaderParameter(s,gl.COMPILE_STATUS)?s:null}
+try{
+  gl=gc.getContext('webgl',{antialias:false,alpha:false})||gc.getContext('experimental-webgl');
+  if(gl){
+    var vs=mk(gl.VERTEX_SHADER,'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}'),fs=mk(gl.FRAGMENT_SHADER,FS),pr=gl.createProgram();
+    if(!vs||!fs)throw 0;
+    gl.attachShader(pr,vs);gl.attachShader(pr,fs);gl.linkProgram(pr);
+    if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw 0;
+    gl.useProgram(pr);
+    gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+    var loc=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+    ['r','m','c','t','k'].forEach(function(n){U[n]=gl.getUniformLocation(pr,n)});
+  }
+}catch(err){gl=null;gc.style.display='none';hero.style.background='radial-gradient(circle at 50% 45%,#93a4d6,#2a3768 55%,#0a1030)'}
+function gsize(){
+  if(!gl)return;
+  var s=Math.min(window.devicePixelRatio||1,1.5),w=Math.max(1,Math.round(gc.clientWidth*s)),h=Math.max(1,Math.round(gc.clientHeight*s));
+  if(gc.width!==w||gc.height!==h){gc.width=w;gc.height=h;gl.viewport(0,0,w,h)}
+}
+function gdraw(t){
+  var w=gc.width,h=gc.height,px=ptr?ptr[0]:.5+.27*Math.cos(t*.31),py=ptr?ptr[1]:.5+.2*Math.sin(t*.43);
+  gl.uniform2f(U.r,w,h);gl.uniform2f(U.m,px*w,py*h);gl.uniform2f(U.c,click[0]*w,click[1]*h);
+  gl.uniform1f(U.t,t);gl.uniform1f(U.k,kt);gl.drawArrays(gl.TRIANGLES,0,3);
+}
+function norm(e){var b=hero.getBoundingClientRect();return[(e.clientX-b.left)/b.width,1-(e.clientY-b.top)/b.height]}
+var t0=performance.now();
+hero.addEventListener('pointermove',function(e){ptr=norm(e)});
+hero.addEventListener('pointerleave',function(){ptr=null});
+hero.addEventListener('pointerdown',function(e){click=norm(e);kt=(performance.now()-t0)/1000;if(rm&&gl)gdraw(kt)});
+
+function frame(now){
+  var t=(now-t0)/1000;
+  if(gl&&heroOn)gdraw(t);
+  mdraw(now,true);
+  requestAnimationFrame(frame);
+}
+function resize(){msize();gsize();place(cur||1,true);spy();if(rm){if(gl)gdraw(8);mdraw(0,false)}}
+window.addEventListener('resize',resize);
+resize();
+if(!rm)requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
